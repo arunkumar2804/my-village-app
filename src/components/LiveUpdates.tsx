@@ -158,9 +158,14 @@ export default function LiveUpdates() {
                   <ArrowRight size={14} className="route-arrow arrow-bus" />
                   <span>{nextBus.item.to}</span>
                 </div>
-                <div className="bus-departure">
-                  <Clock size={11} />
-                  <span>Departs at {format12h(nextBus.item.departureTime)}</span>
+                <div className="bus-departure" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Clock size={11} />
+                    <span>Departs at {format12h(nextBus.item.departureTime)}</span>
+                  </div>
+                  <span style={{ fontSize: '10px', background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                    {nextBus.item.operator || "Government"}
+                  </span>
                 </div>
               </div>
             </div>

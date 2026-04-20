@@ -213,7 +213,7 @@ function BusCard({ item }: { item: BusTiming }) {
   return (
     <>
       <div className="data-card-title">{item.routeNumber} — {item.from} → {item.to}</div>
-      <div className="data-card-subtitle">Departs at {item.departureTime}</div>
+      <div className="data-card-subtitle">Departs at {item.departureTime} · {item.operator}</div>
       <div className="data-card-meta">
         <span className={`data-chip ${item.isActive ? "active" : "inactive"}`}>
           {item.isActive ? "Active" : "Inactive"}
@@ -332,19 +332,29 @@ function BusForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => voi
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [departureTime, setDepartureTime] = useState("");
+  const [operator, setOperator] = useState("Government");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await store.addBusTiming({ routeNumber, from, to, departureTime, isActive: true });
+    const result = await store.addBusTiming({ routeNumber, from, to, departureTime, operator, isActive: true });
     if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label>Route Number</label>
-        <input className="form-input" placeholder="e.g. 3A" value={routeNumber} onChange={(e) => setRouteNumber(e.target.value)} required />
+      <div className="form-row">
+        <div className="form-group">
+          <label>Route Number</label>
+          <input className="form-input" placeholder="e.g. 3A" value={routeNumber} onChange={(e) => setRouteNumber(e.target.value)} required />
+        </div>
+        <div className="form-group">
+          <label>Operator</label>
+          <select className="form-select" value={operator} onChange={(e) => setOperator(e.target.value)}>
+            <option value="Government">Government (TNSTC)</option>
+            <option value="Private">Private</option>
+          </select>
+        </div>
       </div>
       <div className="form-row">
         <div className="form-group">

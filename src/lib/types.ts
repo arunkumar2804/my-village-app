@@ -9,6 +9,7 @@ export interface BusTiming {
   to: string;
   departureTime: string;
   isActive: boolean;
+  operator: string;
   createdAt: string;
 }
 

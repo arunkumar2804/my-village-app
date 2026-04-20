@@ -82,110 +82,154 @@
   background-color: #f7fbff; /* Slight blue tint background */
 }
 
-/* Cards */
+/* Cards Modern */
 .bus-cards {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.bus-card-detailed {
+.bus-card-modern {
   background: white;
-  border-radius: 20px;
+  border-radius: 24px;
   padding: 16px;
   display: flex;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
   align-items: center;
   gap: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
-.bus-card-detailed:active {
+.bus-card-modern:active {
   transform: scale(0.98);
 }
 
-.bus-card-time-column {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-  min-width: 80px;
-  border-right: 1px dashed rgba(0,0,0,0.1);
-  padding-right: 16px;
+.bus-card-modern::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--primary);
+  border-radius: 24px 0 0 24px;
 }
 
-.time-badge {
-  font-size: 20px;
-  font-weight: 800;
+.bus-route-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
   color: var(--primary);
-  background: rgba(37, 99, 235, 0.1);
-  padding: 6px 12px;
-  border-radius: 10px;
-  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  flex-shrink: 0;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5), 0 4px 10px rgba(99, 102, 241, 0.15);
 }
 
-.route-badge {
-  font-size: 11px;
-  font-weight: 700;
-  color: white;
-  background: var(--secondary);
-  padding: 4px 8px;
-  border-radius: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.bus-card-info-column {
+.bus-card-body {
   flex: 1;
-}
-
-.bus-card-route {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.route-point {
+.bus-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bus-locations {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.node {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.node.start {
-  border: 3px solid #cbd5e1;
-  background: white;
-}
-
-.node.end {
-  border: 3px solid var(--accent);
-  background: white;
-}
-
-.location-name {
-  font-size: 14px;
-  font-weight: 500;
+.from-loc {
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-dark);
 }
 
-.location-name.destination {
-  font-weight: 700;
-  font-size: 16px;
+.to-loc {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
 }
 
-.route-line {
-  position: absolute;
-  width: 2px;
-  height: 20px;
-  background-color: #e2e8f0;
-  margin-left: 4px;
-  margin-top: 14px;
-  z-index: 0;
+.arrow-icon {
+  color: var(--text-light);
+}
+
+.bus-time-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  background: rgba(37, 99, 235, 0.05);
+  padding: 4px 10px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.bus-time-text {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.bus-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px dashed rgba(0,0,0,0.08);
+  padding-top: 12px;
+}
+
+.operator-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.operator-chip.govt {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.operator-chip.private {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.status-chip {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-chip.active::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
 }
 
 /* Empty / Loading States */

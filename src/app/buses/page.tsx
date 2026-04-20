@@ -28,6 +28,16 @@ export default function BusSchedules() {
       b.routeNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  function format12h(timeStr: string) {
+    if (!timeStr) return "";
+    const [hStr, mStr] = timeStr.split(":");
+    let h = parseInt(hStr, 10);
+    const m = parseInt(mStr || "0", 10);
+    const ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12 || 12;
+    return `${h}:${m.toString().padStart(2, "0")} ${ampm}`;
+  }
+
   return (
     <div className="buses-page">
       <header className="buses-header">
@@ -67,27 +77,29 @@ export default function BusSchedules() {
         ) : (
           <div className="bus-cards">
             {filteredBuses.map((bus) => (
-              <div key={bus.id} className="bus-card-detailed">
-                <div className="bus-card-time-column">
-                  <div className="time-badge">
-                    {bus.departureTime}
-                  </div>
-                  <div className="route-badge">
-                    Route {bus.routeNumber}
-                  </div>
+              <div key={bus.id} className="bus-card-modern">
+                <div className="bus-route-circle">
+                  <span>{bus.routeNumber}</span>
                 </div>
 
-                <div className="bus-card-info-column">
-                  <div className="bus-card-route">
-                    <div className="route-point">
-                      <div className="node start"></div>
-                      <span className="location-name">{bus.from}</span>
+                <div className="bus-card-body">
+                  <div className="bus-main-info">
+                    <div className="bus-locations">
+                      <span className="from-loc">{bus.from}</span>
+                      <ArrowRight size={14} className="arrow-icon" />
+                      <span className="to-loc">{bus.to}</span>
                     </div>
-                    <div className="route-line"></div>
-                    <div className="route-point">
-                      <div className="node end"></div>
-                      <span className="location-name destination">{bus.to}</span>
+                    <div className="bus-time-wrapper">
+                      <Clock size={14} className="time-icon" />
+                      <span className="bus-time-text">{format12h(bus.departureTime)}</span>
                     </div>
+                  </div>
+                  
+                  <div className="bus-card-footer">
+                    <span className={`operator-chip ${bus.operator === "Private" ? "private" : "govt"}`}>
+                      {bus.operator || "Government"}
+                    </span>
+                    <span className="status-chip active">On Schedule</span>
                   </div>
                 </div>
               </div>

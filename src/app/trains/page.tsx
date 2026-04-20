@@ -64,7 +64,7 @@ export default function TrainSchedules() {
     } catch (e: any) {
       console.warn("Falling back to Supabase database:", e.message);
       setIsLiveApi(false);
-      setErrorObj("Live API key requested. Showing scheduled village timetable instead.");
+      setErrorObj(`API Error: ${e.message}. Showing scheduled village timetable instead.`);
       const dbTrains = await getTrainTimings();
       setTrains(dbTrains.filter((t) => t.isActive));
     } finally {

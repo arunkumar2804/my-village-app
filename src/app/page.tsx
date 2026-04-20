@@ -49,7 +49,7 @@ export default function Home() {
       <header className="location-header">
         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           {userName && (
-            <div style={{ fontSize: "12px", color: "var(--text-light)", fontStyle: "italic", marginLeft: "28px" }}>
+            <div style={{ fontSize: "10px", color: "var(--text-light)", fontStyle: "italic", marginLeft: "28px" }}>
               Welcome {userName},
             </div>
           )}

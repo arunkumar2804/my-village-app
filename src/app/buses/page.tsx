@@ -24,8 +24,8 @@ export default function BusSchedules() {
 
   const filteredBuses = buses.filter(
     (b) =>
-      b.to.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.routeNumber.toLowerCase().includes(searchQuery.toLowerCase())
+      b?.to?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b?.routeNumber?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   function format12h(timeStr: string) {

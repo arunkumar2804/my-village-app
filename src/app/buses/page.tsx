@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Clock, MapPin, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, MapPin, Search } from "lucide-react";
 import { getBusTimings } from "@/lib/store";
 import type { BusTiming } from "@/lib/types";
 import "./buses.css";

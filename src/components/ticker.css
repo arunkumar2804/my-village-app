@@ -49,8 +49,8 @@
 .ticker-scroll {
   display: inline-block;
   white-space: nowrap;
-  /* Starts entirely off-screen right, ends entirely off-screen left */
-  animation: scrollText 15s linear infinite;
+  /* Reduced speed significantly for better readability */
+  animation: scrollText 35s linear infinite;
   padding-left: 100%;
 }
 
@@ -65,14 +65,14 @@
 }
 
 .ticker-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-dark);
   margin-right: 6px;
 }
 
 .ticker-desc {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-light);
   font-weight: 500;
 }

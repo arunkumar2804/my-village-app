@@ -16,6 +16,8 @@ import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import LiveUpdates from "@/components/LiveUpdates";
 
+import AnnouncementTicker from "@/components/AnnouncementTicker";
+
 export default function Home() {
   const services = [
     { iconSrc: "/icons/bus-icon.svg", label: "Bus Schedules", link: "/buses" },
@@ -47,6 +49,9 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Announcements */}
+      <AnnouncementTicker />
 
       {/* Services Grid */}
       <div className="service-grid">

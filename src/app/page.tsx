@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   MapPin,
   Sun,
@@ -15,10 +16,22 @@ import Image from "next/image";
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import LiveUpdates from "@/components/LiveUpdates";
-
 import AnnouncementTicker from "@/components/AnnouncementTicker";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
+  const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+       if (data.session?.user?.user_metadata?.full_name) {
+          setUserName(data.session.user.user_metadata.full_name.split(" ")[0]);
+       } else if (data.session?.user?.email) {
+          setUserName(data.session.user.email.split("@")[0]);
+       }
+    });
+  }, []);
+
   const services = [
     { iconSrc: "/icons/bus-icon.svg", label: "Bus Schedules", link: "/buses" },
     { iconSrc: "/icons/train-icon.svg", label: "Train Schedules", link: "/trains" },
@@ -34,9 +47,16 @@ export default function Home() {
     <main className="scroll-area">
       {/* Header */}
       <header className="location-header">
-        <div className="location-title">
-          <MapPin size={20} />
-          <h1 className="village-name">Panaimarathupalayam</h1>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          {userName && (
+            <div style={{ fontSize: "12px", color: "var(--text-light)", fontStyle: "italic", marginLeft: "28px" }}>
+              Welcome {userName},
+            </div>
+          )}
+          <div className="location-title">
+            <MapPin size={20} />
+            <h1 className="village-name">Panaimarathupalayam</h1>
+          </div>
         </div>
         <div className="badge-container">
           <div className="badge live">

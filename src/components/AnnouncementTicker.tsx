@@ -19,7 +19,7 @@ export default function AnnouncementTicker() {
   if (loading) return null;
 
   return (
-    <div className="ticker-wrapper">
+    <div className={`ticker-wrapper ${announcements.length === 0 ? "disabled" : ""}`}>
       <div className="ticker-icon">
         <Megaphone size={16} />
       </div>

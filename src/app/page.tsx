@@ -12,12 +12,13 @@ import {
   Megaphone
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import LiveUpdates from "@/components/LiveUpdates";
 
 export default function Home() {
   const services = [
-    { iconSrc: "/icons/bus-icon.svg", label: "Bus Schedules" },
+    { iconSrc: "/icons/bus-icon.svg", label: "Bus Schedules", link: "/buses" },
     { iconSrc: "/icons/train-icon.svg", label: "Train Schedules" },
     { iconSrc: "/icons/water-tap-icon.svg", label: "Water timings" },
     { iconSrc: "/icons/panchayat-icon.svg", label: "Panchayat" },
@@ -49,16 +50,28 @@ export default function Home() {
 
       {/* Services Grid */}
       <div className="service-grid">
-        {services.map((service, index) => (
-          <div key={index} className="service-item">
-            <div className="service-icon-box">
-              <div style={{ position: 'relative', width: 28, height: 28 }}>
-                <Image src={service.iconSrc} alt={service.label} fill style={{ objectFit: 'contain' }} />
+        {services.map((service, index) => {
+          const Content = (
+            <>
+              <div className="service-icon-box">
+                <div style={{ position: 'relative', width: 28, height: 28 }}>
+                  <Image src={service.iconSrc} alt={service.label} fill style={{ objectFit: 'contain' }} />
+                </div>
               </div>
+              <span className="service-label">{service.label}</span>
+            </>
+          );
+          
+          return service.link ? (
+            <Link href={service.link} key={index} className="service-item" style={{ textDecoration: 'none' }}>
+              {Content}
+            </Link>
+          ) : (
+            <div key={index} className="service-item">
+              {Content}
             </div>
-            <span className="service-label">{service.label}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Live Updates */}

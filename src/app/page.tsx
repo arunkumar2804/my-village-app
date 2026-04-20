@@ -1,66 +1,70 @@
+import React from "react";
+import {
+  MapPin,
+  Sun,
+  Bus,
+  TrainFront,
+  Droplets,
+  Landmark,
+  Calendar,
+  Waves,
+  Store,
+  Megaphone
+} from "lucide-react";
 import Image from "next/image";
-import styles from "./page.module.css";
+import BottomNav from "@/components/BottomNav";
+import LiveUpdates from "@/components/LiveUpdates";
 
 export default function Home() {
+  const services = [
+    { iconSrc: "/icons/bus-icon.svg", label: "Bus Schedules" },
+    { iconSrc: "/icons/train-icon.svg", label: "Train Schedules" },
+    { iconSrc: "/icons/water-tap-icon.svg", label: "Water timings" },
+    { iconSrc: "/icons/panchayat-icon.svg", label: "Panchayat" },
+    { iconSrc: "/icons/events-icon.svg", label: "Events" },
+    { iconSrc: "/icons/canal-icon.svg", label: "PAP Canal info" },
+    { iconSrc: "/icons/ration-icon.svg", label: "Ration Store" },
+    { iconSrc: "/icons/announcement-icon.svg", label: "Announcements" },
+  ];
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="scroll-area">
+      {/* Header */}
+      <header className="location-header">
+        <div className="location-title">
+          <MapPin size={20} />
+          <h1 className="village-name">Panaimarathupalayam</h1>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="badge-container">
+          <div className="badge live">
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block', marginRight: '6px' }}></span>
+            Live
+          </div>
+          <div className="badge">
+            <Sun size={14} />
+            33°C
+          </div>
         </div>
-      </main>
-    </div>
+      </header>
+
+      {/* Services Grid */}
+      <div className="service-grid">
+        {services.map((service, index) => (
+          <div key={index} className="service-item">
+            <div className="service-icon-box">
+              <div style={{ position: 'relative', width: 28, height: 28 }}>
+                <Image src={service.iconSrc} alt={service.label} fill style={{ objectFit: 'contain' }} />
+              </div>
+            </div>
+            <span className="service-label">{service.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Live Updates */}
+      <LiveUpdates />
+
+      <BottomNav />
+    </main>
   );
 }

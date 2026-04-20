@@ -335,7 +335,8 @@ function BusForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => voi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await store.addBusTiming({ routeNumber, from, to, departureTime, isActive: true });
+    const result = await store.addBusTiming({ routeNumber, from, to, departureTime, isActive: true });
+    if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
 
@@ -377,7 +378,8 @@ function TrainForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => v
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await store.addTrainTiming({ trainName, trainNumber, from, to, departureTime, nearbyStation, isActive: true });
+    const result = await store.addTrainTiming({ trainName, trainNumber, from, to, departureTime, nearbyStation, isActive: true });
+    if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
 
@@ -430,7 +432,8 @@ function WaterForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => v
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await store.addWaterUpdate({ session, zone, startTime, endTime, durationMins, isActive: true });
+    const result = await store.addWaterUpdate({ session, zone, startTime, endTime, durationMins, isActive: true });
+    if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
 
@@ -479,7 +482,8 @@ function CanalForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => v
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await store.addCanalUpdate({ title, description, status, waterLevel, updatedAt: new Date().toISOString() });
+    const result = await store.addCanalUpdate({ title, description, status, waterLevel, updatedAt: new Date().toISOString() });
+    if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
 
@@ -527,7 +531,8 @@ function AnnouncementForm({ onSaved, onClose }: { onSaved: () => void; onClose: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await store.addAnnouncement({ title, description, priority });
+    const result = await store.addAnnouncement({ title, description, priority });
+    if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
 
@@ -566,7 +571,8 @@ function EventForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => v
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await store.addEvent({ title, description, date, time, location });
+    const result = await store.addEvent({ title, description, date, time, location });
+    if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
 

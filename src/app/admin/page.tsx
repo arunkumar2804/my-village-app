@@ -10,6 +10,7 @@ import type {
   CanalUpdate,
   Announcement,
   VillageEvent,
+  Profile,
   DataCategory,
 } from "@/lib/types";
 import * as store from "@/lib/store";
@@ -22,6 +23,7 @@ const TABS: { key: DataCategory; label: string; emoji: string }[] = [
   { key: "canal", label: "Canal", emoji: "🌊" },
   { key: "announcement", label: "Announce", emoji: "📢" },
   { key: "event", label: "Events", emoji: "📅" },
+  { key: "users", label: "Users", emoji: "👥" },
 ];
 
 export default function AdminPage() {
@@ -66,10 +68,12 @@ export default function AdminPage() {
       {/* ─── Content ─── */}
       <div className="admin-content">
         <div className="admin-section-header">
-          <h2>{TABS.find((t) => t.key === activeTab)?.emoji} {TABS.find((t) => t.key === activeTab)?.label} Timings</h2>
-          <button className="btn-add" onClick={() => setShowForm(true)}>
-            + Add
-          </button>
+          <h2>{TABS.find((t) => t.key === activeTab)?.emoji} {TABS.find((t) => t.key === activeTab)?.label} {activeTab === "users" ? "Directory" : "Timings"}</h2>
+          {activeTab !== "users" && (
+            <button className="btn-add" onClick={() => setShowForm(true)}>
+              + Add
+            </button>
+          )}
         </div>
 
         <DataList category={activeTab} refreshKey={refreshKey} onRefresh={refresh} onToast={showToast} />
@@ -105,6 +109,7 @@ function TabCount({ category, refreshKey }: { category: DataCategory; refreshKey
         canal: store.getCanalUpdates,
         announcement: store.getAnnouncements,
         event: store.getEvents,
+        users: store.getAllProfiles,
       };
       const items = await counts[category]();
       if (active) setCount(items.length);
@@ -143,6 +148,7 @@ function DataList({
         canal: store.getCanalUpdates,
         announcement: store.getAnnouncements,
         event: store.getEvents,
+        users: store.getAllProfiles,
       };
       const data = await loaders[category]();
       if (active) setItems(data);
@@ -195,9 +201,12 @@ function DataList({
             {category === "canal" && <CanalCard item={item as CanalUpdate} />}
             {category === "announcement" && <AnnouncementCard item={item as Announcement} />}
             {category === "event" && <EventCard item={item as VillageEvent} />}
+            {category === "users" && <UserCard item={item as Profile} />}
           </div>
           <div className="data-card-actions">
-            <button className="btn-icon delete" title="Delete" onClick={() => handleDelete(item.id)}>🗑</button>
+            {category !== "users" && (
+              <button className="btn-icon delete" title="Delete" onClick={() => handleDelete(item.id)}>🗑</button>
+            )}
           </div>
         </div>
       ))}
@@ -208,6 +217,21 @@ function DataList({
 // ═══════════════════════════════════════════
 // Individual Card Renderers
 // ═══════════════════════════════════════════
+
+function UserCard({ item }: { item: Profile }) {
+  return (
+    <>
+      {item.avatar_url && (
+        <img src={item.avatar_url} alt="Av" style={{width: 32, height: 32, borderRadius: '50%', marginBottom: 8}} />
+      )}
+      <div className="data-card-title">{item.full_name}</div>
+      <div className="data-card-subtitle">{item.email}</div>
+      <div className="data-card-meta">
+        <span className="data-chip active" style={{fontSize: 12}}>📞 {item.phone_number}</span>
+      </div>
+    </>
+  );
+}
 
 function BusCard({ item }: { item: BusTiming }) {
   return (

@@ -116,3 +116,27 @@ export async function addEvent(data: Omit<VillageEvent, "id" | "createdAt">): Pr
 export async function deleteEvent(id: string): Promise<void> {
   await supabase.from("events").delete().eq("id", id);
 }
+
+// ─── Profiles ───
+import type { Profile } from "./types";
+
+export async function getProfile(id: string): Promise<Profile | null> {
+  const { data, error } = await supabase.from("profiles").select("*").eq("id", id).single();
+  if (error) return null;
+  return data as Profile;
+}
+
+export async function upsertProfile(profile: Profile): Promise<Profile | null> {
+  const { data, error } = await supabase.from("profiles").upsert(profile).select().single();
+  if (error) {
+    console.error("Error creating profile", error);
+    return null;
+  }
+  return data as Profile;
+}
+
+export async function getAllProfiles(): Promise<Profile[]> {
+  const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+  if (error) return [];
+  return data as Profile[];
+}

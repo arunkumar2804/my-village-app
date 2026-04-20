@@ -70,4 +70,14 @@ export type DataCategory =
   | "water"
   | "canal"
   | "announcement"
-  | "event";
+  | "event"
+  | "users";
+
+export interface Profile {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url: string;
+  phone_number: string | null;
+  created_at?: string;
+}

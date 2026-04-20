@@ -19,7 +19,7 @@ import LiveUpdates from "@/components/LiveUpdates";
 export default function Home() {
   const services = [
     { iconSrc: "/icons/bus-icon.svg", label: "Bus Schedules", link: "/buses" },
-    { iconSrc: "/icons/train-icon.svg", label: "Train Schedules" },
+    { iconSrc: "/icons/train-icon.svg", label: "Train Schedules", link: "/trains" },
     { iconSrc: "/icons/water-tap-icon.svg", label: "Water timings" },
     { iconSrc: "/icons/panchayat-icon.svg", label: "Panchayat" },
     { iconSrc: "/icons/events-icon.svg", label: "Events" },

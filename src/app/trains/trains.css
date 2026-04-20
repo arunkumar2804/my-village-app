@@ -1,0 +1,290 @@
+.trains-page {
+  min-height: 100vh;
+  background-color: var(--background);
+  display: flex;
+  flex-direction: column;
+}
+
+.trains-header {
+  background: white;
+  padding: 16px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-top h1 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.back-button {
+  color: var(--text-dark);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-left: -8px;
+}
+
+.refresh-button {
+  color: var(--primary);
+  background: rgba(37, 99, 235, 0.1);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.refresh-button .spin {
+  animation: spin 1s linear infinite;
+}
+
+.connection-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.connection-strip.live {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.connection-strip.fallback {
+  background: #fdf2f8;
+  color: #db2777;
+}
+
+.api-warning {
+  background: #fffbeb;
+  color: #b45309;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #fde68a;
+}
+
+.trains-content {
+  padding: 20px;
+  flex: 1;
+  background-color: #f8fafc; /* neutral cool tint */
+}
+
+/* CARDS */
+.train-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.train-card-modern {
+  background: white;
+  border-radius: 24px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.train-card-modern::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #f97316; /* Indian Railways Orange */
+  border-radius: 24px 0 0 24px;
+}
+
+.train-route-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.train-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.train-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.train-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.train-num-badge {
+  background: #1e293b;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.train-name-text {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.train-locations {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  margin-left: 2px;
+}
+
+.station-node {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.node-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #94a3b8;
+  z-index: 1;
+}
+
+.station-node.endpoint .node-dot {
+  background: #f97316;
+  border: 2px solid white;
+  width: 10px;
+  height: 10px;
+  margin-left: -1px;
+}
+
+.station-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.track-connector {
+  position: absolute;
+  left: 3px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: repeating-linear-gradient(to bottom, #cbd5e1 0, #cbd5e1 4px, transparent 4px, transparent 8px);
+}
+
+.train-time-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ea580c;
+  background: #fff7ed;
+  padding: 4px 10px;
+  border-radius: 8px;
+  width: fit-content;
+  margin-top: 4px;
+}
+
+.train-time-text {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.train-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px dashed rgba(0,0,0,0.08);
+  padding-top: 12px;
+}
+
+.platform-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.status-chip {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-chip.active::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.status-chip.delayed {
+  color: #ef4444;
+}
+
+.status-chip.delayed::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ef4444;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -7,47 +7,62 @@ import { getTrainTimings } from "@/lib/store";
 import type { TrainTiming } from "@/lib/types";
 import "./trains.css";
 
-// Example interface for Indian Rail API response
-interface LiveTrainData {
-  TrainNo: string;
-  TrainName: string;
-  Source: string;
-  Destination: string;
-  ExpectedArrival: string;
-  ExpectedDeparture: string;
-  Delay: string;
+// Interface for RailRadar API response
+interface RailRadarTrain {
+  train: {
+    number: string;
+    name: string;
+    source: { code: string; name: string };
+    destination: { code: string; name: string };
+  };
+  live: {
+    expectedArrival: string;
+    expectedDeparture: string;
+    arrivalDelayDisplay: string;
+    departureDelayDisplay: string;
+  };
+  status: {
+    isCancelled: boolean;
+    hasDeparted: boolean;
+  };
+  platform: string;
 }
 
 export default function TrainSchedules() {
-  const [trains, setTrains] = useState<(TrainTiming | LiveTrainData)[]>([]);
+  const [trains, setTrains] = useState<(TrainTiming | RailRadarTrain)[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorObj, setErrorObj] = useState<string | null>(null);
   const [isLiveApi, setIsLiveApi] = useState(true);
 
-  const fetchIndianRailwaysLiveAPI = async () => {
+  const fetchRailRadarLiveAPI = async () => {
     try {
       setLoading(true);
       setErrorObj(null);
       
-      // Get your API Key from environment variables (fallback logic to avoid crashing)
-      const apiKey = process.env.NEXT_PUBLIC_RAIL_API_KEY;
+      const apiKey = process.env.NEXT_PUBLIC_RAIL_RADAR_KEY;
       if (!apiKey) {
-        throw new Error("Missing NEXT_PUBLIC_RAIL_API_KEY");
+        throw new Error("Missing NEXT_PUBLIC_RAIL_RADAR_KEY");
       }
 
-      const res = await fetch(`https://indianrailapi.com/api/v2/livestation/apikey/${apiKey}/stationcode/GMGM/hours/4/`);
+      // Using the RailRadar endpoint
+      const res = await fetch("https://api.railradar.org/api/v1/stations/GMGM/live?hours=8", {
+        headers: {
+          "x-api-key": apiKey
+        }
+      });
+      
       if (!res.ok) throw new Error("API Connection Failed");
 
       const data = await res.json();
-      if (data.ResponseCode === "200" && data.Trains) {
-        setTrains(data.Trains);
+      if (data && data.trains) {
+        // Filter out trains that don't have expected time
+        setTrains(data.trains);
         setIsLiveApi(true);
       } else {
-        throw new Error(data.Message || "No live trains available");
+        throw new Error(data.message || "No live trains available");
       }
     } catch (e: any) {
       console.warn("Falling back to Supabase database:", e.message);
-      // Fallback to Supabase
       setIsLiveApi(false);
       setErrorObj("Live API key requested. Showing scheduled village timetable instead.");
       const dbTrains = await getTrainTimings();
@@ -58,29 +73,34 @@ export default function TrainSchedules() {
   };
 
   useEffect(() => {
-    fetchIndianRailwaysLiveAPI();
+    fetchRailRadarLiveAPI();
   }, []);
 
   function format12h(timeStr: string) {
     if (!timeStr) return "";
     const [hStr, mStr] = timeStr.split(":");
+    if (!hStr || !mStr) return timeStr;
     let h = parseInt(hStr, 10);
     const m = parseInt(mStr || "0", 10);
+    if (isNaN(h)) return timeStr; // For things like "10:00" from API
     const ampm = h >= 12 ? "PM" : "AM";
     h = h % 12 || 12;
     return `${h}:${m.toString().padStart(2, "0")} ${ampm}`;
   }
 
-  // Render a Train object from either Supabase (TrainTiming) or API (LiveTrainData)
   const renderTrainCard = (train: any, idx: number) => {
-    // If it comes from API:
-    const isApi = "TrainNo" in train;
-    const trainNumber = isApi ? train.TrainNo : train.trainNumber;
-    const trainName = isApi ? train.TrainName : train.trainName;
-    const fromLoc = isApi ? train.Source : train.from;
-    const toLoc = isApi ? train.Destination : train.to;
-    const time = isApi ? train.ExpectedDeparture || train.ScheduleDeparture : train.departureTime;
-    const delay = isApi ? train.Delay : null;
+    const isApi = "live" in train;
+    const trainNumber = isApi ? train.train.number : train.trainNumber;
+    const trainName = isApi ? train.train.name : train.trainName;
+    const fromLoc = isApi ? train.train.source?.name : train.from;
+    const toLoc = isApi ? train.train.destination?.name : train.to;
+    
+    // For live API use expectedDeparture (or expectedArrival if destination)
+    const time = isApi ? (train.live.expectedDeparture || train.live.expectedArrival) : train.departureTime;
+    
+    const delay = isApi ? train.live.departureDelayDisplay || train.live.arrivalDelayDisplay : null;
+    const isCancelled = isApi ? train.status.isCancelled : false;
+    const platform = isApi ? train.platform : "N/A";
 
     return (
       <div key={train.id || idx} className="train-card-modern">
@@ -109,15 +129,17 @@ export default function TrainSchedules() {
             
             <div className="train-time-wrapper">
               <Clock size={14} className="time-icon" />
-              <span className="train-time-text">{format12h(time)}</span>
+              <span className="train-time-text">{isApi && typeof time === "string" && !time.includes(":") ? time : format12h(time)}</span>
             </div>
           </div>
           
           <div className="train-card-footer">
-            <span className="platform-chip">Gomangalam (GMGM)</span>
+            <span className="platform-chip">Platform {platform || "?"}</span>
             
-            {delay && delay !== "On Time" && delay !== "0" && delay !== "" ? (
-              <span className="status-chip delayed">Delayed {delay} mins</span>
+            {isCancelled ? (
+              <span className="status-chip delayed" style={{color: '#dc2626'}}>Cancelled</span>
+            ) : delay && delay !== "On Time" && delay !== "0" && delay !== "" && delay !== "RT" && delay !== "Right Time" ? (
+              <span className="status-chip delayed">Delayed {delay}</span>
             ) : (
               <span className="status-chip active">On Time</span>
             )}
@@ -135,16 +157,15 @@ export default function TrainSchedules() {
             <ArrowLeft size={24} />
           </Link>
           <h1>Train Schedules</h1>
-          <button className="refresh-button" onClick={fetchIndianRailwaysLiveAPI}>
+          <button className="refresh-button" onClick={fetchRailRadarLiveAPI}>
             <RefreshCw size={18} className={loading ? "spin" : ""} />
           </button>
         </div>
       </header>
 
-      {/* API Warning / Live Status Strip */}
       <div className={`connection-strip ${isLiveApi ? "live" : "fallback"}`}>
         {isLiveApi ? (
-          <><TrainFront size={14} /> LIVE: Indian Railways GMGM Station Data</>
+          <><TrainFront size={14} /> LIVE: RailRadar Connected (GMGM Station)</>
         ) : (
           <><AlertCircle size={14} /> Offline: Showing local standard timetable</>
         )}
@@ -161,13 +182,13 @@ export default function TrainSchedules() {
         {loading ? (
           <div className="loading-state">
             <div className="spinner"></div>
-            <p>Fetching Gomangalam Station...</p>
+            <p>Scanning Gomangalam Station...</p>
           </div>
         ) : trains.length === 0 ? (
           <div className="empty-state">
             <div className="empty-emoji">🚆</div>
             <h3>No trains right now</h3>
-            <p>Gomangalam station is currently clear for the next 4 hours.</p>
+            <p>Gomangalam station is currently clear for the next 8 hours.</p>
           </div>
         ) : (
           <div className="train-cards">

@@ -31,38 +31,45 @@ export default function RationPage() {
       </header>
 
       <main className="ration-content scroll-area">
-        <section className="ration-card info-card">
-          <h2 className="card-heading">
-            <Store size={18} className="heading-icon" /> Shop Profile
-          </h2>
-          <div className="info-grid">
-            <div className="info-item full-width">
-              <span className="info-label">Shop Name</span>
-              <span className="info-value">Roja Msuk Panamarathupalayam</span>
+        <section className="ration-card profile-card-modern">
+          <div className="profile-header-modern">
+            <div className="shop-avatar">
+              <Store size={32} color="var(--card-bg)" />
             </div>
-            <div className="info-item">
-              <span className="info-label"><Hash size={14} className="inline-icon"/> Code</span>
-              <span className="info-value">31GW006P1</span>
+            <div className="shop-title-wrapper">
+              <span className="shop-badge">Part Time (SHG)</span>
+              <h2 className="shop-modern-name">Roja Msuk Panamarathupalayam</h2>
+              <span className="shop-code"><Hash size={12}/> 31GW006P1</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">Type & Agency</span>
-              <span className="info-value">Part Time (SHG)</span>
+          </div>
+
+          <div className="profile-details-modern">
+            <div className="detail-pill">
+              <User size={18} className="pill-icon" />
+              <div>
+                <div className="pill-label">Incharge</div>
+                <div className="pill-val">Manimekalai</div>
+              </div>
             </div>
-            <div className="info-item full-width">
-              <span className="info-label"><User size={14} className="inline-icon"/> Incharge</span>
-              <span className="info-value">Manimekalai</span>
+            <div className="detail-pill">
+              <Phone size={18} className="pill-icon" />
+              <div>
+                <div className="pill-label">Contact</div>
+                <div className="pill-val">90XXXXXX57</div>
+              </div>
             </div>
-            <div className="info-item full-width">
-              <span className="info-label"><Phone size={14} className="inline-icon"/> Contact</span>
-              <span className="info-value">90XXXXXX57</span>
-            </div>
-            <div className="info-item full-width">
-              <span className="info-label"><MapPin size={14} className="inline-icon"/> Address</span>
-              <span className="info-value">Near Vinayagar Kovil, Panamarathupalayam, Pollachi (Tk), Coimbatore - 642107</span>
-            </div>
-            <div className="info-item full-width">
-              <span className="info-label"><Clock size={14} className="inline-icon"/> Operating Hours</span>
-              <span className="info-value">Morning: 09:00 AM - 01:00 PM<br/>Afternoon: 02:00 PM - 06:00 PM</span>
+          </div>
+
+          <div className="address-box-modern">
+            <MapPin size={20} className="address-icon" />
+            <p>Near Vinayagar Kovil, Panamarathupalayam, Pollachi (Tk), Coimbatore - 642107</p>
+          </div>
+
+          <div className="hours-box-modern">
+            <div className="hours-icon-wrap"><Clock size={16} /></div>
+            <div className="hours-text">
+              <div className="hr-slot"><span>Morning</span> 09:00 AM - 01:00 PM</div>
+              <div className="hr-slot"><span>Afternoon</span> 02:00 PM - 06:00 PM</div>
             </div>
           </div>
         </section>

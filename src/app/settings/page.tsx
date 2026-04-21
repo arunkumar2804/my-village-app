@@ -1,8 +1,23 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import BottomNav from "@/components/BottomNav";
 
 export default function SettingsPage() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   return (
     <main className="scroll-area">
       <div className="settings-page">
@@ -41,6 +56,13 @@ export default function SettingsPage() {
             <div className="settings-row-body">
               <div className="settings-row-title">About</div>
               <div className="settings-row-desc">My Village App v1.0</div>
+            </div>
+          </div>
+          <div className="settings-row" onClick={handleLogout} style={{ cursor: "pointer" }}>
+            <div className="settings-row-icon">🚪</div>
+            <div className="settings-row-body">
+              <div className="settings-row-title" style={{ color: "var(--danger, #ef4444)" }}>Log Out</div>
+              <div className="settings-row-desc">Sign out of your account</div>
             </div>
           </div>
         </div>

@@ -25,6 +25,7 @@ export const metadata: Metadata = {
 };
 
 import AuthGuard from "@/components/AuthGuard";
+import InstallPrompt from "@/components/InstallPrompt";
 
 export default function RootLayout({
   children,
@@ -34,9 +35,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <AuthGuard>
-          {children}
-        </AuthGuard>
+        <InstallPrompt>
+          <AuthGuard>
+            {children}
+          </AuthGuard>
+        </InstallPrompt>
       </body>
     </html>
   );

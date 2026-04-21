@@ -58,6 +58,10 @@ export default function SettingsPage() {
               <div className="settings-row-desc">My Village App v1.0</div>
             </div>
           </div>
+        </div>
+
+        <div className="settings-group">
+          <div className="settings-group-label">Account</div>
           <div className="settings-row" onClick={handleLogout} style={{ cursor: "pointer" }}>
             <div className="settings-row-icon">🚪</div>
             <div className="settings-row-body">
@@ -66,6 +70,8 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+
+        <div style={{ height: "80px" }}></div>
       </div>
       <BottomNav />
     </main>

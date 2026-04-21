@@ -3,7 +3,9 @@
   --background: #f1f5f9;
   --foreground: #111827;
   --text-muted: #6b7280;
-  --card-bg: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-blur: blur(16px);
   --accent-green: #dcfce7;
   --accent-green-text: #166534;
   
@@ -30,7 +32,8 @@
   :root {
     --background: #0f172a;
     --foreground: #f8fafc;
-    --card-bg: #1e293b;
+    --card-bg: rgba(30, 41, 59, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.08);
     --text-muted: #94a3b8;
     --accent-green: #064e3b;
     --accent-green-text: #34d399;
@@ -63,10 +66,18 @@ html, body {
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #e0f2fe 0%, #f1f5f9 40%, #dcfce7 100%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #064e3b 100%);
+    background-attachment: fixed;
+  }
 }
 
 .app-container {
@@ -153,11 +164,14 @@ body {
   width: 64px;
   height: 64px;
   background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.1s ease;
 }
 
@@ -186,9 +200,12 @@ body {
 
 .update-card {
   background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -713,6 +730,10 @@ body {
   gap: 14px;
   padding: 14px 16px;
   background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--glass-border);
+  border-right: 1px solid var(--glass-border);
   border-radius: 16px;
   margin-bottom: 2px;
   text-decoration: none;
@@ -723,15 +744,18 @@ body {
 
 .settings-row:first-of-type {
   border-radius: 16px 16px 4px 4px;
+  border-top: 1px solid var(--glass-border);
 }
 
 .settings-row:last-of-type {
   border-radius: 4px 4px 16px 16px;
   margin-bottom: 0;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .settings-row:only-of-type {
   border-radius: 16px;
+  border: 1px solid var(--glass-border);
 }
 
 .settings-row:active {

@@ -1,13 +1,15 @@
 .ticker-wrapper {
   display: flex;
   align-items: center;
-  background: white;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
   /* Top Negative to close the gap to header, Bottom to push the grid down */
   margin: -16px 0 28px 0;
   padding: 8px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
 
 .ticker-icon {

@@ -660,6 +660,77 @@ function LocationForm({ onSaved, onClose }: { onSaved: () => void; onClose: () =
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
   const [description, setDescription] = useState("");
+  const [map, setMap] = useState<any>(null);
+  const [marker, setMarker] = useState<any>(null);
+
+  const villageCenter: [number, number] = [10.6049693, 77.1235782];
+
+  useEffect(() => {
+    // Load Leaflet CSS
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(link);
+
+    // Load Leaflet JS
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    script.async = true;
+    script.onload = () => {
+      const L = (window as any).L;
+      if (!L) return;
+
+      const leafletMap = L.map("map-picker-container", {
+        center: villageCenter,
+        zoom: 16,
+        zoomControl: true,
+        attributionControl: false
+      });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+      }).addTo(leafletMap);
+
+      leafletMap.on('click', (e: any) => {
+        const { lat, lng } = e.latlng;
+        setLat(lat.toFixed(7));
+        setLng(lng.toFixed(7));
+      });
+
+      setMap(leafletMap);
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      link.remove();
+      script.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const L = (window as any).L;
+    if (!map || !L || !lat || !lng) return;
+
+    const pLat = parseFloat(lat);
+    const pLng = parseFloat(lng);
+    if (isNaN(pLat) || isNaN(pLng)) return;
+
+    if (marker) {
+      marker.setLatLng([pLat, pLng]);
+    } else {
+      const newMarker = L.marker([pLat, pLng], {
+        draggable: true
+      }).addTo(map);
+      
+      newMarker.on('dragend', (e: any) => {
+        const { lat, lng } = e.target.getLatLng();
+        setLat(lat.toFixed(7));
+        setLng(lng.toFixed(7));
+      });
+
+      setMarker(newMarker);
+    }
+  }, [map, lat, lng]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -687,14 +758,24 @@ function LocationForm({ onSaved, onClose }: { onSaved: () => void; onClose: () =
             <option value="other">Other</option>
           </select>
         </div>
-        <div className="form-group">
-          <label>Latitude</label>
-          <input className="form-input" type="number" step="any" placeholder="10.60..." value={lat} onChange={(e) => setLat(e.target.value)} required />
-        </div>
       </div>
+      
       <div className="form-group">
-        <label>Longitude</label>
-        <input className="form-input" type="number" step="any" placeholder="77.12..." value={lng} onChange={(e) => setLng(e.target.value)} required />
+        <label>Select Location on Map</label>
+        <div className="admin-map-picker">
+          <div className="map-picker-hint">Tap on map or drag marker to set location</div>
+          <div id="map-picker-container" style={{ width: '100%', height: '100%' }}></div>
+        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Latitude</label>
+            <input className="form-input" type="number" step="any" placeholder="Auto-filled" value={lat} onChange={(e) => setLat(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Longitude</label>
+            <input className="form-input" type="number" step="any" placeholder="Auto-filled" value={lng} onChange={(e) => setLng(e.target.value)} required />
+          </div>
+        </div>
       </div>
       <div className="form-group">
         <label>Description (Optional)</label>

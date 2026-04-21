@@ -222,12 +222,12 @@ function UserCard({ item }: { item: Profile }) {
   return (
     <>
       {item.avatar_url && (
-        <img src={item.avatar_url} alt="Av" style={{width: 32, height: 32, borderRadius: '50%', marginBottom: 8}} />
+        <img src={item.avatar_url} alt="Av" style={{ width: 32, height: 32, borderRadius: '50%', marginBottom: 8 }} />
       )}
       <div className="data-card-title">{item.full_name}</div>
       <div className="data-card-subtitle">{item.email}</div>
       <div className="data-card-meta">
-        <span className="data-chip active" style={{fontSize: 12}}>📞 {item.phone_number}</span>
+        <span className="data-chip active" style={{ fontSize: 12 }}>📞 {item.phone_number}</span>
       </div>
     </>
   );
@@ -296,7 +296,7 @@ function CanalCard({ item }: { item: CanalUpdate }) {
 function AnnouncementCard({ item }: { item: Announcement }) {
   return (
     <>
-      <div className="data-card-title" style={{ fontWeight: "normal", fontSize: "14px" }}>{item.description}</div>
+      <div className="data-card-title" style={{ fontWeight: "normal", fontSize: "12px" }}>{item.description}</div>
       <div className="data-card-meta">
         <span className={`data-chip ${item.priority}`}>{item.priority}</span>
       </div>

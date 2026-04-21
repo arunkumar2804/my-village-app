@@ -296,8 +296,7 @@ function CanalCard({ item }: { item: CanalUpdate }) {
 function AnnouncementCard({ item }: { item: Announcement }) {
   return (
     <>
-      <div className="data-card-title">{item.title}</div>
-      <div className="data-card-subtitle">{item.description}</div>
+      <div className="data-card-title" style={{ fontWeight: "normal", fontSize: "14px" }}>{item.description}</div>
       <div className="data-card-meta">
         <span className={`data-chip ${item.priority}`}>{item.priority}</span>
       </div>
@@ -559,23 +558,18 @@ function CanalForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => v
 }
 
 function AnnouncementForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => void }) {
-  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<"normal" | "important" | "urgent">("normal");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await store.addAnnouncement({ title, description, priority });
+    const result = await store.addAnnouncement({ title: "", description, priority });
     if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label>Title</label>
-        <input className="form-input" placeholder="Announcement title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-      </div>
       <div className="form-group">
         <label>Description</label>
         <textarea className="form-textarea" placeholder="Announcement details..." value={description} onChange={(e) => setDescription(e.target.value)} required />

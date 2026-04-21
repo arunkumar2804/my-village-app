@@ -6,6 +6,7 @@ import { Share, PlusSquare, MoreVertical } from "lucide-react";
 export default function InstallPrompt({ children }: { children: React.ReactNode }) {
   const [isStandalone, setIsStandalone] = useState<boolean | null>(null);
   const [isIOS, setIsIOS] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
     // Check if device is iOS
@@ -31,6 +32,13 @@ export default function InstallPrompt({ children }: { children: React.ReactNode 
       setIsStandalone(checkStandalone());
     }
 
+    // Listen for Chrome install prompt
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
     // Optional: listen for display-mode change
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
     const handleChange = (e: MediaQueryListEvent) => {
@@ -46,7 +54,28 @@ export default function InstallPrompt({ children }: { children: React.ReactNode 
       // Fallback for older browsers
       mediaQuery.addListener(handleChange);
     }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleChange);
+      } else {
+        mediaQuery.removeListener(handleChange);
+      }
+    };
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    // Show the native install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    // We optionally clear the prompt if they accepted
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   // Prevent flicker
   if (isStandalone === null) {
@@ -93,6 +122,19 @@ export default function InstallPrompt({ children }: { children: React.ReactNode 
               Select <strong>Add to Home Screen</strong>
               <PlusSquare size={18} style={{ marginLeft: "auto", color: "var(--primary)" }} />
             </p>
+          </div>
+        ) : deferredPrompt ? (
+          <div style={{ textAlign: "center" }}>
+            <button 
+              onClick={handleInstallClick}
+              style={{
+                background: "var(--primary, #10b981)", color: "#fff", border: "none",
+                padding: "16px 32px", fontSize: "16px", fontWeight: "bold", borderRadius: "16px",
+                cursor: "pointer", width: "100%", boxShadow: "0 4px 12px rgba(16, 185, 129, 0.2)"
+              }}
+            >
+              Install App Now
+            </button>
           </div>
         ) : (
           <div style={{ textAlign: "left", background: "var(--background, #f8fafc)", padding: "20px", borderRadius: "16px", border: "1px solid rgba(0,0,0,0.05)" }}>

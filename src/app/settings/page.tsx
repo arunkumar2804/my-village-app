@@ -88,7 +88,9 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div style={{ height: "80px" }}></div>
+        <div style={{ textAlign: "center", marginTop: "32px", marginBottom: "80px", fontSize: "12px", color: "var(--text-muted, rgba(0,0,0,0.5))" }}>
+          Made with ❤️ by Arun Kumar
+        </div>
       </div>
       <BottomNav />
     </main>

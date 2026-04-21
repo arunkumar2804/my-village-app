@@ -1,0 +1,223 @@
+.ration-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--background, #111);
+  color: var(--text, #fff);
+  padding: 16px;
+}
+
+.ration-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  background-color: var(--background, #111);
+  padding-bottom: 16px;
+  z-index: 10;
+  border-bottom: 1px solid var(--border, #333);
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--text, #fff);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button:hover {
+  background-color: var(--card-bg, #222);
+}
+
+.ration-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ration-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.ration-card {
+  background-color: var(--card-bg, #1a1a1a);
+  border: 1px solid var(--border, #333);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--primary, #3b82f6);
+}
+
+.heading-icon {
+  color: var(--primary, #3b82f6);
+}
+
+/* Shop Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inline-icon {
+  vertical-align: text-bottom;
+  margin-right: 4px;
+  color: var(--text-light, #9ca3af);
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: var(--text-light, #9ca3af);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Beneficiary Stats */
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stat-box {
+  flex: 1;
+  background-color: var(--background, #111);
+  border: 1px solid var(--border, #333);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-icon {
+  color: var(--primary, #3b82f6);
+  margin-bottom: 8px;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-text {
+  font-size: 0.8rem;
+  color: var(--text-light, #9ca3af);
+}
+
+.stat-subtext {
+  font-size: 0.8rem;
+  color: var(--text-light, #9ca3af);
+  text-align: center;
+  margin: 0;
+  padding: 8px;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+}
+
+/* Stock List */
+.stock-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border, #333);
+}
+
+.stock-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stock-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  background-color: var(--background, #111);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-right: 12px;
+}
+
+.stock-details {
+  flex: 1;
+}
+
+.stock-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.stock-allocation {
+  font-size: 0.75rem;
+  color: var(--text-light, #9ca3af);
+}
+
+.stock-amount {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+}
+
+.amount-num {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.amount-unit {
+  font-size: 0.75rem;
+}
+
+.stock-in {
+  color: var(--success, #10b981);
+}
+
+.stock-out {
+  color: var(--danger, #ef4444);
+}

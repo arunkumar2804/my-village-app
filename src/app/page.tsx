@@ -39,7 +39,7 @@ export default function Home() {
     { iconSrc: "/icons/panchayat-icon.svg", label: "Panchayat" },
     { iconSrc: "/icons/events-icon.svg", label: "Events" },
     { iconSrc: "/icons/canal-icon.svg", label: "PAP Canal info" },
-    { iconSrc: "/icons/ration-icon.svg", label: "Ration Store" },
+    { iconSrc: "/icons/ration-icon.svg", label: "Ration Store", link: "/ration" },
     { iconSrc: "/icons/announcement-icon.svg", label: "Announcements" },
   ];
 

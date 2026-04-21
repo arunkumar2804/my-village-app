@@ -23,6 +23,7 @@ const TABS: { key: DataCategory; label: string; emoji: string }[] = [
   { key: "canal", label: "Canal", emoji: "🌊" },
   { key: "announcement", label: "Announce", emoji: "📢" },
   { key: "event", label: "Events", emoji: "📅" },
+  { key: "location", label: "Maps", emoji: "📍" },
   { key: "users", label: "Users", emoji: "👥" },
 ];
 
@@ -109,6 +110,7 @@ function TabCount({ category, refreshKey }: { category: DataCategory; refreshKey
         canal: store.getCanalUpdates,
         announcement: store.getAnnouncements,
         event: store.getEvents,
+        location: store.getVillageLocations,
         users: store.getAllProfiles,
       };
       const items = await counts[category]();
@@ -148,6 +150,7 @@ function DataList({
         canal: store.getCanalUpdates,
         announcement: store.getAnnouncements,
         event: store.getEvents,
+        location: store.getVillageLocations,
         users: store.getAllProfiles,
       };
       const data = await loaders[category]();
@@ -166,6 +169,7 @@ function DataList({
       canal: store.deleteCanalUpdate,
       announcement: store.deleteAnnouncement,
       event: store.deleteEvent,
+      location: store.deleteVillageLocation,
     };
     await deleters[category](id);
     onRefresh();
@@ -201,6 +205,7 @@ function DataList({
             {category === "canal" && <CanalCard item={item as CanalUpdate} />}
             {category === "announcement" && <AnnouncementCard item={item as Announcement} />}
             {category === "event" && <EventCard item={item as VillageEvent} />}
+            {category === "location" && <LocationCard item={item as any} />}
             {category === "users" && <UserCard item={item as Profile} />}
           </div>
           <div className="data-card-actions">
@@ -318,6 +323,18 @@ function EventCard({ item }: { item: VillageEvent }) {
   );
 }
 
+function LocationCard({ item }: { item: any }) {
+  return (
+    <>
+      <div className="data-card-title">{item.name}</div>
+      <div className="data-card-subtitle">{item.category} · Lat: {item.lat}, Lng: {item.lng}</div>
+      <div className="data-card-meta">
+        <span className={`data-chip ${item.category}`}>{item.category}</span>
+      </div>
+    </>
+  );
+}
+
 // ═══════════════════════════════════════════
 // Form Modal
 // ═══════════════════════════════════════════
@@ -341,6 +358,7 @@ function FormModal({
         {category === "canal" && <CanalForm onSaved={onSaved} onClose={onClose} />}
         {category === "announcement" && <AnnouncementForm onSaved={onSaved} onClose={onClose} />}
         {category === "event" && <EventForm onSaved={onSaved} onClose={onClose} />}
+        {category === "location" && <LocationForm onSaved={onSaved} onClose={onClose} />}
       </div>
     </div>
   );
@@ -631,6 +649,60 @@ function EventForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => v
       <div className="form-actions">
         <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-submit">Save Event</button>
+      </div>
+    </form>
+  );
+}
+
+function LocationForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => void }) {
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState<any>("temple");
+  const [lat, setLat] = useState("");
+  const [lng, setLng] = useState("");
+  const [description, setDescription] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = await store.addVillageLocation({ name, category, lat: parseFloat(lat), lng: parseFloat(lng), description });
+    if (!result) { alert("Failed to save! Please ensure the village_locations table exists."); return; }
+    onSaved();
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label>Place Name</label>
+        <input className="form-input" placeholder="e.g. Vinayagar Kovil" value={name} onChange={(e) => setName(e.target.value)} required />
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label>Category</label>
+          <select className="form-select" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="temple">Temple</option>
+            <option value="school">School</option>
+            <option value="panchayat">Panchayat Office</option>
+            <option value="vao">VAO Office</option>
+            <option value="lake">Lake</option>
+            <option value="shop">Shop</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Latitude</label>
+          <input className="form-input" type="number" step="any" placeholder="10.60..." value={lat} onChange={(e) => setLat(e.target.value)} required />
+        </div>
+      </div>
+      <div className="form-group">
+        <label>Longitude</label>
+        <input className="form-input" type="number" step="any" placeholder="77.12..." value={lng} onChange={(e) => setLng(e.target.value)} required />
+      </div>
+      <div className="form-group">
+        <label>Description (Optional)</label>
+        <textarea className="form-textarea" placeholder="Details about this place..." value={description} onChange={(e) => setDescription(e.target.value)} />
+      </div>
+      <div className="form-actions">
+        <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
+        <button type="submit" className="btn-submit">Save Location</button>
       </div>
     </form>
   );

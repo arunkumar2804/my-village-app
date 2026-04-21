@@ -10,10 +10,28 @@ import type {
   CanalUpdate,
   Announcement,
   VillageEvent,
+  VillageLocation,
 } from "./types";
 
 // Note: Database tables should match these definitions.
-// Table names: bus_timings, train_timings, water_updates, canal_updates, announcements, events
+// Table names: bus_timings, train_timings, water_updates, canal_updates, announcements, events, village_locations
+
+// ─── Village Locations ───
+export async function getVillageLocations(): Promise<VillageLocation[]> {
+  const { data, error } = await supabase.from("village_locations").select("*").order("created_at", { ascending: false });
+  if (error) { console.error("Error fetching locations:", error); return []; }
+  return data as VillageLocation[];
+}
+
+export async function addVillageLocation(data: Omit<VillageLocation, "id" | "createdAt">): Promise<VillageLocation | null> {
+  const { data: newRow, error } = await supabase.from("village_locations").insert([data]).select().single();
+  if (error) { console.error("Error adding location:", error); return null; }
+  return newRow;
+}
+
+export async function deleteVillageLocation(id: string): Promise<void> {
+  await supabase.from("village_locations").delete().eq("id", id);
+}
 
 // ─── Bus Timings ───
 export async function getBusTimings(): Promise<BusTiming[]> {

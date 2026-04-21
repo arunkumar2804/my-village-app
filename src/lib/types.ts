@@ -64,6 +64,16 @@ export interface VillageEvent {
   createdAt: string;
 }
 
+export interface VillageLocation {
+  id: string;
+  name: string;
+  category: "temple" | "school" | "panchayat" | "vao" | "lake" | "shop" | "other";
+  lat: number;
+  lng: number;
+  description: string;
+  createdAt: string;
+}
+
 export type DataCategory =
   | "bus"
   | "train"
@@ -71,7 +81,8 @@ export type DataCategory =
   | "canal"
   | "announcement"
   | "event"
-  | "users";
+  | "users"
+  | "location";
 
 export interface Profile {
   id: string;

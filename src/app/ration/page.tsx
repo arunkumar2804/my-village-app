@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, User, MapPin, Clock, Phone, Hash, CreditCard, Users, Box } from "lucide-react";
+import { ArrowLeft, User, MapPin, Clock, Phone, Hash, CreditCard, Users, Box, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import "./ration.css";
 

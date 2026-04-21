@@ -812,3 +812,21 @@ body {
     background: rgba(255,255,255,0.04);
   }
 }
+
+/* ═══════════════════════════════════════════
+   SECURITY: DISABLE TEXT COPY
+   ═══════════════════════════════════════════ */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Exception for form inputs and textareas */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}

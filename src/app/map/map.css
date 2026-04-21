@@ -33,15 +33,22 @@
 .map-view-area {
   flex: 1;
   position: relative;
-  background: #e5e7eb;
-  overflow: hidden;
+  background: #f1f5f9;
+  z-index: 1;
+  touch-action: pan-x pan-y;
 }
 
-.village-map-iframe {
+.leaflet-container {
   width: 100%;
   height: 100%;
+  z-index: 1;
+}
+
+.custom-marker-icon {
+  background: none;
   border: none;
 }
+
 
 .map-category-container {
   padding: 16px;

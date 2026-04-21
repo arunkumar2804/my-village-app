@@ -32,7 +32,6 @@ export default function AnnouncementTicker() {
               {announcements.map((a) => (
                 <span key={a.id} className="ticker-item">
                   <span className={`priority-dot ${a.priority}`}></span>
-                  <span className="ticker-title">{a.title}</span>
                   <span className="ticker-desc">{a.description}</span>
                 </span>
               ))}
@@ -40,7 +39,6 @@ export default function AnnouncementTicker() {
               {announcements.length > 0 && announcements.map((a) => (
                 <span key={a.id + "-dup"} className="ticker-item">
                   <span className={`priority-dot ${a.priority}`}></span>
-                  <span className="ticker-title">{a.title}</span>
                   <span className="ticker-desc">{a.description}</span>
                 </span>
               ))}

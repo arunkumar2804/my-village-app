@@ -72,9 +72,9 @@
 }
 
 .ticker-desc {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-light);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .priority-dot {

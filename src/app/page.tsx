@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import {
   MapPin,
   Sun,
+  Cloud,
+  CloudRain,
+  CloudLightning,
   Bus,
   TrainFront,
   Droplets,
@@ -21,6 +24,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [userName, setUserName] = useState<string>("");
+  const [weatherData, setWeatherData] = useState<{ temp: number; code: number } | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -30,7 +34,36 @@ export default function Home() {
           setUserName(data.session.user.email.split("@")[0]);
        }
     });
+
+    const fetchWeather = async () => {
+      try {
+        const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=10.662&longitude=77.006&current_weather=true");
+        const data = await res.json();
+        if (data.current_weather) {
+          setWeatherData({
+            temp: Math.round(data.current_weather.temperature),
+            code: data.current_weather.weathercode
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch weather", err);
+      }
+    };
+
+    fetchWeather();
+    // Refresh weather every 30 mins
+    const interval = setInterval(fetchWeather, 30 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
+
+  const getWeatherIcon = (code: number) => {
+    if (code <= 1) return <Sun size={14} />;
+    if (code <= 3) return <Cloud size={14} />;
+    if (code >= 51 && code <= 67) return <CloudRain size={14} />;
+    if (code >= 80 && code <= 82) return <CloudRain size={14} />;
+    if (code >= 95) return <CloudLightning size={14} />;
+    return <Cloud size={14} />;
+  };
 
   const services = [
     { iconSrc: "/icons/bus-icon.svg", label: "Bus Schedules", link: "/buses" },
@@ -64,8 +97,8 @@ export default function Home() {
             Live
           </div>
           <div className="badge">
-            <Sun size={14} />
-            33°C
+            {weatherData ? getWeatherIcon(weatherData.code) : <Sun size={14} />}
+            {weatherData ? `${weatherData.temp}°C` : "..."}
           </div>
         </div>
       </header>

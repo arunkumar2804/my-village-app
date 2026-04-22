@@ -27,7 +27,7 @@ const BottomNav = () => {
               className={`nav-item ${isActive ? "active" : ""}`}
             >
               <div className={`nav-icon-wrapper ${isActive ? "nav-icon-active" : ""}`}>
-                <div style={{ position: 'relative', width: 22, height: 22 }}>
+                <div className="nav-icon-inner" style={{ position: 'relative', width: 24, height: 24 }}>
                    <Image src={item.iconSrc} alt={item.label} fill style={{ objectFit: 'contain' }} />
                 </div>
               </div>

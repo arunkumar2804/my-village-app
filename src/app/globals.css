@@ -97,156 +97,51 @@ body {
 }
 
 /* Header Styles */
-.home-header {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-radius: 40px;
-  padding: 32px 24px 24px;
-  margin: 12px;
+.location-header {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  color: #0f172a;
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-  .home-header {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    color: #f1f5f9;
-  }
-}
-
-.user-welcome-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.user-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: #f8fafc;
-  border: 4px solid white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  overflow: hidden;
-}
-
-.welcome-text h2 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.location-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  opacity: 0.7;
-  margin-top: 2px;
-}
-
-.header-badges {
-  display: flex;
   gap: 12px;
+  margin-bottom: 32px;
 }
 
-.header-badge {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 700;
+.location-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  font-size: 20px;
+  font-weight: 600;
+  min-width: 0;
 }
 
-.ad-placeholder {
-  width: 100%;
-  aspect-ratio: 16/8;
-  background: rgba(200, 200, 200, 0.2);
-  border-radius: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.ad-placeholder img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.announcement-bar-minimal {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  opacity: 0.6;
-}
-
-/* Service Pills Horizontal Scroll */
-.home-services-scroll {
-  padding: 8px 16px 24px;
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.home-services-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.service-pill {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 6px 20px 6px 6px;
-  border-radius: 100px;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-}
-
-.service-pill:active {
-  transform: scale(0.95);
-}
-
-.pill-bus { background: #dbeafe; color: #1e40af; }
-.pill-train { background: #dcfce7; color: #166534; }
-.pill-panchayat { background: #f3e8ff; color: #6b21a8; }
-.pill-water { background: #e0f2fe; color: #075985; }
-.pill-ration { background: #fef3c7; color: #92400e; }
-.pill-generic { background: #f1f5f9; color: #475569; }
-
-.pill-icon-circle {
-  width: 48px;
-  height: 48px;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.pill-label-text {
-  font-size: 14px;
+.village-name {
+  font-size: 17px;
   font-weight: 700;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  letter-spacing: -0.02em;
+}
+
+.badge-container {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #e2e8f0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.badge.live {
+  background: #ecfdf5;
+  color: #10b981;
 }
 
 /* Service Grid */

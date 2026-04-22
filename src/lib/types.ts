@@ -74,14 +74,6 @@ export interface VillageLocation {
   createdAt: string;
 }
 
-export interface AdBanner {
-  id: string;
-  imageUrl: string;
-  linkUrl?: string;
-  isActive: boolean;
-  createdAt: string;
-}
-
 export type DataCategory =
   | "bus"
   | "train"
@@ -90,8 +82,7 @@ export type DataCategory =
   | "announcement"
   | "event"
   | "users"
-  | "location"
-  | "ad";
+  | "location";
 
 export interface Profile {
   id: string;

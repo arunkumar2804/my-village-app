@@ -24,7 +24,6 @@ const TABS: { key: DataCategory; label: string; emoji: string }[] = [
   { key: "announcement", label: "Announce", emoji: "📢" },
   { key: "event", label: "Events", emoji: "📅" },
   { key: "location", label: "Maps", emoji: "📍" },
-  { key: "ad", label: "Ad Banner", emoji: "🖼️" },
   { key: "users", label: "Users", emoji: "👥" },
 ];
 
@@ -112,7 +111,6 @@ function TabCount({ category, refreshKey }: { category: DataCategory; refreshKey
         announcement: store.getAnnouncements,
         event: store.getEvents,
         location: store.getVillageLocations,
-        ad: store.getAdBanners,
         users: store.getAllProfiles,
       };
       const items = await counts[category]();
@@ -153,7 +151,6 @@ function DataList({
         announcement: store.getAnnouncements,
         event: store.getEvents,
         location: store.getVillageLocations,
-        ad: store.getAdBanners,
         users: store.getAllProfiles,
       };
       const data = await loaders[category]();
@@ -173,7 +170,6 @@ function DataList({
       announcement: store.deleteAnnouncement,
       event: store.deleteEvent,
       location: store.deleteVillageLocation,
-      ad: store.deleteAdBanner,
     };
     await deleters[category](id);
     onRefresh();
@@ -188,8 +184,6 @@ function DataList({
       canal: "No canal updates added yet",
       announcement: "No announcements yet",
       event: "No events added yet",
-      ad: "No ad banners added yet",
-      location: "No locations added yet",
     };
     return (
       <div className="admin-empty">
@@ -212,7 +206,6 @@ function DataList({
             {category === "announcement" && <AnnouncementCard item={item as Announcement} />}
             {category === "event" && <EventCard item={item as VillageEvent} />}
             {category === "location" && <LocationCard item={item as any} />}
-            {category === "ad" && <AdCard item={item as any} />}
             {category === "users" && <UserCard item={item as Profile} />}
           </div>
           <div className="data-card-actions">
@@ -229,23 +222,6 @@ function DataList({
 // ═══════════════════════════════════════════
 // Individual Card Renderers
 // ═══════════════════════════════════════════
-
-function AdCard({ item }: { item: any }) {
-  return (
-    <>
-      <div className="data-card-title">Ad Banner</div>
-      <div className="data-card-subtitle">{item.linkUrl || "No link"}</div>
-      {item.imageUrl && (
-        <img src={item.imageUrl} alt="Ad" style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 8, marginTop: 8 }} />
-      )}
-      <div className="data-card-meta">
-        <span className={`data-chip ${item.isActive ? "active" : "inactive"}`}>
-          {item.isActive ? "Active" : "Inactive"}
-        </span>
-      </div>
-    </>
-  );
-}
 
 function UserCard({ item }: { item: Profile }) {
   return (
@@ -383,7 +359,6 @@ function FormModal({
         {category === "announcement" && <AnnouncementForm onSaved={onSaved} onClose={onClose} />}
         {category === "event" && <EventForm onSaved={onSaved} onClose={onClose} />}
         {category === "location" && <LocationForm onSaved={onSaved} onClose={onClose} />}
-        {category === "ad" && <AdBannerForm onSaved={onSaved} onClose={onClose} />}
       </div>
     </div>
   );
@@ -809,74 +784,6 @@ function LocationForm({ onSaved, onClose }: { onSaved: () => void; onClose: () =
       <div className="form-actions">
         <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-submit">Save Location</button>
-      </div>
-    </form>
-  );
-}
-
-function AdBannerForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => void }) {
-  const [imageUrl, setImageUrl] = useState("");
-  const [linkUrl, setLinkUrl] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const { supabase } = require("@/lib/supabase");
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setUploading(true);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `ads/${fileName}`;
-
-      const { data, error } = await supabase.storage
-        .from('images')
-        .upload(filePath, file);
-
-      if (error) throw error;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('images')
-        .getPublicUrl(filePath);
-
-      setImageUrl(publicUrl);
-    } catch (error) {
-      alert('Error uploading image!');
-      console.error(error);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = await store.addAdBanner({ imageUrl, linkUrl, isActive: true });
-    if (!result) { alert("Failed to save!"); return; }
-    onSaved();
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label>Banner Image</label>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <input className="form-input" placeholder="Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} required />
-          <span>OR</span>
-          <input type="file" accept="image/*" onChange={handleFileUpload} disabled={uploading} style={{ fontSize: 12 }} />
-        </div>
-        {uploading && <div style={{ fontSize: 10, color: 'blue', marginTop: 4 }}>Uploading...</div>}
-        {imageUrl && (
-          <img src={imageUrl} alt="Preview" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 12, marginTop: 12, border: '1px solid #eee' }} />
-        )}
-      </div>
-      <div className="form-group">
-        <label>Link URL (Optional)</label>
-        <input className="form-input" placeholder="https://..." value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} />
-      </div>
-      <div className="form-actions">
-        <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
-        <button type="submit" className="btn-submit" disabled={uploading}>Save Ad Banner</button>
       </div>
     </form>
   );

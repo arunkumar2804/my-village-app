@@ -11,6 +11,7 @@ import type {
   Announcement,
   VillageEvent,
   VillageLocation,
+  AdBanner,
 } from "./types";
 
 // Note: Database tables should match these definitions.
@@ -157,4 +158,21 @@ export async function getAllProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
   if (error) return [];
   return data as Profile[];
+}
+
+// ─── Ad Banners ───
+export async function getAdBanners(): Promise<AdBanner[]> {
+  const { data, error } = await supabase.from("ad_banners").select("*").order("created_at", { ascending: false });
+  if (error) return [];
+  return data as AdBanner[];
+}
+
+export async function addAdBanner(data: Omit<AdBanner, "id" | "createdAt">): Promise<AdBanner | null> {
+  const { data: newRow, error } = await supabase.from("ad_banners").insert([data]).select().single();
+  if (error) return null;
+  return newRow;
+}
+
+export async function deleteAdBanner(id: string): Promise<void> {
+  await supabase.from("ad_banners").delete().eq("id", id);
 }

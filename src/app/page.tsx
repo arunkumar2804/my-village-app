@@ -22,7 +22,6 @@ import LiveUpdates from "@/components/LiveUpdates";
 import AnnouncementTicker from "@/components/AnnouncementTicker";
 import * as store from "@/lib/store";
 import { AdBanner } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [userName, setUserName] = useState<string>("User");
@@ -39,14 +38,10 @@ export default function Home() {
     });
 
     const loadData = async () => {
-      try {
-        // Load Ad Banner
-        const ads = await store.getAdBanners();
-        if (ads && ads.length > 0) {
-          setAdBanner(ads[0]);
-        }
-      } catch (err) {
-        console.error("Failed to load ads", err);
+      // Load Ad Banner
+      const ads = await store.getAdBanners();
+      if (ads.length > 0) {
+        setAdBanner(ads[0]);
       }
 
       // Load Weather

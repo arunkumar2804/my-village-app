@@ -6,14 +6,8 @@ import {
   Cloud,
   CloudRain,
   CloudLightning,
-  Bus,
-  TrainFront,
-  Droplets,
-  Landmark,
-  Calendar,
-  Waves,
-  Store,
-  Megaphone
+  ChevronRight,
+  Megaphone,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,14 +18,25 @@ import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [userName, setUserName] = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [weatherData, setWeatherData] = useState<{ temp: number; code: number } | null>(null);
+  const [greeting, setGreeting] = useState("Hello");
 
   useEffect(() => {
+    // Determine greeting based on time of day
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good morning");
+    else if (hour < 17) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+
     supabase.auth.getSession().then(({ data }) => {
        if (data.session?.user?.user_metadata?.full_name) {
           setUserName(data.session.user.user_metadata.full_name.split(" ")[0]);
        } else if (data.session?.user?.email) {
           setUserName(data.session.user.email.split("@")[0]);
+       }
+       if (data.session?.user?.user_metadata?.avatar_url) {
+          setAvatarUrl(data.session.user.user_metadata.avatar_url);
        }
     });
 
@@ -51,89 +56,132 @@ export default function Home() {
     };
 
     fetchWeather();
-    // Refresh weather every 30 mins
     const interval = setInterval(fetchWeather, 30 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
   const getWeatherIcon = (code: number) => {
-    if (code <= 1) return <Sun size={14} />;
-    if (code <= 3) return <Cloud size={14} />;
-    if (code >= 51 && code <= 67) return <CloudRain size={14} />;
-    if (code >= 80 && code <= 82) return <CloudRain size={14} />;
-    if (code >= 95) return <CloudLightning size={14} />;
-    return <Cloud size={14} />;
+    if (code <= 1) return <Sun size={16} />;
+    if (code <= 3) return <Cloud size={16} />;
+    if (code >= 51 && code <= 67) return <CloudRain size={16} />;
+    if (code >= 80 && code <= 82) return <CloudRain size={16} />;
+    if (code >= 95) return <CloudLightning size={16} />;
+    return <Cloud size={16} />;
   };
 
-  const services = [
-    { iconSrc: "/icons/bus-icon.svg", label: "Bus Schedules", link: "/buses" },
-    { iconSrc: "/icons/train-icon.svg", label: "Train Schedules", link: "/trains" },
-    { iconSrc: "/icons/water-tap-icon.svg", label: "Water timings" },
-    { iconSrc: "/icons/panchayat-icon.svg", label: "Panchayat" },
-    { iconSrc: "/icons/events-icon.svg", label: "Events" },
-    { iconSrc: "/icons/canal-icon.svg", label: "PAP Canal info" },
-    { iconSrc: "/icons/ration-icon.svg", label: "Ration Store", link: "/ration" },
-    { iconSrc: "/icons/announcement-icon.svg", label: "Announcements" },
+  const quickServices = [
+    { iconSrc: "/icons/bus-icon.svg", label: "Bus", link: "/buses", color: "#10b981", bg: "#ecfdf5" },
+    { iconSrc: "/icons/train-icon.svg", label: "Train", link: "/trains", color: "#6366f1", bg: "#eef2ff" },
+    { iconSrc: "/icons/water-tap-icon.svg", label: "Water", color: "#06b6d4", bg: "#ecfeff" },
+    { iconSrc: "/icons/panchayat-icon.svg", label: "Panchayat", color: "#8b5cf6", bg: "#f5f3ff" },
+  ];
+
+  const moreServices = [
+    { iconSrc: "/icons/events-icon.svg", label: "Events", color: "#f59e0b", bg: "#fffbeb" },
+    { iconSrc: "/icons/canal-icon.svg", label: "Canal", color: "#0ea5e9", bg: "#f0f9ff" },
+    { iconSrc: "/icons/ration-icon.svg", label: "Ration", link: "/ration", color: "#ec4899", bg: "#fdf2f8" },
+    { iconSrc: "/icons/announcement-icon.svg", label: "News", color: "#ef4444", bg: "#fef2f2" },
   ];
 
   return (
-    <main className="scroll-area">
-      {/* Header */}
-      <header className="location-header">
-        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-          {userName && (
-            <div style={{ fontSize: "10px", color: "var(--text-light)", fontStyle: "italic", marginLeft: "28px" }}>
-              Welcome {userName},
+    <main className="scroll-area home-page">
+      {/* ─── Premium Hero Header ─── */}
+      <header className="hero-header">
+        <div className="hero-header-bg" />
+        <div className="hero-content">
+          <div className="hero-top-row">
+            <div className="hero-user-info">
+              <div className="hero-avatar">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" />
+                ) : (
+                  <span>👤</span>
+                )}
+              </div>
+              <div>
+                <p className="hero-greeting">{greeting}</p>
+                <h1 className="hero-name">{userName || "There"}</h1>
+              </div>
             </div>
-          )}
-          <div className="location-title">
-            <MapPin size={20} />
-            <h1 className="village-name">Panaimarathupalayam</h1>
+            <div className="hero-weather-pill">
+              {weatherData ? getWeatherIcon(weatherData.code) : <Sun size={16} />}
+              <span>{weatherData ? `${weatherData.temp}°` : "..."}</span>
+            </div>
           </div>
-        </div>
-        <div className="badge-container">
-          <div className="badge live">
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block', marginRight: '6px' }}></span>
-            Live
-          </div>
-          <div className="badge">
-            {weatherData ? getWeatherIcon(weatherData.code) : <Sun size={14} />}
-            {weatherData ? `${weatherData.temp}°C` : "..."}
+
+          <div className="hero-location-row">
+            <div className="hero-location-pill">
+              <MapPin size={13} />
+              <span>Panaimarathupalayam</span>
+            </div>
+            <div className="hero-live-badge">
+              <span className="hero-live-dot" />
+              Live
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Announcements */}
+      {/* ─── Announcement Ticker ─── */}
       <AnnouncementTicker />
 
-      {/* Services Grid */}
-      <div className="service-grid">
-        {services.map((service, index) => {
-          const Content = (
-            <>
-              <div className="service-icon-box">
-                <div style={{ position: 'relative', width: 28, height: 28 }}>
-                  <Image src={service.iconSrc} alt={service.label} fill style={{ objectFit: 'contain' }} />
+      {/* ─── Quick Access Services ─── */}
+      <section className="quick-access-section">
+        <div className="section-header">
+          <h2 className="section-heading">Quick Access</h2>
+        </div>
+        <div className="quick-access-grid">
+          {quickServices.map((service, index) => {
+            const inner = (
+              <div className="qa-card" key={index}>
+                <div className="qa-icon-ring" style={{ background: service.bg, borderColor: service.color + '20' }}>
+                  <div style={{ position: 'relative', width: 26, height: 26 }}>
+                    <Image src={service.iconSrc} alt={service.label} fill style={{ objectFit: 'contain' }} />
+                  </div>
                 </div>
+                <span className="qa-label">{service.label}</span>
               </div>
-              <span className="service-label">{service.label}</span>
-            </>
-          );
-          
-          return service.link ? (
-            <Link href={service.link} key={index} className="service-item" style={{ textDecoration: 'none' }}>
-              {Content}
-            </Link>
-          ) : (
-            <div key={index} className="service-item">
-              {Content}
-            </div>
-          );
-        })}
-      </div>
+            );
+            return service.link ? (
+              <Link href={service.link} key={index} className="qa-link">{inner}</Link>
+            ) : (
+              <div key={index} className="qa-link">{inner}</div>
+            );
+          })}
+        </div>
+      </section>
 
-      {/* Live Updates */}
-      <LiveUpdates />
+      {/* ─── More Services ─── */}
+      <section className="more-services-section">
+        <div className="section-header">
+          <h2 className="section-heading">Explore</h2>
+        </div>
+        <div className="more-services-scroll">
+          {moreServices.map((service, index) => {
+            const inner = (
+              <div className="ms-chip" style={{ background: service.bg }}>
+                <div className="ms-chip-icon" style={{ background: 'white' }}>
+                  <div style={{ position: 'relative', width: 20, height: 20 }}>
+                    <Image src={service.iconSrc} alt={service.label} fill style={{ objectFit: 'contain' }} />
+                  </div>
+                </div>
+                <span className="ms-chip-label" style={{ color: service.color }}>{service.label}</span>
+                <ChevronRight size={14} style={{ color: service.color, opacity: 0.5 }} />
+              </div>
+            );
+            return service.link ? (
+              <Link href={service.link} key={index} className="ms-chip-link">{inner}</Link>
+            ) : (
+              <div key={index} className="ms-chip-link">{inner}</div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ─── Live Updates ─── */}
+      <section className="live-updates-section">
+        <LiveUpdates />
+      </section>
 
       <BottomNav />
     </main>

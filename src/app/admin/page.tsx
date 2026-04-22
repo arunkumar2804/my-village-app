@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import "./admin.css";
 import type {
   BusTiming,
@@ -819,6 +818,7 @@ function AdBannerForm({ onSaved, onClose }: { onSaved: () => void; onClose: () =
   const [imageUrl, setImageUrl] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const { supabase } = require("@/lib/supabase");
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

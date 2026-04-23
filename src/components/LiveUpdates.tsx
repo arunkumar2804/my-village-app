@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Bus, MapPin, Clock, Shield, Building2, Coins, Users, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Bus, MapPin, Clock, Shield, Building2, Coins, Users, AlertTriangle, CheckCircle2, Train, Droplets, Sun } from "lucide-react";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 import "./live-updates.css";

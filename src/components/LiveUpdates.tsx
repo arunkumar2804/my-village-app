@@ -1,16 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Bus, MapPin, Clock, Shield, Building2, Train, Droplets, Sun } from "lucide-react";
+import { MapPin, Clock, Train, Droplets, Sun, Bus } from "lucide-react";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
+import BusCard from "@/components/BusCard";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 import "./live-updates.css";
-
-interface BusInfo {
-  item: BusTiming;
-  relTime: string;
-  minutesLeft: number;
-}
 
 interface TrainInfo {
   item: TrainTiming;
@@ -34,7 +29,7 @@ function getNextOccurrence(timeStr: string): Date {
 
 function getTimeData(targetDate: Date): { text: string; minutes: number } {
   const diffMs = targetDate.getTime() - Date.now();
-  const diffMins = Math.max(0, Math.floor(diffMs / 60000));
+  const diffMins = Math.max(0, Math.ceil(diffMs / 60000));
   
   if (diffMins === 0) return { text: "Arriving", minutes: 0 };
   if (diffMins === 1) return { text: "Arriving", minutes: 1 };
@@ -52,25 +47,8 @@ function format12h(timeStr: string): string {
   return `${h12}:${mStr} ${ampm}`;
 }
 
-function getCrowdStatus(timeStr: string): { status: "crowded" | "less"; label: string } {
-  const [h, m] = timeStr.split(":").map(Number);
-  const totalMins = h * 60 + m;
-  const morningPeakStart = 7 * 60;
-  const morningPeakEnd = 9 * 60;
-  const eveningPeakStart = 16 * 60;
-  const eveningPeakEnd = 18 * 60 + 30;
-
-  if (
-    (totalMins >= morningPeakStart && totalMins <= morningPeakEnd) ||
-    (totalMins >= eveningPeakStart && totalMins <= eveningPeakEnd)
-  ) {
-    return { status: "crowded", label: "Mostly crowded" };
-  }
-  return { status: "less", label: "Less crowded" };
-}
-
 export default function LiveUpdates() {
-  const [nextBus, setNextBus] = useState<BusInfo | null>(null);
+  const [nextBus, setNextBus] = useState<BusTiming | null>(null);
   const [nextTrain, setNextTrain] = useState<TrainInfo | null>(null);
   const [nextWater, setNextWater] = useState<WaterInfo | null>(null);
   const [, setTick] = useState(0);
@@ -84,9 +62,7 @@ export default function LiveUpdates() {
         const diff = d.getTime() - Date.now();
         if (diff > 0 && diff < minDiff) { minDiff = diff; closest = b; }
       });
-      const d = getNextOccurrence(closest.departureTime);
-      const { text, minutes } = getTimeData(d);
-      setNextBus({ item: closest, relTime: text, minutesLeft: minutes });
+      setNextBus(closest);
     } else {
       setNextBus(null);
     }
@@ -166,61 +142,15 @@ export default function LiveUpdates() {
 
       <div className="lu-cards">
         {nextBus && (
-          <div className={`lu-bus-card ${nextBus.minutesLeft <= 5 ? 'urgent' : ''}`}>
-            <div className="lu-bus-card-bg"></div>
-            <div className="lu-bus-top">
-              <div className="lu-bus-badge-row">
-                <span className={`lu-bus-tag ${nextBus.item.operatorType === 'government' ? 'govt' : 'private'}`}>
-                  {nextBus.item.operatorType === 'government' ? 'Government' : 'Private'}
-                </span>
-                {nextBus.minutesLeft <= 5 && <span className="lu-urgent-tag">Arriving soon</span>}
-                <div className={`lu-bus-tag ${getCrowdStatus(nextBus.item.departureTime).status}`} 
-                     style={{ 
-                       background: getCrowdStatus(nextBus.item.departureTime).status === 'crowded' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-                       color: getCrowdStatus(nextBus.item.departureTime).status === 'crowded' ? '#ef4444' : '#10b981',
-                       marginLeft: 'auto'
-                     }}>
-                  <span style={{ fontSize: '9px', opacity: 0.8, marginRight: '4px' }}>CROWD:</span>
-                  {getCrowdStatus(nextBus.item.departureTime).label}
-                </div>
-              </div>
-              <div className="lu-bus-route">#{nextBus.item.routeNumber}</div>
-            </div>
-
-            <div className="lu-bus-route-display">
-              <div className="lu-route-stop">
-                <div className="lu-stop-dot"></div>
-                <span>{nextBus.item.from}</span>
-              </div>
-              <div className="lu-route-journey">
-                <div className="lu-journey-track">
-                  <div className="lu-journey-progress" style={{ width: '65%' }}>
-                    <div className="lu-bus-icon-anim">
-                      <Bus size={16} />
-                    </div>
-                  </div>
-                </div>
-                <div className="lu-journey-stops">
-                  <span>•</span><span>•</span><span>•</span>
-                </div>
-              </div>
-              <div className="lu-route-stop">
-                <div className="lu-stop-dot end-dot"></div>
-                <span>{nextBus.item.to}</span>
-              </div>
-            </div>
-
-            <div className="lu-bus-timing">
-              <div className="lu-bus-remain-chip">
-                <Clock size={16} />
-                <span>{nextBus.relTime}</span>
-              </div>
-              <div className="lu-bus-depart-info">
-                <span className="lu-depart-label">Departure</span>
-                <span className="lu-depart-time">{format12h(nextBus.item.departureTime)}</span>
-              </div>
-            </div>
-          </div>
+          <BusCard
+            routeNumber={nextBus.routeNumber}
+            fromLocation={nextBus.from}
+            toLocation={nextBus.to}
+            departureTime={nextBus.departureTime}
+            serviceName={nextBus.serviceName}
+            ownershipType={nextBus.operatorType === "government" ? "Government" : "Private"}
+            fareType={nextBus.fareType === "free" ? "Free" : "Paid"}
+          />
         )}
 
         {nextTrain && (

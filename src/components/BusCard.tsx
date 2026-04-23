@@ -125,66 +125,52 @@ export default function BusCard({
   );
 
   return (
-    <div className="bus-card">
+    <div className={`bus-card ${timeInfo.minutes <= 5 ? 'urgent' : ''}`}>
       <div className="bus-card-header">
-        <div className="bus-card-header-left">
-          <Bus size={18} className="bus-icon" />
-          <span className="bus-card-header-label">Next Bus</span>
+        <div className="bus-card-badge-row">
+          <span className={`bus-card-tag ${ownershipType.toLowerCase() === 'government' ? 'govt' : 'private'}`}>
+            {ownershipType}
+          </span>
+          <span className={`bus-card-crowd-tag ${crowdInfo.status}`}>
+            <Users size={12} style={{ marginRight: 4 }} />
+            {crowdInfo.label}
+          </span>
+          {timeInfo.minutes <= 5 && <span className="bus-card-tag urgent">Arriving soon</span>}
         </div>
-        <div
-          className={`bus-card-time-chip ${
-            timeInfo.status === "arriving" ? "arriving" : "normal"
-          }`}
-        >
-          {timeInfo.status === "arriving" ? (
-            "Arriving"
-          ) : (
-            <>
-              <Clock size={12} />
-              <span>{timeInfo.formattedText}</span>
-            </>
-          )}
-        </div>
+        <div className="bus-card-route-num">#{routeNumber}</div>
       </div>
 
-      <div className="bus-card-main">
-        <div className="bus-card-main-top">
-          <div className="bus-card-route-badge">{routeNumber}</div>
-          <div className="bus-card-route-path">
-            <div className="bus-card-destination">
-              <span className="destination-from">{fromLocation}</span>
-              <div className="path-connector">
-                <span className="connector-line"></span>
-                <Bus size={14} className="connector-bus" />
-                <span className="connector-line"></span>
+      <div className="bus-card-path">
+        <div className="bus-card-stop">
+          <div className="bus-card-stop-dot"></div>
+          <span>{fromLocation}</span>
+        </div>
+        <div className="bus-card-journey">
+          <div className="bus-card-track">
+            <div className="bus-card-progress" style={{ width: '65%' }}>
+              <div className="bus-card-icon-wrap">
+                <Bus size={16} />
               </div>
-              <span className="destination-to">{toLocation}</span>
-            </div>
-            <div className="bus-card-departure">
-              Departs at {formatDepartureTime(departureTime)}
             </div>
           </div>
-          <div
-            className={`bus-card-crowd-chip ${crowdInfo.status}`}
-          >
-            <Users size={12} />
-            <span>{crowdInfo.label}</span>
+          <div className="bus-card-journey-dots">
+            <span>•</span><span>•</span><span>•</span><span>•</span>
           </div>
+        </div>
+        <div className="bus-card-stop">
+          <div className="bus-card-stop-dot end"></div>
+          <span>{toLocation}</span>
         </div>
       </div>
 
-      <div className="bus-card-footer">
-        <div className="bus-card-tag service-tag">
-          <span className="tag-label">Service</span>
-          <span className="tag-value">{serviceName}</span>
+      <div className="bus-card-timing">
+        <div className="bus-card-remain-chip">
+          <Clock size={16} style={{ marginRight: 6 }} />
+          <span>{timeInfo.formattedText}</span>
         </div>
-        <div className="bus-card-tag ownership-tag">
-          <span className="tag-label">Ownership</span>
-          <span className="tag-value">{ownershipType}</span>
-        </div>
-        <div className="bus-card-tag fare-tag">
-          <span className="tag-label">Fare</span>
-          <span className="tag-value">{fareType}</span>
+        <div className="bus-card-depart-info">
+          <span className="bus-card-depart-label">Departure</span>
+          <span className="bus-card-depart-time">{formatDepartureTime(departureTime)}</span>
         </div>
       </div>
     </div>

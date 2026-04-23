@@ -502,14 +502,20 @@
 }
 
 /* ─── Category Chips ─── */
+.map-bottom-spacer {
+  height: calc(100px + env(safe-area-inset-bottom));
+}
+
 .map-category-container {
-  background: rgba(255, 255, 255, 0.9);
+  position: fixed;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.8);
   padding: 12px 0;
-  padding-bottom: calc(100px + env(safe-area-inset-bottom));
-  position: relative;
   z-index: 100;
 }
 

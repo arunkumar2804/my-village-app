@@ -14,16 +14,11 @@ import {
   Navigation,
   Search,
   Crosshair,
-  Layers,
-  ZoomIn,
-  ZoomOut,
-  ChevronRight,
   Compass
 } from "lucide-react";
 import "./map.css";
 import * as store from "@/lib/store";
 import type { VillageLocation } from "@/lib/types";
-import BottomNav from "@/components/BottomNav";
 
 const CATEGORIES = [
   { id: "temple", label: "Temples", icon: <Church size={18} />, emoji: "🛕", color: "#f59e0b", gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)" },
@@ -48,7 +43,6 @@ export default function MapPage() {
   const [isLocating, setIsLocating] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
-  const userLocationInterval = useRef<NodeJS.Timeout | null>(null);
 
   const villageCenter: [number, number] = [10.6049693, 77.1235782];
 
@@ -67,9 +61,7 @@ export default function MapPage() {
     script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
     script.async = true;
     script.id = "leaflet-js";
-    script.onload = () => {
-      initMap();
-    };
+    script.onload = () => { initMap(); };
     document.head.appendChild(script);
 
     return () => {
@@ -93,10 +85,8 @@ export default function MapPage() {
 
     L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(leafletMap);
 
-    // Add custom zoom control
     const zoomControl = L.control({ position: "topright" });
     zoomControl.onAdd = () => {
       const container = L.DomUtil.create("div", "premium-zoom-control");
@@ -118,20 +108,14 @@ export default function MapPage() {
       return container;
     };
     zoomControl.addTo(leafletMap);
-
     setMap(leafletMap);
   };
 
   const getUserLocation = useCallback(() => {
     const L = (window as any).L;
     if (!L || !map) return;
-
     setIsLocating(true);
-
-    if (!navigator.geolocation) {
-      setIsLocating(false);
-      return;
-    }
+    if (!navigator.geolocation) { setIsLocating(false); return; }
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -140,44 +124,31 @@ export default function MapPage() {
         setUserLocation(userPos);
         setIsLocating(false);
 
-        if (userMarker) {
-          map.removeLayer(userMarker);
-        }
+        if (userMarker) map.removeLayer(userMarker);
 
         const pulseIcon = L.divIcon({
           className: 'user-location-marker',
-          html: `
-            <div class="user-marker-container">
-              <div class="user-marker-pulse"></div>
-              <div class="user-marker-dot"></div>
-            </div>
-          `,
+          html: `<div class="user-marker-container"><div class="user-marker-pulse"></div><div class="user-marker-dot"></div></div>`,
           iconSize: [50, 50],
           iconAnchor: [25, 25]
         });
 
         const marker = L.marker(userPos, { icon: pulseIcon }).addTo(map);
         setUserMarker(marker);
-
         map.setView(userPos, 17, { animate: true, duration: 0.8 });
       },
-      () => {
-        setIsLocating(false);
-      },
+      () => { setIsLocating(false); },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }, [map, userMarker]);
 
   useEffect(() => {
-    if (map) {
-      getUserLocation();
-    }
+    if (map) getUserLocation();
   }, [map]);
 
   useEffect(() => {
     const L = (window as any).L;
     if (!map || !L) return;
-
     markers.forEach(m => map.removeLayer(m));
 
     const newMarkers = locations.map(loc => {
@@ -189,26 +160,22 @@ export default function MapPage() {
         html: `
           <div class="marker-wrapper ${isSelected ? 'selected' : ''}" style="--marker-color: ${cat?.color || '#333'}">
             <div class="marker-bounce"></div>
-            <div class="marker-content">
-              <span class="marker-emoji">${cat?.emoji || '📍'}</span>
-            </div>
+            <div class="marker-content"><span class="marker-emoji">${cat?.emoji || '📍'}</span></div>
             <div class="marker-glow"></div>
           </div>
         `,
         iconSize: [48, 56],
         iconAnchor: [24, 56],
-        popupAnchor: [0, -56]
       });
 
       const marker = L.marker([loc.lat, loc.lng], { icon })
         .addTo(map)
         .on('click', () => {
           setSelectedMarker(loc.id);
-setSelectedCategory(loc.category);
+          setSelectedCategory(loc.category);
           setFilteredLocations([loc]);
           setShowSheet(true);
         });
-
       return marker;
     });
 
@@ -247,14 +214,11 @@ setSelectedCategory(loc.category);
   };
 
   const resetMapView = () => {
-    if (map) {
-      map.setView(villageCenter, 16, { animate: true, duration: 0.8 });
-    }
+    if (map) map.setView(villageCenter, 16, { animate: true, duration: 0.8 });
   };
 
   return (
     <div className="map-page-container">
-      {/* Premium Header */}
       <header className="map-header">
         <div className="header-left">
           <button className="back-btn" onClick={() => router.back()}>
@@ -270,13 +234,12 @@ setSelectedCategory(loc.category);
         </button>
       </header>
 
-      {/* Search Bar */}
       <div className="map-search-container">
         <div className="search-input-wrapper">
           <Search size={18} className="search-icon" />
           <input
             type="text"
-            placeholder="Search places, locations..."
+            placeholder="Search places..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             className="search-input"
@@ -289,25 +252,21 @@ setSelectedCategory(loc.category);
         </div>
       </div>
 
-      {/* Map View */}
       <div className="map-view-area" ref={mapRef}>
         <div id="map-container" style={{ width: '100%', height: '100%' }}></div>
-
-        {/* Map Overlay Controls */}
         <div className="map-overlay-controls">
           <button className="overlay-btn" onClick={resetMapView} title="Reset view">
             <Compass size={20} />
           </button>
         </div>
-
-        {/* Location Counter Badge */}
         <div className="location-count-badge">
           <span className="count-number">{locations.length}</span>
           <span className="count-label">places</span>
         </div>
       </div>
 
-      {/* Premium Category Chips */}
+      <div className="map-bottom-spacer" />
+
       <div className="map-category-container">
         <div className="category-scroll">
           {CATEGORIES.map((cat) => {
@@ -319,35 +278,24 @@ setSelectedCategory(loc.category);
                 onClick={() => handleCategoryClick(cat.id)}
                 style={{ "--cat-color": cat.color, "--cat-gradient": cat.gradient } as React.CSSProperties}
               >
-                <div className="chip-icon">
-                  {cat.icon}
-                </div>
+                <div className="chip-icon">{cat.icon}</div>
                 <div className="chip-content">
                   <span className="chip-label">{cat.label}</span>
                   <span className="chip-count">{count}</span>
                 </div>
-                {selectedCategory === cat.id && <div className="chip-indicator" />}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Premium Bottom Sheet */}
       {showSheet && (
-        <div className="location-sheet-overlay" onClick={() => {
-          setShowSheet(false);
-          setSelectedMarker(null);
-        }}>
+        <div className="location-sheet-overlay" onClick={() => { setShowSheet(false); setSelectedMarker(null); }}>
           <div className="location-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="sheet-handle" />
-            
             <div className="sheet-header">
               <div className="sheet-title-section">
-                <div 
-                  className="sheet-icon"
-                  style={{ background: CATEGORIES.find(c => c.id === selectedCategory)?.gradient }}
-                >
+                <div className="sheet-icon" style={{ background: CATEGORIES.find(c => c.id === selectedCategory)?.gradient }}>
                   {CATEGORIES.find(c => c.id === selectedCategory)?.icon}
                 </div>
                 <div className="sheet-title-content">
@@ -355,48 +303,22 @@ setSelectedCategory(loc.category);
                   <span className="sheet-count">{filteredLocations.length} {filteredLocations.length === 1 ? 'location' : 'locations'}</span>
                 </div>
               </div>
-              <button className="close-sheet" onClick={() => {
-                setShowSheet(false);
-                setSelectedMarker(null);
-              }}>
+              <button className="close-sheet" onClick={() => { setShowSheet(false); setSelectedMarker(null); }}>
                 <X size={20} />
               </button>
             </div>
-
             <div className="location-list">
               {filteredLocations.length > 0 ? (
                 filteredLocations.map((loc) => (
-                  <div 
-                    key={loc.id} 
-                    className="location-item"
-                    onClick={() => {
-                      setSelectedMarker(loc.id);
-                      if (map) {
-                        map.setView([loc.lat, loc.lng], 18, { animate: true });
-                      }
-                    }}
-                  >
+                  <div key={loc.id} className="location-item" onClick={() => { setSelectedMarker(loc.id); if (map) map.setView([loc.lat, loc.lng], 18, { animate: true }); }}>
                     <div className="location-content">
                       <div className="location-header">
                         <span className="loc-name">{loc.name}</span>
-                        <span className="loc-distance">
-                          <MapPin size={12} /> 0.5 km
-                        </span>
+                        <span className="loc-distance"><MapPin size={12} /> 0.5 km</span>
                       </div>
-                      <p className="loc-desc">{loc.description || "No description available"}</p>
-                      <div className="loc-footer">
-                        <span className="loc-coords">
-                          {loc.lat.toFixed(5)}, {loc.lng.toFixed(5)}
-                        </span>
-                      </div>
+                      <p className="loc-desc">{loc.description || "No description"}</p>
                     </div>
-                    <button 
-                      className="navigate-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openInGoogleMaps(loc.lat, loc.lng);
-                      }}
-                    >
+                    <button className="navigate-btn" onClick={(e) => { e.stopPropagation(); openInGoogleMaps(loc.lat, loc.lng); }}>
                       <Navigation size={16} />
                       <span>Navigate</span>
                     </button>
@@ -404,23 +326,15 @@ setSelectedCategory(loc.category);
                 ))
               ) : (
                 <div className="empty-state">
-                  <div className="empty-icon-wrapper">
-                    <MapPin size={40} />
-                  </div>
+                  <div className="empty-icon-wrapper"><MapPin size={40} /></div>
                   <h3>No Locations Found</h3>
-                  <p>No {selectedCategory}s marked yet in Panaimarathupalayam.</p>
-                  <button className="add-location-btn">
-                    <span>Add First Location</span>
-                    <ChevronRight size={16} />
-                  </button>
+                  <p>No {selectedCategory}s marked yet.</p>
                 </div>
               )}
             </div>
           </div>
         </div>
       )}
-
-      <BottomNav />
     </div>
   );
 }

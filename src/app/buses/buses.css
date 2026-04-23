@@ -1,17 +1,19 @@
 .buses-page {
   min-height: 100vh;
-  background-color: var(--background);
+  background: var(--background);
   display: flex;
   flex-direction: column;
 }
 
 .buses-header {
-  background: white;
+  background: var(--card-bg);
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: calc(16px + env(safe-area-inset-top));
+  border-bottom: 1px solid var(--glass-border);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
+  backdrop-filter: blur(20px);
 }
 
 .header-top {
@@ -21,15 +23,8 @@
   margin-bottom: 16px;
 }
 
-.header-top h1 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin: 0;
-}
-
 .back-button {
-  color: var(--text-dark);
+  color: var(--foreground);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -37,199 +32,314 @@
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  transition: background 0.2s;
-  margin-left: -8px;
+  transition: all 0.2s;
 }
 
 .back-button:active {
-  background: var(--gray-light);
+  transform: scale(0.9);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.header-title-center {
+  flex: 1;
+  text-align: center;
+}
+
+.header-title-center h1 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+  margin: 0;
 }
 
 .search-bar-container {
-  width: 100%;
+  margin-bottom: 12px;
 }
 
 .search-bar {
-  background: var(--gray-light);
-  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 14px;
   padding: 12px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+@media (prefers-color-scheme: dark) {
+  .search-bar { background: rgba(255, 255, 255, 0.06); }
+}
+
+.search-bar:focus-within {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
 }
 
 .search-icon {
-  color: var(--text-light);
+  color: var(--text-muted);
 }
 
 .search-bar input {
   background: transparent;
   border: none;
   flex: 1;
-  font-size: 15px;
-  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground);
   outline: none;
 }
 
 .search-bar input::placeholder {
-  color: var(--text-light);
+  color: var(--text-muted);
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-tab:active { transform: scale(0.95); }
+
+.filter-tab.active {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+.filter-tab.active.govt {
+  background: #6366f1;
+  border-color: #6366f1;
+}
+
+.filter-tab.active.private {
+  background: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.tab-count {
+  padding: 2px 6px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 10px;
+}
+
+.filter-tab.active .tab-count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  .tab-count { background: rgba(255, 255, 255, 0.1); }
 }
 
 /* Content Area */
 .buses-content {
-  padding: 20px;
   flex: 1;
-  background-color: #f7fbff; /* Slight blue tint background */
+  padding: 16px 20px;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
 }
 
-/* Cards Modern */
-.bus-cards {
+.bus-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-.bus-card-modern {
-  background: white;
-  border-radius: 24px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  transition: transform 0.2s, box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
+/* Bus Item Card */
+.bus-item-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 18px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.bus-card-modern:active {
+.bus-item-card:active {
   transform: scale(0.98);
 }
 
-.bus-card-modern::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background: var(--primary);
-  border-radius: 24px 0 0 24px;
-}
-
-.bus-route-circle {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-  color: var(--primary);
+.bus-item-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 800;
-  flex-shrink: 0;
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5), 0 4px 10px rgba(99, 102, 241, 0.15);
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.bus-card-body {
-  flex: 1;
+.bus-number-badge {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+
+.bus-type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bus-type-chip.govt {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.bus-type-chip.private {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+/* Route Visual */
+.bus-route-visual {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.bus-stop-point {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stop-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px #10b981;
+}
+
+.stop-marker.end-marker {
+  background: transparent;
+  border-color: var(--text-muted);
+  box-shadow: none;
+}
+
+.bus-stop-point span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  max-width: 70px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bus-route-line {
+  flex: 1;
+  position: relative;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 100px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bus-route-line { background: rgba(255, 255, 255, 0.08); }
+}
+
+.route-progress {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.route-bus-icon {
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  background: #10b981;
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+
+/* Footer */
+.bus-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 
-.bus-main-info {
+.bus-schedule-info {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.bus-locations {
-  display: flex;
-  align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.from-loc {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-dark);
-}
-
-.to-loc {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--text-dark);
-}
-
-.arrow-icon {
-  color: var(--text-light);
-}
-
-.bus-time-wrapper {
-  display: flex;
+.schedule-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--primary);
-  background: rgba(37, 99, 235, 0.05);
-  padding: 4px 10px;
-  border-radius: 8px;
-  width: fit-content;
-}
-
-.bus-time-text {
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 700;
-  font-size: 14px;
 }
 
-.bus-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px dashed rgba(0,0,0,0.08);
-  padding-top: 12px;
+.schedule-chip.depart {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
 }
 
-.operator-chip {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
+.schedule-chip.next {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.bus-action-btn {
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.operator-chip.govt {
-  background: #f0fdf4;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-}
-
-.operator-chip.private {
-  background: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-}
-
-.status-chip {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-light);
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  color: white;
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  flex-shrink: 0;
 }
 
-.status-chip.active::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #10b981;
+.bus-action-btn:active {
+  transform: scale(0.9);
 }
 
 /* Empty / Loading States */
@@ -242,7 +352,7 @@
   gap: 12px;
   text-align: center;
   padding: 60px 20px;
-  color: var(--text-light);
+  color: var(--text-muted);
 }
 
 .empty-emoji {
@@ -255,11 +365,15 @@
   width: 32px;
   height: 32px;
   border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top-color: var(--primary);
+  border-top-color: #10b981;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.buses-bottom-nav-spacer {
+  height: calc(80px + env(safe-area-inset-bottom));
 }

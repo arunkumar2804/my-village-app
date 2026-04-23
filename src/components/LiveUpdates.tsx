@@ -101,83 +101,165 @@ export default function LiveUpdates() {
       </div>
 
       {(activeTab === "all" || activeTab === "transport") && nextBus && (
-        <div className="premium-update-card card-bus">
-          <div className="premium-icon-box">
-            <Bus size={24} />
-          </div>
-          <div className="card-main-info">
-            <div className="service-header-row">
-              <span className="service-name-premium">{nextBus.item.routeNumber} Service</span>
-              <div className="live-indicator-pill">
-                <div className="live-pulse-dot"></div>
-                Live
+        <div className="high-impact-card card-bus">
+          <div className="mesh-bg"></div>
+          <div className="card-top-section">
+            <div className="service-badge-large">
+              <div className="icon-wrapper-large">
+                <Bus size={28} />
+              </div>
+              <div className="service-title-info">
+                <span className="operator-label">{nextBus.item.operator || "Public Transit"}</span>
+                <span className="service-name-bold">{nextBus.item.routeNumber} Service</span>
               </div>
             </div>
-            <div className="route-text-premium">
-              <span>{nextBus.item.from}</span>
-              <ArrowRight size={14} className="opacity-40" />
-              <span>{nextBus.item.to}</span>
+            <div className="status-pill-premium">
+              <div className="pulse-dot-large"></div>
+              Live
             </div>
           </div>
-          <div className="premium-time-box">
-            <span className="time-val">{format12h(nextBus.item.departureTime).split(' ')[0]}</span>
-            <span className="time-rel">{nextBus.relTime}</span>
+
+          <div className="route-visualization">
+            <div className="route-point">
+              <span className="point-label">From</span>
+              <span className="point-name">{nextBus.item.from}</span>
+            </div>
+            <div className="route-line-visual"></div>
+            <div className="route-point" style={{textAlign: 'right'}}>
+              <span className="point-label">Destination</span>
+              <span className="point-name">{nextBus.item.to}</span>
+            </div>
+          </div>
+
+          <div className="card-details-grid">
+            <div className="detail-item">
+              <span className="detail-label">Type</span>
+              <span className="detail-val">AC Express</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Frequency</span>
+              <span className="detail-val">Every 30m</span>
+            </div>
+          </div>
+
+          <div className="card-footer-section">
+            <div className="big-time-display">
+              <span className="big-time-val">{format12h(nextBus.item.departureTime)}</span>
+              <span className="big-time-label">Scheduled Departure</span>
+            </div>
+            <div className="rel-time-tag">
+              {nextBus.relTime}
+            </div>
           </div>
         </div>
       )}
 
       {(activeTab === "all" || activeTab === "transport") && nextTrain && (
-        <div className="premium-update-card card-train">
-          <div className="premium-icon-box">
-            <Train size={24} />
-          </div>
-          <div className="card-main-info">
-            <div className="service-header-row">
-              <span className="service-name-premium">{nextTrain.item.trainName}</span>
-              <div className="live-indicator-pill">
-                <div className="live-pulse-dot"></div>
-                On Time
+        <div className="high-impact-card card-train">
+          <div className="mesh-bg"></div>
+          <div className="card-top-section">
+            <div className="service-badge-large">
+              <div className="icon-wrapper-large">
+                <Train size={28} />
+              </div>
+              <div className="service-title-info">
+                <span className="operator-label">Indian Railways</span>
+                <span className="service-name-bold">{nextTrain.item.trainName}</span>
               </div>
             </div>
-            <div className="route-text-premium">
-              <Clock size={12} className="opacity-50" />
-              <span>Station: {nextTrain.item.nearbyStation}</span>
+            <div className="status-pill-premium">
+              <div className="pulse-dot-large"></div>
+              On Time
             </div>
           </div>
-          <div className="premium-time-box">
-            <span className="time-val">{format12h(nextTrain.item.departureTime).split(' ')[0]}</span>
-            <span className="time-rel">{nextTrain.relTime}</span>
+
+          <div className="route-visualization">
+            <div className="route-point">
+              <span className="point-label">Origin</span>
+              <span className="point-name">{nextTrain.item.from}</span>
+            </div>
+            <div className="route-line-visual"></div>
+            <div className="route-point" style={{textAlign: 'right'}}>
+              <span className="point-label">Terminus</span>
+              <span className="point-name">{nextTrain.item.to}</span>
+            </div>
+          </div>
+
+          <div className="card-details-grid">
+            <div className="detail-item">
+              <span className="detail-label">Train No</span>
+              <span className="detail-val">#{nextTrain.item.trainNumber}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Nearby</span>
+              <span className="detail-val">{nextTrain.item.nearbyStation}</span>
+            </div>
+          </div>
+
+          <div className="card-footer-section">
+            <div className="big-time-display">
+              <span className="big-time-val">{format12h(nextTrain.item.departureTime)}</span>
+              <span className="big-time-label">Station Departure</span>
+            </div>
+            <div className="rel-time-tag">
+              {nextTrain.relTime}
+            </div>
           </div>
         </div>
       )}
 
       {(activeTab === "all" || activeTab === "water") && nextWater && (
-        <div className="premium-update-card card-water">
-          <div className="premium-icon-box">
-            <Droplets size={24} />
-          </div>
-          <div className="card-main-info">
-            <div className="service-header-row">
-              <span className="service-name-premium">{nextWater.item.zone} Supply</span>
-              <div className="live-indicator-pill">
-                <div className="live-pulse-dot"></div>
-                Active
+        <div className="high-impact-card card-water">
+          <div className="mesh-bg"></div>
+          <div className="card-top-section">
+            <div className="service-badge-large">
+              <div className="icon-wrapper-large">
+                <Droplets size={28} />
+              </div>
+              <div className="service-title-info">
+                <span className="operator-label">Municipal Supply</span>
+                <span className="service-name-bold">{nextWater.item.zone} Zone</span>
               </div>
             </div>
-            <div className="route-text-premium">
-              <Sun size={12} className="opacity-50" />
-              <span className="capitalize">{nextWater.item.session} Session</span>
+            <div className="status-pill-premium">
+              <div className="pulse-dot-large"></div>
+              Active
             </div>
           </div>
-          <div className="premium-time-box">
-            <span className="time-val">{format12h(nextWater.item.startTime).split(' ')[0]}</span>
-            <span className="time-rel">{nextWater.relTime}</span>
+
+          <div className="card-details-grid">
+            <div className="detail-item">
+              <span className="detail-label">Session</span>
+              <span className="detail-val capitalize">{nextWater.item.session} Supply</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Duration</span>
+              <span className="detail-val">{nextWater.item.durationMins} Minutes</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">End Time</span>
+              <span className="detail-val">{format12h(nextWater.item.endTime)}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Status</span>
+              <span className="detail-val">High Pressure</span>
+            </div>
+          </div>
+
+          <div className="card-footer-section">
+            <div className="big-time-display">
+              <span className="big-time-val">{format12h(nextWater.item.startTime)}</span>
+              <span className="big-time-label">Flow Starts At</span>
+            </div>
+            <div className="rel-time-tag">
+              {nextWater.relTime}
+            </div>
           </div>
         </div>
       )}
 
       {(!nextBus && !nextTrain && !nextWater) && (
-        <div className="premium-empty-state">
+        <div className="high-impact-empty">
           <p>No live updates currently available.</p>
         </div>
       )}

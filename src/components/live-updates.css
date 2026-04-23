@@ -1,29 +1,28 @@
 .live-updates-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .live-updates-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .live-updates-header h2 {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--foreground);
 }
 
 .live-filter-tabs {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   background: rgba(0, 0, 0, 0.05);
   padding: 4px;
-  border-radius: 16px;
+  border-radius: 12px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,13 +30,13 @@
 }
 
 .filter-tab {
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   border: none;
   background: transparent;
 }
@@ -45,252 +44,130 @@
 .filter-tab.active {
   background: white;
   color: var(--foreground);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
-  .filter-tab.active { background: #1e293b; color: white; }
+  .filter-tab.active { background: #334155; color: white; }
 }
 
-/* High-Impact Update Cards */
-.high-impact-card {
-  position: relative;
+/* Simplified Clean Cards */
+.clean-update-card {
   background: var(--card-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
-  border-radius: 28px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.high-impact-card:active {
-  transform: scale(0.98) translateY(4px);
-}
-
-/* Animated Mesh Background */
-.mesh-bg {
-  position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
-  opacity: 0.05;
-  z-index: 0;
-  pointer-events: none;
-  background-image: 
-    radial-gradient(at 100% 0%, var(--accent-solid) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, var(--accent-solid) 0px, transparent 50%);
-}
-
-.card-bus { --accent-solid: var(--bus-primary); --accent-light: var(--bus-light); }
-.card-train { --accent-solid: var(--train-primary); --accent-light: var(--train-light); }
-.card-water { --accent-solid: var(--water-primary); --accent-light: var(--water-light); }
-
-.card-top-section {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.service-badge-large {
+  border-radius: 20px;
+  padding: 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease;
 }
 
-.icon-wrapper-large {
-  width: 56px;
-  height: 56px;
-  border-radius: 20px;
+.clean-update-card:active {
+  transform: scale(0.98);
+}
+
+.service-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent-light);
-  color: var(--accent-solid);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
-.service-title-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.icon-bus { background: var(--bus-light); color: var(--bus-primary); }
+.icon-train { background: var(--train-light); color: var(--train-primary); }
+.icon-water { background: var(--water-light); color: var(--water-primary); }
 
-.service-name-bold {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--foreground);
-  letter-spacing: -0.02em;
-}
-
-.operator-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.status-pill-premium {
-  padding: 6px 14px;
-  border-radius: 100px;
-  background: var(--background);
-  border: 1px solid var(--glass-border);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--accent-solid);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.pulse-dot-large {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent-solid);
-  animation: pulse-dot 2s infinite;
-}
-
-@keyframes pulse-dot {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.5; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.card-details-grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 20px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .card-details-grid { background: rgba(255, 255, 255, 0.03); }
-}
-
-.detail-item {
+.card-main-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
-.detail-label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
-}
-
-.detail-val {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--foreground);
-}
-
-.route-visualization {
-  position: relative;
-  z-index: 1;
+.service-title-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 4px 0;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.route-point {
+.service-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dot { width: 6px; height: 6px; border-radius: 50%; }
+.dot-bus { background: var(--bus-primary); }
+.dot-train { background: var(--train-primary); }
+.dot-water { background: var(--water-primary); }
+
+.route-details {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.time-info-section {
+  text-align: right;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  flex: 1;
+  padding-left: 12px;
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.point-name {
+@media (prefers-color-scheme: dark) {
+  .time-info-section { border-left-color: rgba(255, 255, 255, 0.05); }
+}
+
+.departure-time {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--foreground);
 }
 
-.point-label {
-  font-size: 10px;
+.relative-time {
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
 }
 
-.route-line-visual {
-  flex: 0.5;
-  height: 2px;
-  background: repeating-linear-gradient(90deg, var(--glass-border) 0, var(--glass-border) 4px, transparent 4px, transparent 8px);
-  position: relative;
-}
-
-.route-line-visual::after {
-  content: '→';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 12px;
-  color: var(--accent-solid);
-  background: var(--card-bg);
-  padding: 0 4px;
-}
-
-.card-footer-section {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 4px;
-}
-
-.big-time-display {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-.big-time-val {
-  font-size: 24px;
-  font-weight: 900;
-  color: var(--foreground);
-  letter-spacing: -0.02em;
-}
-
-.big-time-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.rel-time-tag {
-  padding: 8px 16px;
-  border-radius: 14px;
-  background: var(--accent-solid);
-  color: white;
-  font-size: 13px;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
-}
-
 /* Empty State */
-.high-impact-empty {
-  padding: 60px 20px;
+.empty-state-simple {
+  padding: 32px 16px;
   text-align: center;
   background: var(--card-bg);
-  border-radius: 28px;
-  border: 2px dashed var(--glass-border);
+  border-radius: 20px;
+  border: 1px dashed var(--glass-border);
+  color: var(--text-muted);
+}
+
+.empty-state-simple p {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
 }

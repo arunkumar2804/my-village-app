@@ -37,11 +37,8 @@ export default function LiveUpdates() {
   const [nextBus, setNextBus] = useState<{ item: BusTiming; relTime: string; date: Date } | null>(null);
   const [nextTrain, setNextTrain] = useState<{ item: TrainTiming; relTime: string; date: Date } | null>(null);
   const [nextWater, setNextWater] = useState<{ item: WaterUpdate; relTime: string; date: Date } | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const calculateNext = async () => {
-    setIsRefreshing(true);
-    
     // Bus
     const activeBuses = (await getBusTimings()).filter((b) => b.isActive);
     if (activeBuses.length > 0) {
@@ -74,7 +71,6 @@ export default function LiveUpdates() {
       });
       setNextWater({ item: closest, relTime: getTimeData(closestDate), date: closestDate });
     }
-    setTimeout(() => setIsRefreshing(false), 600);
   };
 
   useEffect(() => {
@@ -87,11 +83,11 @@ export default function LiveUpdates() {
     <section className="live-updates-container">
       <div className="live-updates-header">
         <h2>Live Updates</h2>
-        <div className="live-filter-tabs">
+        <div className="segmented-tabs">
           {["all", "transport", "water"].map((tab) => (
             <button 
               key={tab}
-              className={`filter-tab ${activeTab === tab ? "active" : ""}`}
+              className={`tab-btn ${activeTab === tab ? "active" : ""}`}
               onClick={() => setActiveTab(tab as any)}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -101,84 +97,78 @@ export default function LiveUpdates() {
       </div>
 
       {(activeTab === "all" || activeTab === "transport") && nextBus && (
-        <div className="clean-update-card">
-          <div className="service-icon-box icon-bus">
-            <Bus size={22} />
+        <div className="live-widget-card card-bus" style={{"--accent-rgb": "16, 185, 129"} as any}>
+          <div className="aura-glow aura-bus"></div>
+          <div className="widget-icon-container">
+            <Bus size={22} className="icon-inner" />
           </div>
-          <div className="card-main-content">
-            <div className="service-title-row">
-              <span className="service-name">{nextBus.item.routeNumber} • {nextBus.item.operator || "Public"}</span>
-              <div className="status-indicator">
-                <div className="dot dot-bus"></div>
-                Live
-              </div>
+          <div className="widget-info">
+            <div className="widget-title-row">
+              <span className="widget-name">{nextBus.item.routeNumber} Service</span>
+              <span className="status-badge-mini">Live</span>
             </div>
-            <div className="route-details">
+            <div className="widget-route">
               <span>{nextBus.item.from}</span>
-              <ArrowRight size={14} opacity={0.5} />
+              <ArrowRight size={12} opacity={0.5} />
               <span>{nextBus.item.to}</span>
             </div>
           </div>
-          <div className="time-info-section">
-            <span className="departure-time">{format12h(nextBus.item.departureTime)}</span>
-            <span className="relative-time">{nextBus.relTime}</span>
+          <div className="widget-time-section">
+            <span className="main-time">{format12h(nextBus.item.departureTime)}</span>
+            <span className="time-label-pill">{nextBus.relTime}</span>
           </div>
         </div>
       )}
 
       {(activeTab === "all" || activeTab === "transport") && nextTrain && (
-        <div className="clean-update-card">
-          <div className="service-icon-box icon-train">
-            <Train size={22} />
+        <div className="live-widget-card card-train" style={{"--accent-rgb": "99, 102, 241"} as any}>
+          <div className="aura-glow aura-train"></div>
+          <div className="widget-icon-container">
+            <Train size={22} className="icon-inner" />
           </div>
-          <div className="card-main-content">
-            <div className="service-title-row">
-              <span className="service-name">{nextTrain.item.trainName}</span>
-              <div className="status-indicator">
-                <div className="dot dot-train"></div>
-                On Time
-              </div>
+          <div className="widget-info">
+            <div className="widget-title-row">
+              <span className="widget-name">{nextTrain.item.trainName}</span>
+              <span className="status-badge-mini">On Time</span>
             </div>
-            <div className="route-details">
+            <div className="widget-route">
               <Clock size={12} opacity={0.6} />
-              <span>Station: {nextTrain.item.nearbyStation}</span>
+              <span>{nextTrain.item.nearbyStation}</span>
             </div>
           </div>
-          <div className="time-info-section">
-            <span className="departure-time">{format12h(nextTrain.item.departureTime)}</span>
-            <span className="relative-time">{nextTrain.relTime}</span>
+          <div className="widget-time-section">
+            <span className="main-time">{format12h(nextTrain.item.departureTime)}</span>
+            <span className="time-label-pill">{nextTrain.relTime}</span>
           </div>
         </div>
       )}
 
       {(activeTab === "all" || activeTab === "water") && nextWater && (
-        <div className="clean-update-card">
-          <div className="service-icon-box icon-water">
-            <Droplets size={22} />
+        <div className="live-widget-card card-water" style={{"--accent-rgb": "6, 182, 212"} as any}>
+          <div className="aura-glow aura-water"></div>
+          <div className="widget-icon-container">
+            <Droplets size={22} className="icon-inner" />
           </div>
-          <div className="card-main-content">
-            <div className="service-title-row">
-              <span className="service-name">{nextWater.item.zone} Supply</span>
-              <div className="status-indicator">
-                <div className="dot dot-water"></div>
-                Active
-              </div>
+          <div className="widget-info">
+            <div className="widget-title-row">
+              <span className="widget-name">{nextWater.item.zone} Zone</span>
+              <span className="status-badge-mini">Active</span>
             </div>
-            <div className="route-details">
+            <div className="widget-route">
               <Sun size={12} opacity={0.6} />
-              <span style={{textTransform: 'capitalize'}}>{nextWater.item.session} Session</span>
+              <span className="capitalize">{nextWater.item.session} session</span>
             </div>
           </div>
-          <div className="time-info-section">
-            <span className="departure-time">{format12h(nextWater.item.startTime)}</span>
-            <span className="relative-time">{nextWater.relTime}</span>
+          <div className="widget-time-section">
+            <span className="main-time">{format12h(nextWater.item.startTime)}</span>
+            <span className="time-label-pill">{nextWater.relTime}</span>
           </div>
         </div>
       )}
 
       {(!nextBus && !nextTrain && !nextWater) && (
-        <div className="empty-state-simple">
-          <p>No live updates currently available.</p>
+        <div className="widget-empty">
+          <p>No live updates at the moment.</p>
         </div>
       )}
     </section>

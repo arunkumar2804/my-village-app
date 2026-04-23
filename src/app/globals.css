@@ -736,15 +736,33 @@ body {
    ═══════════════════════════════════════════ */
 
 .bus-card {
+  position: relative;
   background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 24px;
+  padding: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  isolation: isolate;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bus-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bus-card:active {
+  transform: scale(0.985);
 }
 
 .bus-card-header {
@@ -788,11 +806,18 @@ body {
 .bus-card-time-chip.arriving {
   background: #fef2f2;
   color: #dc2626;
+  animation: arrivingPulse 1.5s infinite;
+}
+
+@keyframes arrivingPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
 }
 
 @media (prefers-color-scheme: dark) {
   .bus-card-time-chip.arriving {
-    background: rgba(220, 38, 38, 0.15);
+    background: rgba(220, 38, 38, 0.2);
+    color: #ef4444;
   }
 }
 
@@ -838,16 +863,18 @@ body {
 
 .destination-from,
 .destination-to {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: var(--foreground);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
 .destination-to {
   text-align: right;
+  color: var(--bus-primary);
 }
 
 .path-connector {
@@ -896,34 +923,48 @@ body {
 }
 
 .bus-card-crowd-chip.crowded {
-  background: #fef2f2;
-  color: #dc2626;
+  background: #fff1f2;
+  color: #e11d48;
+  border: 1px solid rgba(225, 29, 72, 0.1);
 }
 
 .bus-card-crowd-chip.less {
-  background: var(--bus-light);
-  color: var(--bus-primary);
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid rgba(22, 163, 74, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   .bus-card-crowd-chip.crowded {
-    background: rgba(220, 38, 38, 0.15);
+    background: rgba(225, 29, 72, 0.15);
+    color: #fb7185;
+  }
+  .bus-card-crowd-chip.less {
+    background: rgba(22, 163, 74, 0.15);
+    color: #4ade80;
   }
 }
 
 .bus-card-footer {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .bus-card-tag {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 10px 12px;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
+  gap: 4px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+}
+
+.bus-card-tag:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {

@@ -16,6 +16,7 @@ interface BusCardProps {
 function calculateTimeRemaining(departureTime: Date | string): {
   minutes: number;
   status: "normal" | "arriving";
+  formattedText: string;
 } {
   let hours: number, minutes: number;
   
@@ -35,10 +36,23 @@ function calculateTimeRemaining(departureTime: Date | string): {
   
   const diffMs = target.getTime() - now.getTime();
   const diffMinutes = Math.ceil(diffMs / 60000);
+  const totalMins = Math.max(0, diffMinutes);
+
+  let formattedText = "";
+  if (totalMins <= 1) {
+    formattedText = "Arriving";
+  } else if (totalMins < 60) {
+    formattedText = `${totalMins} mins`;
+  } else {
+    const h = Math.floor(totalMins / 60);
+    const m = totalMins % 60;
+    formattedText = m > 0 ? `${h} hrs ${m} mins` : `${h} hrs`;
+  }
 
   return {
-    minutes: Math.max(0, diffMinutes),
-    status: diffMinutes <= 1 ? "arriving" : "normal",
+    minutes: totalMins,
+    status: totalMins <= 1 ? "arriving" : "normal",
+    formattedText,
   };
 }
 
@@ -127,7 +141,7 @@ export default function BusCard({
           ) : (
             <>
               <Clock size={12} />
-              <span>{timeInfo.minutes} mins</span>
+              <span>{timeInfo.formattedText}</span>
             </>
           )}
         </div>

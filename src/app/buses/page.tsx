@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Search, Shield, Building2 } from "lucide-react";
+import { ArrowLeft, Search, Shield, Building2, Info } from "lucide-react";
 import { getBusTimings } from "@/lib/store";
 import BusCard from "@/components/BusCard";
 import type { BusTiming } from "@/lib/types";
@@ -39,66 +39,88 @@ export default function BusSchedules() {
 
   return (
     <div className="buses-page">
-      <header className="buses-header">
-        <div className="header-top">
-          <Link href="/" className="back-button">
+      {/* Background Aura Glow */}
+      <div className="buses-aura-glow"></div>
+
+      <header className="buses-hero">
+        <div className="buses-hero-top">
+          <Link href="/" className="buses-back-btn">
             <ArrowLeft size={24} />
           </Link>
-          <div className="header-title-center">
+          <div className="buses-hero-info">
             <h1>Bus Schedules</h1>
-          </div>
-          <div style={{ width: 40 }} />
-        </div>
-        
-        <div className="search-bar-container">
-          <div className="search-bar">
-            <Search size={18} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search route, destination..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <p>Real-time timings for your village</p>
           </div>
         </div>
 
-        <div className="filter-tabs">
-          <button 
-            className={`filter-tab ${filterType === "all" ? "active" : ""}`}
-            onClick={() => setFilterType("all")}
-          >
-            All <span className="tab-count">{buses.length}</span>
-          </button>
-          <button 
-            className={`filter-tab ${filterType === "government" ? "active govt" : ""}`}
-            onClick={() => setFilterType("government")}
-          >
-            <Shield size={12} /> Govt <span className="tab-count">{govtCount}</span>
-          </button>
-          <button 
-            className={`filter-tab ${filterType === "private" ? "active private" : ""}`}
-            onClick={() => setFilterType("private")}
-          >
-            <Building2 size={12} /> Private <span className="tab-count">{privateCount}</span>
-          </button>
+        <div className="buses-stats-row">
+          <div className="stat-pill">
+            <span className="stat-val">{buses.length}</span>
+            <span className="stat-lbl">Routes</span>
+          </div>
+          <div className="stat-pill govt">
+            <span className="stat-val">{govtCount}</span>
+            <span className="stat-lbl">Govt</span>
+          </div>
+          <div className="stat-pill private">
+            <span className="stat-val">{privateCount}</span>
+            <span className="stat-lbl">Private</span>
+          </div>
         </div>
       </header>
 
-      <div className="buses-content">
+      <div className="buses-controls-sticky">
+        <div className="buses-search-wrap">
+          <Search size={18} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search route or destination..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="buses-filter-bar">
+          <button 
+            className={`buses-filter-btn ${filterType === "all" ? "active" : ""}`}
+            onClick={() => setFilterType("all")}
+          >
+            All
+          </button>
+          <button 
+            className={`buses-filter-btn ${filterType === "government" ? "active" : ""}`}
+            onClick={() => setFilterType("government")}
+          >
+            <Shield size={14} /> Government
+          </button>
+          <button 
+            className={`buses-filter-btn ${filterType === "private" ? "active" : ""}`}
+            onClick={() => setFilterType("private")}
+          >
+            <Building2 size={14} /> Private
+          </button>
+        </div>
+      </div>
+
+      <main className="buses-main-content">
         {loading ? (
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading schedules...</p>
+          <div className="buses-loading">
+            <div className="buses-spinner"></div>
+            <p>Fetching latest schedules...</p>
           </div>
         ) : filteredBuses.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-emoji">🚌</div>
-            <h3>No buses found</h3>
-            <p>Try adjusting your search or filters.</p>
+          <div className="buses-empty">
+            <div className="empty-icon-wrap">🚌</div>
+            <h3>No results found</h3>
+            <p>Try searching for a different route or filter</p>
           </div>
         ) : (
-          <div className="bus-list">
-            {filteredBuses.map((bus, index) => (
+          <div className="buses-list-view">
+            <div className="list-section-header">
+              <span>{filteredBuses.length} AVAILABLE SERVICES</span>
+              <div className="header-line"></div>
+            </div>
+            {filteredBuses.map((bus) => (
               <BusCard
                 key={bus.id}
                 routeNumber={bus.routeNumber}
@@ -112,9 +134,14 @@ export default function BusSchedules() {
             ))}
           </div>
         )}
-      </div>
+      </main>
 
-      <div className="buses-bottom-nav-spacer" />
+      <div className="buses-bottom-spacer" />
+      
+      <div className="buses-info-banner">
+        <Info size={16} />
+        <span>Timings are subject to traffic conditions</span>
+      </div>
     </div>
   );
 }

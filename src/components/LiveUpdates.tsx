@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Bus, Train, Droplets, MapPin, Clock, Sun, Shield, Building2 } from "lucide-react";
+import { Bus, MapPin, Clock, Shield, Building2, Coins, Users, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 import "./live-updates.css";
@@ -11,6 +11,8 @@ interface BusInfo {
   relTime: string;
   minutesLeft: number;
   progress: number;
+  isArriving: boolean;
+  isCrowded: boolean;
 }
 
 interface TrainInfo {
@@ -38,7 +40,7 @@ function getTimeData(targetDate: Date): { text: string; minutes: number } {
   const diffMins = Math.max(0, Math.floor(diffMs / 60000));
   
   if (diffMins === 0) return { text: "Arriving", minutes: 0 };
-  if (diffMins === 1) return { text: "1 min", minutes: 1 };
+  if (diffMins === 1) return { text: "Arriving", minutes: 1 };
   if (diffMins < 60) return { text: `${diffMins} mins`, minutes: diffMins };
   const hrs = Math.floor(diffMins / 60);
   const mins = diffMins % 60;
@@ -63,6 +65,17 @@ function getProgress(minutesLeft: number): number {
   return 10;
 }
 
+function isCrowdedTime(departureTime: string): boolean {
+  const [hours, minutes] = departureTime.split(":").map(Number);
+  const totalMins = hours * 60 + minutes;
+  const morningStart = 7 * 60;
+  const morningEnd = 9 * 60;
+  const eveningStart = 16 * 60;
+  const eveningEnd = 18 * 60 + 30;
+  return (totalMins >= morningStart && totalMins <= morningEnd) || 
+         (totalMins >= eveningStart && totalMins <= eveningEnd);
+}
+
 export default function LiveUpdates() {
   const [nextBus, setNextBus] = useState<BusInfo | null>(null);
   const [nextTrain, setNextTrain] = useState<TrainInfo | null>(null);
@@ -80,7 +93,15 @@ export default function LiveUpdates() {
       });
       const d = getNextOccurrence(closest.departureTime);
       const { text, minutes } = getTimeData(d);
-      setNextBus({ item: closest, relTime: text, minutesLeft: minutes, progress: getProgress(minutes) });
+      const isArriving = minutes <= 1;
+      setNextBus({ 
+        item: closest, 
+        relTime: text, 
+        minutesLeft: minutes, 
+        progress: getProgress(minutes),
+        isArriving,
+        isCrowded: isCrowdedTime(closest.departureTime)
+      });
     } else {
       setNextBus(null);
     }
@@ -121,7 +142,7 @@ export default function LiveUpdates() {
     const interval = setInterval(() => {
       calculateNext();
       setTick(t => t + 1);
-    }, 30000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -160,57 +181,56 @@ export default function LiveUpdates() {
 
       <div className="lu-cards">
         {nextBus && (
-          <div className={`lu-bus-card ${nextBus.minutesLeft <= 5 ? "urgent" : ""} ${nextBus.minutesLeft <= 15 ? "soon" : ""}`}>
+          <div className={`lu-bus-card ${nextBus.isArriving ? "arriving" : ""}`}>
             <div className="lu-bus-card-bg"></div>
             
             <div className="lu-bus-top">
-              <div className="lu-bus-badge-row">
-                <span className={`lu-bus-tag ${nextBus.item.operatorType === "government" ? "govt" : "private"}`}>
-                  {nextBus.item.operatorType === "government" ? <Shield size={10} /> : <Building2 size={10} />}
-                  {nextBus.item.operatorType === "government" ? "Government" : "Private"}
-                </span>
-                {nextBus.minutesLeft <= 5 && <span className="lu-urgent-tag">⚡ Arriving</span>}
-              </div>
-              <span className="lu-bus-route">{nextBus.item.routeNumber}</span>
-            </div>
-
-            <div className="lu-bus-route-display">
-              <div className="lu-route-stop start">
-                <div className="lu-stop-dot"></div>
-                <span>{nextBus.item.from}</span>
-              </div>
-              
-              <div className="lu-route-journey">
-                <div className="lu-journey-track">
-                  <div className="lu-journey-progress" style={{ width: `${nextBus.progress}%` }}>
-                    <div className="lu-bus-icon-anim">
-                      <Bus size={16} />
-                    </div>
-                  </div>
+              <div className="lu-bus-top-left">
+                <div className="lu-bus-icon-sm">
+                  <Bus size={16} />
                 </div>
-                <div className="lu-journey-stops">
-                  <MapPin size={10} />
-                  <MapPin size={10} />
-                  <MapPin size={10} />
-                  <MapPin size={10} />
-                </div>
+                <span className="lu-bus-label">Next Bus</span>
               </div>
-              
-              <div className="lu-route-stop end">
-                <div className="lu-stop-dot end-dot"></div>
-                <span>{nextBus.item.to}</span>
-              </div>
-            </div>
-
-            <div className="lu-bus-timing">
-              <div className="lu-bus-remain-chip">
-                <Clock size={14} />
+              <div className={`lu-time-chip ${nextBus.isArriving ? "arriving" : ""}`}>
+                <Clock size={12} />
                 <span>{nextBus.relTime}</span>
               </div>
-              <div className="lu-bus-depart-info">
-                <span className="lu-depart-label">Departs at</span>
-                <span className="lu-depart-time">{format12h(nextBus.item.departureTime)}</span>
+            </div>
+
+            <div className="lu-bus-middle">
+              <div className="lu-route-badge">{nextBus.item.routeNumber}</div>
+              
+              <div className="lu-route-info">
+                <div className="lu-route-path">
+                  <span className="lu-from">{nextBus.item.from}</span>
+                  <div className="lu-path-connector">
+                    <div className="lu-dashed-line"></div>
+                    <div className="lu-bus-icon-anim">
+                      <Bus size={12} />
+                    </div>
+                    <div className="lu-dashed-line"></div>
+                  </div>
+                  <span className="lu-to">{nextBus.item.to}</span>
+                </div>
+                <span className="lu-depart-subtitle">Departs at {format12h(nextBus.item.departureTime)}</span>
               </div>
+
+              <div className={`lu-crowd-chip ${nextBus.isCrowded ? "crowded" : ""}`}>
+                {nextBus.isCrowded ? <Users size={10} /> : <CheckCircle2 size={10} />}
+                <span>{nextBus.isCrowded ? "Mostly Crowded" : "Less Crowded"}</span>
+              </div>
+            </div>
+
+            <div className="lu-bus-bottom">
+              <span className="lu-meta-tag">{nextBus.item.serviceName}</span>
+              <span className={`lu-meta-tag ${nextBus.item.operatorType}`}>
+                {nextBus.item.operatorType === "government" ? <Shield size={10} /> : <Building2 size={10} />}
+                {nextBus.item.operatorType === "government" ? "Government" : "Private"}
+              </span>
+              <span className="lu-meta-tag fare">
+                <Coins size={10} />
+                {nextBus.item.fareType === "free" ? "Free" : "Paid"}
+              </span>
             </div>
           </div>
         )}

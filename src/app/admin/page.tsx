@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import "./admin.css";
+import BusCard from "@/components/BusCard";
 import type {
   BusTiming,
   TrainTiming,
@@ -199,7 +200,7 @@ function DataList({
       {items.map((item: any) => (
         <div key={item.id} className="data-card">
           <div className="data-card-body">
-            {category === "bus" && <BusCard item={item as BusTiming} />}
+            {category === "bus" && <BusCardAdmin item={item as BusTiming} />}
             {category === "train" && <TrainCard item={item as TrainTiming} />}
             {category === "water" && <WaterCard item={item as WaterUpdate} />}
             {category === "canal" && <CanalCard item={item as CanalUpdate} />}
@@ -238,17 +239,17 @@ function UserCard({ item }: { item: Profile }) {
   );
 }
 
-function BusCard({ item }: { item: BusTiming }) {
+function BusCardAdmin({ item }: { item: BusTiming }) {
   return (
-    <>
-      <div className="data-card-title">{item.routeNumber} — {item.from} → {item.to}</div>
-      <div className="data-card-subtitle">Departs at {item.departureTime} · {item.operator}</div>
-      <div className="data-card-meta">
-        <span className={`data-chip ${item.isActive ? "active" : "inactive"}`}>
-          {item.isActive ? "Active" : "Inactive"}
-        </span>
-      </div>
-    </>
+    <BusCard
+      routeNumber={item.routeNumber}
+      fromLocation={item.from}
+      toLocation={item.to}
+      departureTime={item.departureTime}
+      serviceName={item.serviceName}
+      ownershipType={item.operatorType === "government" ? "Government" : "Private"}
+      fareType={item.fareType === "free" ? "Free" : "Paid"}
+    />
   );
 }
 
@@ -373,11 +374,13 @@ function BusForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => voi
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [departureTime, setDepartureTime] = useState("");
-  const [operator, setOperator] = useState("Government");
+  const [serviceName, setServiceName] = useState("TNSTC");
+  const [operatorType, setOperatorType] = useState<"government" | "private">("government");
+  const [fareType, setFareType] = useState<"free" | "paid">("paid");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await store.addBusTiming({ routeNumber, from, to, departureTime, operator, isActive: true });
+    const result = await store.addBusTiming({ routeNumber, from, to, departureTime, serviceName, operatorType, fareType, isActive: true });
     if (!result) { alert("Failed to save! Please ensure the Supabase SQL tables were created and RLS is disabled."); return; }
     onSaved();
   };
@@ -390,11 +393,8 @@ function BusForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => voi
           <input className="form-input" placeholder="e.g. 3A" value={routeNumber} onChange={(e) => setRouteNumber(e.target.value)} required />
         </div>
         <div className="form-group">
-          <label>Operator</label>
-          <select className="form-select" value={operator} onChange={(e) => setOperator(e.target.value)}>
-            <option value="Government">Government (TNSTC)</option>
-            <option value="Private">Private</option>
-          </select>
+          <label>Service Name</label>
+          <input className="form-input" placeholder="e.g. TNSTC" value={serviceName} onChange={(e) => setServiceName(e.target.value)} required />
         </div>
       </div>
       <div className="form-row">
@@ -410,6 +410,22 @@ function BusForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => voi
       <div className="form-group">
         <label>Departure Time</label>
         <input className="form-input" type="time" value={departureTime} onChange={(e) => setDepartureTime(e.target.value)} required />
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label>Ownership Type</label>
+          <select className="form-select" value={operatorType} onChange={(e) => setOperatorType(e.target.value as "government" | "private")}>
+            <option value="government">Government</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Fare Type</label>
+          <select className="form-select" value={fareType} onChange={(e) => setFareType(e.target.value as "free" | "paid")}>
+            <option value="paid">Paid</option>
+            <option value="free">Free</option>
+          </select>
+        </div>
       </div>
       <div className="form-actions">
         <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>

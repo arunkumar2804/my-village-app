@@ -5,11 +5,13 @@
 export interface BusTiming {
   id: string;
   routeNumber: string;
+  serviceName: string;
   from: string;
   to: string;
   departureTime: string;
   isActive: boolean;
   operatorType: "government" | "private";
+  fareType: "free" | "paid";
   createdAt: string;
 }
 

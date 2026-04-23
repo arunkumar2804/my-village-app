@@ -17,9 +17,23 @@ function calculateTimeRemaining(departureTime: Date | string): {
   minutes: number;
   status: "normal" | "arriving";
 } {
-  const departure = new Date(departureTime);
+  let hours: number, minutes: number;
+  
+  if (typeof departureTime === "string" && departureTime.includes(":")) {
+    const parts = departureTime.split(":").map(Number);
+    hours = parts[0];
+    minutes = parts[1];
+  } else {
+    const date = new Date(departureTime);
+    hours = date.getHours();
+    minutes = date.getMinutes();
+  }
+  
   const now = new Date();
-  const diffMs = departure.getTime() - now.getTime();
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+  if (target.getTime() <= now.getTime()) target.setDate(target.getDate() + 1);
+  
+  const diffMs = target.getTime() - now.getTime();
   const diffMinutes = Math.ceil(diffMs / 60000);
 
   return {
@@ -32,9 +46,18 @@ function calculateCrowdStatus(departureTime: Date | string): {
   status: "crowded" | "less";
   label: string;
 } {
-  const departure = new Date(departureTime);
-  const hours = departure.getHours();
-  const minutes = departure.getMinutes();
+  let hours: number, minutes: number;
+  
+  if (typeof departureTime === "string" && departureTime.includes(":")) {
+    const parts = departureTime.split(":").map(Number);
+    hours = parts[0];
+    minutes = parts[1];
+  } else {
+    const date = new Date(departureTime);
+    hours = date.getHours();
+    minutes = date.getMinutes();
+  }
+  
   const totalMinutes = hours * 60 + minutes;
 
   const morningPeakStart = 7 * 60;
@@ -52,12 +75,21 @@ function calculateCrowdStatus(departureTime: Date | string): {
 }
 
 function formatDepartureTime(departureTime: Date | string): string {
-  const date = new Date(departureTime);
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
+  let hours: number, minutes: number;
+  
+  if (typeof departureTime === "string" && departureTime.includes(":")) {
+    const parts = departureTime.split(":").map(Number);
+    hours = parts[0];
+    minutes = parts[1];
+  } else {
+    const date = new Date(departureTime);
+    hours = date.getHours();
+    minutes = date.getMinutes();
+  }
+  
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const h12 = hours % 12 || 12;
+  return `${h12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
 }
 
 export default function BusCard({

@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import "./admin.css";
-import BusCard from "@/components/BusCard";
 import type {
   BusTiming,
   TrainTiming,
@@ -241,16 +240,29 @@ function UserCard({ item }: { item: Profile }) {
 
 function BusCardAdmin({ item }: { item: BusTiming }) {
   return (
-    <BusCard
-      routeNumber={item.routeNumber}
-      fromLocation={item.from}
-      toLocation={item.to}
-      departureTime={item.departureTime}
-      serviceName={item.serviceName}
-      ownershipType={item.operatorType === "government" ? "Government" : "Private"}
-      fareType={item.fareType === "free" ? "Free" : "Paid"}
-    />
+    <>
+      <div className="data-card-title">{item.routeNumber} — {item.from} → {item.to}</div>
+      <div className="data-card-subtitle">
+        Departs at {format12h(item.departureTime)} · {item.serviceName || item.operatorType || 'TNSTC'}
+      </div>
+      <div className="data-card-meta">
+        <span className={`data-chip ${item.isActive ? "active" : "inactive"}`}>
+          {item.isActive ? "Active" : "Inactive"}
+        </span>
+        {item.fareType && <span className="data-chip">{item.fareType === 'free' ? 'Free' : 'Paid'}</span>}
+      </div>
+    </>
   );
+}
+
+function format12h(timeStr: string): string {
+  if (!timeStr) return "";
+  const [hStr, mStr] = timeStr.split(":");
+  let h = parseInt(hStr, 10);
+  const m = parseInt(mStr || "0", 10);
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h}:${m.toString().padStart(2, "0")} ${ampm}`;
 }
 
 function TrainCard({ item }: { item: TrainTiming }) {

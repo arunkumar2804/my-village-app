@@ -1,4 +1,4 @@
-.live-updates-container {
+.lu-section {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -6,52 +6,49 @@
   margin-bottom: 8px;
 }
 
-.live-updates-header {
+.lu-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 4px;
 }
 
-.live-title-group {
+.lu-title-wrap {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.live-indicator {
-  display: flex;
+.lu-live-pill {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 5px 12px;
   background: linear-gradient(135deg, #10b981, #059669);
   border-radius: 100px;
-  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3);
-}
-
-.live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: white;
-  animation: livePulse 2s ease-in-out infinite;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-}
-
-@keyframes livePulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.8); }
-}
-
-.live-text {
   font-size: 10px;
   font-weight: 800;
   color: white;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  box-shadow: 0 2px 16px rgba(16, 185, 129, 0.35);
 }
 
-.live-updates-header h2 {
+.lu-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
+  animation: luPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes luPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+
+.lu-title {
   font-size: 22px;
   font-weight: 900;
   letter-spacing: -0.03em;
@@ -59,323 +56,573 @@
   margin: 0;
 }
 
-.live-count-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
-  border-radius: 100px;
-  color: var(--train-primary);
+.lu-count {
   font-size: 12px;
   font-weight: 700;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 100px;
+  color: var(--train-primary);
 }
 
-/* Horizontal Scroll Container */
-.live-scroll-container {
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 8px 0 16px;
-  margin: 0 -20px;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.live-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-.live-cards-track {
-  display: flex;
-  gap: 16px;
-  padding-right: 20px;
-}
-
-/* Live Card Base */
-.live-card {
-  flex: 0 0 280px;
-  scroll-snap-align: start;
-  position: relative;
-  background: var(--card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 20px;
+.lu-cards {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  overflow: hidden;
+}
+
+/* BUS CARD */
+.lu-bus-card {
+  position: relative;
+  background: var(--card-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.02);
+  border-radius: 20px;
+  padding: 18px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.live-card:active {
-  transform: scale(0.96);
+.lu-bus-card:active {
+  transform: scale(0.98);
 }
 
-/* Card Background Accent */
-.live-card-bg-accent {
+.lu-bus-card.urgent {
+  border-color: rgba(239, 68, 68, 0.25);
+  animation: luUrgentPulse 2s ease-in-out infinite;
+}
+
+@keyframes luUrgentPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
+  50% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05), 0 0 24px 2px rgba(239, 68, 68, 0.12); }
+}
+
+.lu-bus-card-bg {
   position: absolute;
-  top: -30px;
-  right: -30px;
-  width: 120px;
-  height: 120px;
+  top: -60px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
-  filter: blur(40px);
-  opacity: 0.12;
+  background: #10b981;
+  filter: blur(60px);
+  opacity: 0.1;
   z-index: 0;
-  transition: opacity 0.3s ease;
 }
 
-.live-card:hover .live-card-bg-accent {
-  opacity: 0.18;
-}
-
-/* Type-specific colors */
-.live-card-bus { --card-accent: #10b981; }
-.live-card-bus .live-card-bg-accent { background: #10b981; }
-.live-card-bus .live-card-icon-wrap { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35); }
-.live-card-bus .icon-inner { color: white; }
-
-.live-card-train { --card-accent: #6366f1; }
-.live-card-train .live-card-bg-accent { background: #6366f1; }
-.live-card-train .live-card-icon-wrap { background: linear-gradient(135deg, #6366f1, #818cf8); box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35); }
-.live-card-train .icon-inner { color: white; }
-
-.live-card-water { --card-accent: #06b6d4; }
-.live-card-water .live-card-bg-accent { background: #06b6d4; }
-.live-card-water .live-card-icon-wrap { background: linear-gradient(135deg, #06b6d4, #22d3ee); box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35); }
-.live-card-water .icon-inner { color: white; }
-
-/* Urgent & Soon states */
-.live-card.is-urgent {
-  border-color: rgba(239, 68, 68, 0.3);
-  animation: urgentPulse 2s ease-in-out infinite;
-}
-
-@keyframes urgentPulse {
-  0%, 100% { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), 0 0 0 0 rgba(239, 68, 68, 0); }
-  50% { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), 0 0 20px 4px rgba(239, 68, 68, 0.15); }
-}
-
-.live-card.is-urgent .live-card-bg-accent {
-  background: #ef4444 !important;
-  opacity: 0.2;
-}
-
-.live-card.is-urgent .live-card-time-label {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.live-card.is-soon .live-card-time-label {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
-}
-
-/* Card Header */
-.live-card-header {
+.lu-bus-top {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  position: relative;
-  z-index: 1;
-}
-
-.live-card-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  display: flex;
   align-items: center;
-  justify-content: center;
+  margin-bottom: 14px;
 }
 
-.live-card-badge-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.live-card-alert {
-  padding: 4px 10px;
-  border-radius: 100px;
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.live-card-status {
-  padding: 4px 10px;
-  border-radius: 100px;
-  background: rgba(var(--card-accent), 0.1);
-  color: var(--card-accent);
-  font-size: 10px;
-  font-weight: 700;
-  opacity: 0.8;
-}
-
-/* Card Body */
-.live-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-  z-index: 1;
-}
-
-.live-card-title {
-  font-size: 18px;
-  font-weight: 900;
-  color: var(--foreground);
-  letter-spacing: -0.02em;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.live-card-route {
+.lu-bus-badge-row {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
 }
 
-.live-card-route svg {
-  opacity: 0.5;
+.lu-bus-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-/* Timeline Progress */
-.live-card-timeline {
+.lu-bus-tag.govt {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.lu-bus-tag.private {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.lu-urgent-tag {
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.lu-bus-route {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+
+/* ROUTE DISPLAY */
+.lu-bus-route-display {
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 0 4px;
 }
 
-.timeline-track {
-  height: 4px;
+.lu-route-stop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.lu-stop-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px #10b981;
+}
+
+.lu-stop-dot.end-dot {
+  background: transparent;
+  border-color: var(--text-muted);
+  box-shadow: none;
+}
+
+.lu-route-stop span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  max-width: 60px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lu-route-journey {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lu-journey-track {
+  position: relative;
+  height: 6px;
   background: rgba(0, 0, 0, 0.06);
   border-radius: 100px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 @media (prefers-color-scheme: dark) {
-  .timeline-track { background: rgba(255, 255, 255, 0.08); }
+  .lu-journey-track { background: rgba(255, 255, 255, 0.08); }
 }
 
-.timeline-progress {
+.lu-journey-progress {
+  position: relative;
   height: 100%;
   border-radius: 100px;
-  background: linear-gradient(90deg, var(--card-accent), rgba(var(--card-accent), 0.6));
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, #10b981, #34d399);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Card Footer */
-.live-card-footer {
+.lu-bus-icon-anim {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  background: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  animation: busBounce 1s ease-in-out infinite;
+}
+
+@keyframes busBounce {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-52%) translateX(1px); }
+}
+
+.lu-bus-card.urgent .lu-bus-icon-anim {
+  background: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+  animation: busBounceUrgent 0.5s ease-in-out infinite;
+}
+
+@keyframes busBounceUrgent {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-54%) translateX(2px); }
+}
+
+.lu-journey-stops {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  position: relative;
-  z-index: 1;
+  padding: 0 2px;
+  color: var(--text-muted);
+  opacity: 0.4;
 }
 
-.live-card-time {
+/* TIMING SECTION */
+.lu-bus-timing {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .lu-bus-timing { background: rgba(255, 255, 255, 0.04); }
+}
+
+.lu-bus-card.urgent .lu-bus-timing {
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.lu-timing-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.lu-timing-icon {
+  color: #10b981;
+}
+
+.lu-bus-card.urgent .lu-timing-icon {
+  color: #ef4444;
+}
+
+.lu-timing-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.live-card-time-value {
-  font-size: 20px;
+.lu-timing-remain {
+  font-size: 22px;
   font-weight: 900;
   color: var(--foreground);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
+  line-height: 1;
 }
 
-.live-card-time-label {
-  padding: 3px 10px;
-  border-radius: 100px;
-  background: rgba(var(--card-accent), 0.1);
-  color: var(--card-accent);
-  font-size: 11px;
+.lu-bus-card.urgent .lu-timing-remain {
+  color: #ef4444;
+}
+
+.lu-timing-label {
+  font-size: 10px;
   font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lu-timing-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--glass-border);
+}
+
+.lu-timing-depart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.lu-depart-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.lu-depart-time {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* TRAIN CARD */
+.lu-train-card {
+  position: relative;
+  background: var(--card-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 16px;
+  overflow: hidden;
   transition: all 0.3s ease;
 }
 
-.live-card-arrow {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.04);
+.lu-train-card:active { transform: scale(0.98); }
+
+.lu-train-card-bg {
+  position: absolute;
+  top: -60px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: #6366f1;
+  filter: blur(60px);
+  opacity: 0.1;
+  z-index: 0;
+}
+
+.lu-train-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.lu-train-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+  flex-shrink: 0;
+}
+
+.lu-train-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lu-train-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--foreground);
+  letter-spacing: -0.01em;
+}
+
+.lu-train-route {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
-  transition: all 0.2s ease;
+}
+
+.lu-train-timing {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 14px;
 }
 
 @media (prefers-color-scheme: dark) {
-  .live-card-arrow { background: rgba(255, 255, 255, 0.06); }
+  .lu-train-timing { background: rgba(255, 255, 255, 0.04); }
 }
 
-.live-card:hover .live-card-arrow {
-  background: var(--card-accent);
-  color: white;
-  transform: translateX(2px);
-}
-
-/* Timeline Dots */
-.live-timeline-dots {
+.lu-tm-remain, .lu-tm-depart {
   display: flex;
-  justify-content: center;
-  gap: 6px;
-  padding: 4px 0;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
 }
 
-.timeline-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  opacity: 0.3;
+.lu-tm-depart { align-items: flex-end; }
+
+.lu-tm-value {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.lu-tm-label, .lu-td-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lu-td-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+/* WATER CARD */
+.lu-water-card {
+  position: relative;
+  background: var(--card-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 16px;
+  overflow: hidden;
   transition: all 0.3s ease;
 }
 
-.timeline-dot.active {
-  width: 18px;
-  border-radius: 100px;
-  background: var(--train-primary);
-  opacity: 1;
+.lu-water-card:active { transform: scale(0.98); }
+
+.lu-water-card-bg {
+  position: absolute;
+  top: -60px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: #06b6d4;
+  filter: blur(60px);
+  opacity: 0.1;
+  z-index: 0;
 }
 
-/* Empty State */
-.live-empty-state {
+.lu-water-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.lu-water-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #06b6d4, #22d3ee);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.35);
+  flex-shrink: 0;
+}
+
+.lu-water-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lu-water-zone {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--foreground);
+  letter-spacing: -0.01em;
+}
+
+.lu-water-session {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.lu-water-timing {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .lu-water-timing { background: rgba(255, 255, 255, 0.04); }
+}
+
+.lu-wt-remain, .lu-wt-starts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.lu-wt-starts { align-items: flex-end; }
+
+.lu-wt-value {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.lu-wt-label, .lu-ws-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lu-ws-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+/* EMPTY STATE */
+.lu-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 40px 20px;
   background: var(--card-bg);
-  backdrop-filter: blur(20px);
   border-radius: 24px;
   border: 1px dashed var(--glass-border);
   gap: 8px;
 }
 
-.empty-icon-wrap {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
+.lu-empty-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
   display: flex;
   align-items: center;
@@ -384,14 +631,14 @@
   margin-bottom: 4px;
 }
 
-.live-empty-state p {
-  font-size: 16px;
+.lu-empty p {
+  font-size: 15px;
   font-weight: 800;
   color: var(--foreground);
   margin: 0;
 }
 
-.live-empty-state span {
+.lu-empty span {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
@@ -399,16 +646,7 @@
 
 /* Responsive */
 @media (max-width: 380px) {
-  .live-card {
-    flex: 0 0 250px;
-    padding: 16px;
-  }
-  
-  .live-card-title {
-    font-size: 16px;
-  }
-  
-  .live-card-time-value {
-    font-size: 18px;
-  }
+  .lu-bus-route { font-size: 20px; }
+  .lu-timing-remain { font-size: 18px; }
+  .lu-bus-card { padding: 14px; }
 }

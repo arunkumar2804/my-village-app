@@ -1,14 +1,28 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { ArrowRight, Clock, Sun, Bus, Train, Droplets, Zap, TrendingUp } from "lucide-react";
+import React, { useEffect, useState, useMemo } from "react";
+import { Bus, Train, Droplets, MapPin, Clock, Sun, Navigation, Shield, Building2 } from "lucide-react";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 import "./live-updates.css";
 
-interface TimeItem {
-  type: "bus" | "train" | "water";
-  item: BusTiming | TrainTiming | WaterUpdate;
+interface BusInfo {
+  item: BusTiming;
+  relTime: string;
+  minutesLeft: number;
+  date: Date;
+  progress: number;
+}
+
+interface TrainInfo {
+  item: TrainTiming;
+  relTime: string;
+  minutesLeft: number;
+  date: Date;
+}
+
+interface WaterInfo {
+  item: WaterUpdate;
   relTime: string;
   minutesLeft: number;
   date: Date;
@@ -26,10 +40,12 @@ function getTimeData(targetDate: Date): { text: string; minutes: number } {
   const diffMs = targetDate.getTime() - Date.now();
   const diffMins = Math.max(0, Math.floor(diffMs / 60000));
   
-  if (diffMins === 0) return { text: "Due now", minutes: 0 };
-  if (diffMins < 60) return { text: `in ${diffMins}m`, minutes: diffMins };
+  if (diffMins === 0) return { text: "Arriving", minutes: 0 };
+  if (diffMins === 1) return { text: "1 min", minutes: 1 };
+  if (diffMins < 60) return { text: `${diffMins} mins`, minutes: diffMins };
   const hrs = Math.floor(diffMins / 60);
-  return { text: `in ${hrs}h ${diffMins % 60}m`, minutes: diffMins };
+  const mins = diffMins % 60;
+  return { text: `${hrs}h ${mins}m`, minutes: diffMins };
 }
 
 function format12h(timeStr: string): string {
@@ -40,181 +56,220 @@ function format12h(timeStr: string): string {
   return `${h12}:${mStr} ${ampm}`;
 }
 
-function getProgressWidth(minutesLeft: number, maxMinutes: number = 120): number {
-  return Math.min(100, Math.max(5, (1 - minutesLeft / maxMinutes) * 100));
-}
-
-function getIcon(type: "bus" | "train" | "water", size: number = 24) {
-  const iconClass = "live-card-icon";
-  switch (type) {
-    case "bus": return <Bus size={size} className={iconClass} />;
-    case "train": return <Train size={size} className={iconClass} />;
-    case "water": return <Droplets size={size} className={iconClass} />;
-  }
+function getProgress(minutesLeft: number): number {
+  if (minutesLeft <= 5) return 95;
+  if (minutesLeft <= 10) return 85;
+  if (minutesLeft <= 15) return 70;
+  if (minutesLeft <= 30) return 50;
+  if (minutesLeft <= 45) return 35;
+  if (minutesLeft <= 60) return 20;
+  return 10;
 }
 
 export default function LiveUpdates() {
-  const [items, setItems] = useState<TimeItem[]>([]);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [buses, setBuses] = useState<BusInfo[]>([]);
+  const [trains, setTrains] = useState<TrainInfo[]>([]);
+  const [water, setWater] = useState<WaterInfo[]>([]);
+  const [, setTick] = useState(0);
 
   const calculateNext = async () => {
-    const allItems: TimeItem[] = [];
+    const busList: BusInfo[] = [];
+    const trainList: TrainInfo[] = [];
+    const waterList: WaterInfo[] = [];
     
-    const buses = (await getBusTimings()).filter((b) => b.isActive);
-    buses.forEach((b) => {
+    const activeBuses = (await getBusTimings()).filter((b) => b.isActive);
+    activeBuses.forEach((b) => {
       const d = getNextOccurrence(b.departureTime);
       const { text, minutes } = getTimeData(d);
-      allItems.push({ type: "bus", item: b, relTime: text, minutesLeft: minutes, date: d });
+      busList.push({ item: b, relTime: text, minutesLeft: minutes, date: d, progress: getProgress(minutes) });
     });
+    busList.sort((a, b) => a.minutesLeft - b.minutesLeft);
     
-    const trains = (await getTrainTimings()).filter((t) => t.isActive);
-    trains.forEach((t) => {
+    const activeTrains = (await getTrainTimings()).filter((t) => t.isActive);
+    activeTrains.forEach((t) => {
       const d = getNextOccurrence(t.departureTime);
       const { text, minutes } = getTimeData(d);
-      allItems.push({ type: "train", item: t, relTime: text, minutesLeft: minutes, date: d });
+      trainList.push({ item: t, relTime: text, minutesLeft: minutes, date: d });
     });
+    trainList.sort((a, b) => a.minutesLeft - b.minutesLeft);
     
-    const water = (await getWaterUpdates()).filter((w) => w.isActive);
-    water.forEach((w) => {
+    const activeWater = (await getWaterUpdates()).filter((w) => w.isActive);
+    activeWater.forEach((w) => {
       const d = getNextOccurrence(w.startTime);
       const { text, minutes } = getTimeData(d);
-      allItems.push({ type: "water", item: w, relTime: text, minutesLeft: minutes, date: d });
+      waterList.push({ item: w, relTime: text, minutesLeft: minutes, date: d });
     });
+    waterList.sort((a, b) => a.minutesLeft - b.minutesLeft);
     
-    allItems.sort((a, b) => a.minutesLeft - b.minutesLeft);
-    setItems(allItems.slice(0, 6));
+    setBuses(busList);
+    setTrains(trainList);
+    setWater(waterList);
   };
 
   useEffect(() => {
     calculateNext();
-    const intervalId = setInterval(calculateNext, 30000);
-    return () => clearInterval(intervalId);
+    const interval = setInterval(() => {
+      calculateNext();
+      setTick(t => t + 1);
+    }, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  const getCardLabel = (item: TimeItem): string => {
-    if (item.type === "bus") return (item.item as BusTiming).routeNumber + " Service";
-    if (item.type === "train") return (item.item as TrainTiming).trainName;
-    return (item.item as WaterUpdate).zone + " Zone";
-  };
-
-  const getCardSubtitle = (item: TimeItem): string => {
-    if (item.type === "bus") return `${(item.item as BusTiming).from} → ${(item.item as BusTiming).to}`;
-    if (item.type === "train") return (item.item as TrainTiming).nearbyStation;
-    return (item.item as WaterUpdate).session + " session";
-  };
-
-  const getTime = (item: TimeItem): string => {
-    if (item.type === "bus") return (item.item as BusTiming).departureTime;
-    if (item.type === "train") return (item.item as TrainTiming).departureTime;
-    return (item.item as WaterUpdate).startTime;
-  };
-
-  const isUrgent = (minutes: number) => minutes <= 10;
-  const isSoon = (minutes: number) => minutes <= 30;
-
-  if (items.length === 0) {
+  if (buses.length === 0 && trains.length === 0 && water.length === 0) {
     return (
-      <section className="live-updates-container">
-        <div className="live-updates-header">
-          <div className="live-title-group">
-            <div className="live-indicator">
-              <span className="live-dot"></span>
-              <span className="live-text">Live</span>
-            </div>
-            <h2>Updates</h2>
+      <section className="lu-section">
+        <div className="lu-header">
+          <div className="lu-title-wrap">
+            <span className="lu-live-pill">
+              <span className="lu-live-dot"></span>
+              Live
+            </span>
+            <h2 className="lu-title">Updates</h2>
           </div>
         </div>
-        <div className="live-empty-state">
-          <div className="empty-icon-wrap">
-            <Zap size={32} />
-          </div>
+        <div className="lu-empty">
+          <div className="lu-empty-icon"><Bus size={28} /></div>
           <p>No upcoming schedules</p>
-          <span>Check back soon for updates</span>
+          <span>Check back soon</span>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="live-updates-container">
-      <div className="live-updates-header">
-        <div className="live-title-group">
-          <div className="live-indicator">
-            <span className="live-dot"></span>
-            <span className="live-text">Live</span>
-          </div>
-          <h2>Updates</h2>
+    <section className="lu-section">
+      <div className="lu-header">
+        <div className="lu-title-wrap">
+          <span className="lu-live-pill">
+            <span className="lu-live-dot"></span>
+            Live
+          </span>
+          <h2 className="lu-title">Updates</h2>
         </div>
-        <div className="live-count-badge">
-          <TrendingUp size={14} />
-          <span>{items.length} upcoming</span>
-        </div>
+        <span className="lu-count">{buses.length + trains.length + water.length} upcoming</span>
       </div>
 
-      <div className="live-scroll-container" ref={scrollRef}>
-        <div className="live-cards-track">
-          {items.map((item, index) => {
-            const progress = getProgressWidth(item.minutesLeft);
-            const urgent = isUrgent(item.minutesLeft);
-            const soon = isSoon(item.minutesLeft);
-            
-            return (
-              <div 
-                key={`${item.type}-${index}`}
-                className={`live-card live-card-${item.type} ${urgent ? "is-urgent" : ""} ${soon ? "is-soon" : ""}`}
-              >
-                <div className="live-card-bg-accent"></div>
+      <div className="lu-cards">
+        {buses.map((bus, i) => {
+          const isGovt = bus.item.operatorType === "government";
+          const isUrgent = bus.minutesLeft <= 5;
+          const isSoon = bus.minutesLeft <= 15;
+          
+          return (
+            <div key={bus.item.id || i} className={`lu-bus-card ${isUrgent ? "urgent" : ""} ${isSoon ? "soon" : ""}`}>
+              <div className="lu-bus-card-bg"></div>
+              
+              <div className="lu-bus-top">
+                <div className="lu-bus-badge-row">
+                  <span className={`lu-bus-tag ${isGovt ? "govt" : "private"}`}>
+                    {isGovt ? <Shield size={10} /> : <Building2 size={10} />}
+                    {isGovt ? "Government" : "Private"}
+                  </span>
+                  {isUrgent && <span className="lu-urgent-tag">⚡ Arriving</span>}
+                </div>
+                <span className="lu-bus-route">{bus.item.routeNumber}</span>
+              </div>
+
+              <div className="lu-bus-route-display">
+                <div className="lu-route-stop start">
+                  <div className="lu-stop-dot"></div>
+                  <span>{bus.item.from}</span>
+                </div>
                 
-                <div className="live-card-header">
-                  <div className="live-card-icon-wrap">
-                    {getIcon(item.type)}
+                <div className="lu-route-journey">
+                  <div className="lu-journey-track">
+                    <div className="lu-journey-progress" style={{ width: `${bus.progress}%` }}>
+                      <div className="lu-bus-icon-anim">
+                        <Bus size={16} />
+                      </div>
+                    </div>
                   </div>
-                  <div className="live-card-badge-group">
-                    {urgent && <span className="live-card-alert">⚡ Due soon</span>}
-                    {!urgent && <span className="live-card-status">On time</span>}
+                  <div className="lu-journey-stops">
+                    <MapPin size={10} />
+                    <MapPin size={10} />
+                    <MapPin size={10} />
+                    <MapPin size={10} />
                   </div>
                 </div>
                 
-                <div className="live-card-body">
-                  <h3 className="live-card-title">{getCardLabel(item)}</h3>
-                  <div className="live-card-route">
-                    {item.type === "bus" ? (
-                      <><span>{(item.item as BusTiming).from}</span><ArrowRight size={12} /><span>{(item.item as BusTiming).to}</span></>
-                    ) : item.type === "train" ? (
-                      <><Clock size={12} /><span>{(item.item as TrainTiming).nearbyStation}</span></>
-                    ) : (
-                      <><Sun size={12} /><span>{(item.item as WaterUpdate).session} session</span></>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="live-card-timeline">
-                  <div className="timeline-track">
-                    <div 
-                      className="timeline-progress"
-                      style={{ width: `${progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="live-card-footer">
-                  <div className="live-card-time">
-                    <span className="live-card-time-value">{format12h(getTime(item))}</span>
-                    <span className="live-card-time-label">{item.relTime}</span>
-                  </div>
-                  <div className="live-card-arrow">
-                    <ArrowRight size={16} />
-                  </div>
+                <div className="lu-route-stop end">
+                  <div className="lu-stop-dot end-dot"></div>
+                  <span>{bus.item.to}</span>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
 
-      <div className="live-timeline-dots">
-        {items.map((_, i) => (
-          <span key={i} className={`timeline-dot ${i === 0 ? "active" : ""}`}></span>
+              <div className="lu-bus-timing">
+                <div className="lu-timing-main">
+                  <Clock size={20} className="lu-timing-icon" />
+                  <div className="lu-timing-text">
+                    <span className="lu-timing-remain">{bus.relTime}</span>
+                    <span className="lu-timing-label">Remaining</span>
+                  </div>
+                </div>
+                <div className="lu-timing-divider"></div>
+                <div className="lu-timing-depart">
+                  <span className="lu-depart-label">Departs at</span>
+                  <span className="lu-depart-time">{format12h(bus.item.departureTime)}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {trains.map((train, i) => (
+          <div key={train.item.id || i} className="lu-train-card">
+            <div className="lu-train-card-bg"></div>
+            <div className="lu-train-header">
+              <div className="lu-train-icon-wrap">
+                <Train size={22} />
+              </div>
+              <div className="lu-train-info">
+                <span className="lu-train-name">{train.item.trainName}</span>
+                <div className="lu-train-route">
+                  <MapPin size={11} />
+                  <span>{train.item.nearbyStation}</span>
+                </div>
+              </div>
+            </div>
+            <div className="lu-train-timing">
+              <div className="lu-tm-remain">
+                <span className="lu-tm-value">{train.relTime}</span>
+                <span className="lu-tm-label">remaining</span>
+              </div>
+              <div className="lu-tm-depart">
+                <span className="lu-td-value">{format12h(train.item.departureTime)}</span>
+                <span className="lu-td-label">departure</span>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {water.map((w, i) => (
+          <div key={w.item.id || i} className="lu-water-card">
+            <div className="lu-water-card-bg"></div>
+            <div className="lu-water-header">
+              <div className="lu-water-icon-wrap">
+                <Droplets size={22} />
+              </div>
+              <div className="lu-water-info">
+                <span className="lu-water-zone">{w.item.zone} Zone</span>
+                <div className="lu-water-session">
+                  <Sun size={11} />
+                  <span className="capitalize">{w.item.session} session</span>
+                </div>
+              </div>
+            </div>
+            <div className="lu-water-timing">
+              <div className="lu-wt-remain">
+                <span className="lu-wt-value">{w.relTime}</span>
+                <span className="lu-wt-label">remaining</span>
+              </div>
+              <div className="lu-wt-starts">
+                <span className="lu-ws-value">{format12h(w.item.startTime)}</span>
+                <span className="lu-ws-label">starts</span>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </section>

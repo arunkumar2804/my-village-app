@@ -101,83 +101,83 @@ export default function LiveUpdates() {
       </div>
 
       {(activeTab === "all" || activeTab === "transport") && nextBus && (
-        <div className="clean-update-card">
-          <div className="service-icon-box icon-bus">
-            <Bus size={22} />
+        <div className="premium-update-card card-bus">
+          <div className="premium-icon-box">
+            <Bus size={24} />
           </div>
-          <div className="card-main-content">
-            <div className="service-title-row">
-              <span className="service-name">{nextBus.item.routeNumber} • {nextBus.item.operator || "Public"}</span>
-              <div className="status-indicator">
-                <div className="dot dot-bus"></div>
+          <div className="card-main-info">
+            <div className="service-header-row">
+              <span className="service-name-premium">{nextBus.item.routeNumber} Service</span>
+              <div className="live-indicator-pill">
+                <div className="live-pulse-dot"></div>
                 Live
               </div>
             </div>
-            <div className="route-details">
+            <div className="route-text-premium">
               <span>{nextBus.item.from}</span>
-              <ArrowRight size={14} opacity={0.5} />
+              <ArrowRight size={14} className="opacity-40" />
               <span>{nextBus.item.to}</span>
             </div>
           </div>
-          <div className="time-info-section">
-            <span className="departure-time">{format12h(nextBus.item.departureTime)}</span>
-            <span className="relative-time">{nextBus.relTime}</span>
+          <div className="premium-time-box">
+            <span className="time-val">{format12h(nextBus.item.departureTime).split(' ')[0]}</span>
+            <span className="time-rel">{nextBus.relTime}</span>
           </div>
         </div>
       )}
 
       {(activeTab === "all" || activeTab === "transport") && nextTrain && (
-        <div className="clean-update-card">
-          <div className="service-icon-box icon-train">
-            <Train size={22} />
+        <div className="premium-update-card card-train">
+          <div className="premium-icon-box">
+            <Train size={24} />
           </div>
-          <div className="card-main-content">
-            <div className="service-title-row">
-              <span className="service-name">{nextTrain.item.trainName}</span>
-              <div className="status-indicator">
-                <div className="dot dot-train"></div>
+          <div className="card-main-info">
+            <div className="service-header-row">
+              <span className="service-name-premium">{nextTrain.item.trainName}</span>
+              <div className="live-indicator-pill">
+                <div className="live-pulse-dot"></div>
                 On Time
               </div>
             </div>
-            <div className="route-details">
-              <Clock size={12} opacity={0.6} />
+            <div className="route-text-premium">
+              <Clock size={12} className="opacity-50" />
               <span>Station: {nextTrain.item.nearbyStation}</span>
             </div>
           </div>
-          <div className="time-info-section">
-            <span className="departure-time">{format12h(nextTrain.item.departureTime)}</span>
-            <span className="relative-time">{nextTrain.relTime}</span>
+          <div className="premium-time-box">
+            <span className="time-val">{format12h(nextTrain.item.departureTime).split(' ')[0]}</span>
+            <span className="time-rel">{nextTrain.relTime}</span>
           </div>
         </div>
       )}
 
       {(activeTab === "all" || activeTab === "water") && nextWater && (
-        <div className="clean-update-card">
-          <div className="service-icon-box icon-water">
-            <Droplets size={22} />
+        <div className="premium-update-card card-water">
+          <div className="premium-icon-box">
+            <Droplets size={24} />
           </div>
-          <div className="card-main-content">
-            <div className="service-title-row">
-              <span className="service-name">{nextWater.item.zone} Supply</span>
-              <div className="status-indicator">
-                <div className="dot dot-water"></div>
+          <div className="card-main-info">
+            <div className="service-header-row">
+              <span className="service-name-premium">{nextWater.item.zone} Supply</span>
+              <div className="live-indicator-pill">
+                <div className="live-pulse-dot"></div>
                 Active
               </div>
             </div>
-            <div className="route-details">
-              <Sun size={12} opacity={0.6} />
-              <span style={{textTransform: 'capitalize'}}>{nextWater.item.session} Session</span>
+            <div className="route-text-premium">
+              <Sun size={12} className="opacity-50" />
+              <span className="capitalize">{nextWater.item.session} Session</span>
             </div>
           </div>
-          <div className="time-info-section">
-            <span className="departure-time">{format12h(nextWater.item.startTime)}</span>
-            <span className="relative-time">{nextWater.relTime}</span>
+          <div className="premium-time-box">
+            <span className="time-val">{format12h(nextWater.item.startTime).split(' ')[0]}</span>
+            <span className="time-rel">{nextWater.relTime}</span>
           </div>
         </div>
       )}
 
       {(!nextBus && !nextTrain && !nextWater) && (
-        <div className="empty-state-simple">
+        <div className="premium-empty-state">
           <p>No live updates currently available.</p>
         </div>
       )}

@@ -735,24 +735,35 @@ body {
    BUS CARD — FINAL DESIGN SPEC
    ═══════════════════════════════════════════ */
 .bus-card-final {
-  max-width: 480px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto 16px;
-  background: #ffffff;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
   border-radius: 20px;
-  border: 0.5px solid var(--glass-border);
+  border: 1px solid var(--glass-border);
   overflow: hidden;
-  box-shadow: none; /* explicitly no drop shadow per spec */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
 }
 
+@media (prefers-color-scheme: dark) {
+  .bus-card-final {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.6));
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
 /* Header Strip */
 .bus-header-strip {
-  background: #0F172A; /* dark navy */
+  background: rgba(15, 23, 42, 0.9); /* semi-transparent dark navy */
   padding: 14px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .header-left {
@@ -811,6 +822,7 @@ body {
 /* Body */
 .bus-body {
   padding: 20px 18px 0;
+  background: transparent;
 }
 
 .route-row {

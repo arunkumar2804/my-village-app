@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, Clock, Sun } from "lucide-react";
+import { ArrowRight, Clock, Sun, Bus, Users } from "lucide-react";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 
@@ -132,42 +132,48 @@ export default function LiveUpdates() {
 
       {/* ─── Next Bus Card ─── */}
       {nextBus && (
-        <div className="update-card card-bus">
-          <div className="card-accent-strip accent-bus"></div>
-          <div className="card-inner">
-            <div className="card-header">
-              <div className="card-type">
-                <div className="card-type-icon icon-bg-bus">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/bus-icon.svg" alt="Bus" fill style={{ objectFit: 'contain' }} />
-                  </div>
+        <div className="update-card-premium card-bus-premium">
+          {/* Top Row: Label + Time Badge */}
+          <div className="card-top-row">
+            <div className="next-label-group">
+              <Bus size={16} className="blue-bus-icon" />
+              <span className="next-bus-text">Next Bus</span>
+            </div>
+            <div className="time-remaining-badge">
+              {nextBus.timeRemaining}
+            </div>
+          </div>
+
+          {/* Middle Row: Tile + Route Info */}
+          <div className="card-middle-row">
+            <div className="route-tile">
+              {nextBus.item.routeNumber}
+            </div>
+            <div className="route-info-stack">
+              <div className="route-path-line">
+                <span className="path-stop">{nextBus.item.from}</span>
+                <div className="dotted-connector">
+                  <div className="dot-line" />
+                  <Bus size={14} className="midpoint-bus-icon" />
+                  <div className="dot-line" />
                 </div>
-                <span>Next Bus</span>
+                <span className="path-stop">{nextBus.item.to}</span>
               </div>
-              <div className="time-badge badge-bus">
-                <span className="pulse-dot dot-bus"></span>
-                {nextBus.timeRemaining}
+              <div className="departure-time-sub">
+                Departs at {format12h(nextBus.item.departureTime)}
               </div>
             </div>
+          </div>
 
-            <div className="bus-route-row">
-              <div className="route-number-box">{nextBus.item.routeNumber}</div>
-              <div className="bus-route-detail">
-                <div className="route-names">
-                  <span>{nextBus.item.from}</span>
-                  <ArrowRight size={14} className="route-arrow arrow-bus" />
-                  <span>{nextBus.item.to}</span>
-                </div>
-                <div className="bus-departure" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Clock size={11} />
-                    <span>Departs at {format12h(nextBus.item.departureTime)}</span>
-                  </div>
-                  <span style={{ fontSize: '10px', background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
-                    {nextBus.item.operator || "Government"}
-                  </span>
-                </div>
-              </div>
+          {/* Bottom Row: Chips + Crowd Badge */}
+          <div className="card-bottom-row">
+            <div className="tag-chips-group">
+              <span className="tag-chip">{nextBus.item.operator || "TNSTC"}</span>
+              <span className="tag-chip">Free Bus</span>
+            </div>
+            <div className="crowd-status-badge">
+              <Users size={14} />
+              <span>Mostly Crowded</span>
             </div>
           </div>
         </div>

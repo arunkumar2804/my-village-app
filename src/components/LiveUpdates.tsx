@@ -295,7 +295,7 @@ export default function LiveUpdates() {
             <div className="bus-progress-visual">
               <div className="bus-progress-labels">
                 <span className="progress-label-start">{nextBus.item.from}</span>
-                <span className="progress-label-center">Center Stop</span>
+                <span className="progress-label-center">Panaimarathupalayam</span>
                 <span className="progress-label-end">{nextBus.item.to}</span>
               </div>
               <div className="bus-progress-track">

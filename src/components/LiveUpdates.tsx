@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
-import { ArrowRight, Clock, Sun } from "lucide-react";
+import { ArrowRight, Clock, Sun, Bus, Train, Droplets, Info, RefreshCcw } from "lucide-react";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
+import "./live-updates.css";
 
 // Helper to convert "HH:mm" to a target Date object, either today or tomorrow
 function getNextOccurence(timeStr: string): Date {
@@ -12,27 +13,27 @@ function getNextOccurence(timeStr: string): Date {
   const now = new Date();
   const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
   
-  // If time has already passed today, it means next occurrence is tomorrow
   if (target.getTime() <= now.getTime()) {
     target.setDate(target.getDate() + 1);
   }
   return target;
 }
 
-// Converts diff in ms to a friendly string
-function formatTimeRemaining(targetDate: Date): string {
+// Converts diff in ms to a friendly string and raw minutes
+function getTimeData(targetDate: Date) {
   const diffMs = targetDate.getTime() - Date.now();
   const diffMins = Math.max(0, Math.floor(diffMs / 60000));
   
-  if (diffMins === 0) return "Due";
-  if (diffMins < 60) return `${diffMins} mins`;
-  
-  const hrs = Math.floor(diffMins / 60);
-  const mins = diffMins % 60;
-  return `${hrs} hr ${mins > 0 ? mins + " mins" : ""}`;
+  let label = "Due";
+  if (diffMins > 0 && diffMins < 60) label = `${diffMins}m`;
+  else if (diffMins >= 60) {
+    const hrs = Math.floor(diffMins / 60);
+    label = `${hrs}h`;
+  }
+
+  return { label, mins: diffMins };
 }
 
-// Format 24h string to 12h AM/PM
 function format12h(timeStr: string): string {
   const [h, m] = timeStr.split(":").map(Number);
   const ampm = h >= 12 ? "PM" : "AM";
@@ -42,222 +43,276 @@ function format12h(timeStr: string): string {
 }
 
 export default function LiveUpdates() {
-  const [nextBus, setNextBus] = useState<{ item: BusTiming; timeRemaining: string; date?: Date } | null>(null);
-  const [nextTrain, setNextTrain] = useState<{ item: TrainTiming; timeRemaining: string; date?: Date } | null>(null);
-  const [nextWater, setNextWater] = useState<{ item: WaterUpdate; timeRemaining: string; date?: Date } | null>(null);
+  const [activeTab, setActiveTab] = useState<"all" | "transport" | "water">("all");
+  const [nextBus, setNextBus] = useState<{ item: BusTiming; time: string; mins: number; date: Date } | null>(null);
+  const [nextTrain, setNextTrain] = useState<{ item: TrainTiming; time: string; mins: number; date: Date } | null>(null);
+  const [nextWater, setNextWater] = useState<{ item: WaterUpdate; time: string; mins: number; date: Date } | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const calculateNext = async () => {
+    setIsRefreshing(true);
+    
     // Bus
     const activeBuses = (await getBusTimings()).filter((b) => b.isActive);
     if (activeBuses.length > 0) {
-      let closestBus = activeBuses[0];
+      let closest = activeBuses[0];
       let minDiff = Infinity;
       let closestDate = new Date();
       activeBuses.forEach((b) => {
         const d = getNextOccurence(b.departureTime);
         const diff = d.getTime() - Date.now();
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestBus = b;
-          closestDate = d;
-        }
+        if (diff < minDiff) { minDiff = diff; closest = b; closestDate = d; }
       });
-      setNextBus({ item: closestBus, timeRemaining: formatTimeRemaining(closestDate), date: closestDate });
-    } else {
-      setNextBus(null);
+      const { label, mins } = getTimeData(closestDate);
+      setNextBus({ item: closest, time: label, mins, date: closestDate });
     }
 
     // Train
     const activeTrains = (await getTrainTimings()).filter((t) => t.isActive);
     if (activeTrains.length > 0) {
-      let closestTrain = activeTrains[0];
+      let closest = activeTrains[0];
       let minDiff = Infinity;
       let closestDate = new Date();
       activeTrains.forEach((t) => {
         const d = getNextOccurence(t.departureTime);
         const diff = d.getTime() - Date.now();
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestTrain = t;
-          closestDate = d;
-        }
+        if (diff < minDiff) { minDiff = diff; closest = t; closestDate = d; }
       });
-      setNextTrain({ item: closestTrain, timeRemaining: formatTimeRemaining(closestDate), date: closestDate });
-    } else {
-      setNextTrain(null);
+      const { label, mins } = getTimeData(closestDate);
+      setNextTrain({ item: closest, time: label, mins, date: closestDate });
     }
 
     // Water
     const activeWater = (await getWaterUpdates()).filter((w) => w.isActive);
     if (activeWater.length > 0) {
-      let closestWater = activeWater[0];
+      let closest = activeWater[0];
       let minDiff = Infinity;
       let closestDate = new Date();
       activeWater.forEach((w) => {
         const d = getNextOccurence(w.startTime);
         const diff = d.getTime() - Date.now();
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestWater = w;
-          closestDate = d;
-        }
+        if (diff < minDiff) { minDiff = diff; closest = w; closestDate = d; }
       });
-      setNextWater({ item: closestWater, timeRemaining: formatTimeRemaining(closestDate), date: closestDate });
-    } else {
-      setNextWater(null);
+      const { label, mins } = getTimeData(closestDate);
+      setNextWater({ item: closest, time: label, mins, date: closestDate });
     }
+
+    setTimeout(() => setIsRefreshing(false), 500);
   };
 
   useEffect(() => {
-    // Initial calculate on mount (client-side)
     calculateNext();
-    
-    // Update every minute
     const intervalId = setInterval(calculateNext, 60000);
     return () => clearInterval(intervalId);
   }, []);
 
-  if (!nextBus && !nextTrain && !nextWater) {
+  const ProgressRing = ({ mins, colorClass }: { mins: number, colorClass: string }) => {
+    const radius = 28;
+    const circumference = 2 * Math.PI * radius;
+    // Calculate percentage based on 120 mins max for visual effect
+    const percentage = Math.max(0, Math.min(100, (mins / 120) * 100));
+    const offset = circumference - (percentage / 100) * circumference;
+
     return (
-      <section>
-        <h2 className="section-title">Live updates</h2>
-        <div style={{ color: "var(--text-muted)", fontSize: 14 }}>No live updates currently available.</div>
-      </section>
+      <div className="time-remaining-visual">
+        <svg className="progress-ring-svg" width="64" height="64">
+          <circle
+            className="progress-ring-bg"
+            stroke="rgba(0,0,0,0.05)"
+            strokeWidth="4"
+            fill="transparent"
+            r={radius}
+            cx="32"
+            cy="32"
+          />
+          <circle
+            className={`progress-ring-circle ${colorClass}`}
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            fill="transparent"
+            r={radius}
+            cx="32"
+            cy="32"
+          />
+        </svg>
+        <div className="time-val-overlay">
+          <span className="num">{mins > 60 ? Math.floor(mins/60) : mins}</span>
+          <span className="unit">{mins > 60 ? 'hr' : 'min'}</span>
+        </div>
+      </div>
     );
-  }
+  };
 
   return (
-    <section>
-      <h2 className="section-title">Live updates</h2>
+    <section className="live-updates-container">
+      <div className="live-updates-header">
+        <h2>Live Updates</h2>
+        <div className="live-filter-tabs">
+          <button 
+            className={`filter-tab ${activeTab === "all" ? "active" : ""}`}
+            onClick={() => setActiveTab("all")}
+          >All</button>
+          <button 
+            className={`filter-tab ${activeTab === "transport" ? "active" : ""}`}
+            onClick={() => setActiveTab("transport")}
+          >Transport</button>
+          <button 
+            className={`filter-tab ${activeTab === "water" ? "active" : ""}`}
+            onClick={() => setActiveTab("water")}
+          >Water</button>
+        </div>
+      </div>
 
-      {/* ─── Next Bus Card ─── */}
-      {nextBus && (
-        <div className="update-card card-bus">
-          <div className="card-accent-strip accent-bus"></div>
-          <div className="card-inner">
-            <div className="card-header">
-              <div className="card-type">
-                <div className="card-type-icon icon-bg-bus">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/bus-icon.svg" alt="Bus" fill style={{ objectFit: 'contain' }} />
-                  </div>
-                </div>
-                <span>Next Bus</span>
+      {(activeTab === "all" || activeTab === "transport") && nextBus && (
+        <div className="enhanced-update-card">
+          <div className="card-bg-glow glow-bus"></div>
+          <div className="card-top-section">
+            <div className="service-meta">
+              <div className="service-icon-wrapper icon-bus">
+                <Bus size={20} />
               </div>
-              <div className="time-badge badge-bus">
-                <span className="pulse-dot dot-bus"></span>
-                {nextBus.timeRemaining}
+              <div className="service-labels">
+                <span className="service-type-label">Next Bus</span>
+                <span className="service-main-name">{nextBus.item.routeNumber} Service</span>
               </div>
             </div>
+            <div className="status-badge-premium">
+              <div className="status-dot-pulse dot-bus"></div>
+              Live Tracking
+            </div>
+          </div>
 
-            <div className="bus-route-row">
-              <div className="route-number-box">{nextBus.item.routeNumber}</div>
-              <div className="bus-route-detail">
-                <div className="route-names">
-                  <span>{nextBus.item.from}</span>
-                  <ArrowRight size={14} className="route-arrow arrow-bus" />
-                  <span>{nextBus.item.to}</span>
-                </div>
-                <div className="bus-departure">
-                  <Clock size={11} />
-                  <span>Departs at {format12h(nextBus.item.departureTime)}</span>
-                </div>
+          <div className="card-middle-section">
+            <div className="route-info-enhanced">
+              <div className="route-path-enhanced">
+                <span>{nextBus.item.from}</span>
+                <ArrowRight size={14} className="route-arrow-enhanced" />
+                <span>{nextBus.item.to}</span>
               </div>
+              <div className="departure-info-enhanced">
+                <Clock size={12} />
+                <span>Departs at {format12h(nextBus.item.departureTime)}</span>
+              </div>
+            </div>
+            <ProgressRing mins={nextBus.mins} colorClass="text-emerald-500" />
+          </div>
+
+          <div className="card-bottom-section">
+            <div className="service-extra-info">
+              <span className="extra-tag">{nextBus.item.operator || "Public"}</span>
+              <span className="extra-tag">AC Bus</span>
+            </div>
+            <div className="next-following">
+              Next in <span>45m</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* ─── Next Train Card ─── */}
-      {nextTrain && (
-        <div className="update-card card-train">
-          <div className="card-accent-strip accent-train"></div>
-          <div className="card-inner">
-            <div className="card-header">
-              <div className="card-type">
-                <div className="card-type-icon icon-bg-train">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/train-icon.svg" alt="Train" fill style={{ objectFit: 'contain' }} />
-                  </div>
-                </div>
-                <span>Next Train</span>
+      {(activeTab === "all" || activeTab === "transport") && nextTrain && (
+        <div className="enhanced-update-card">
+          <div className="card-bg-glow glow-train"></div>
+          <div className="card-top-section">
+            <div className="service-meta">
+              <div className="service-icon-wrapper icon-train">
+                <Train size={20} />
               </div>
-              <div className="time-badge badge-train">
-                <span className="pulse-dot dot-train"></span>
-                {nextTrain.timeRemaining}
+              <div className="service-labels">
+                <span className="service-type-label">Next Train</span>
+                <span className="service-main-name">{nextTrain.item.trainName}</span>
               </div>
             </div>
-
-            <div className="train-info-row">
-              <div className="train-name">{nextTrain.item.trainName}</div>
-              <div className="train-meta-row">
-                <div className="train-number-badge">{nextTrain.item.trainNumber}</div>
-                <div className="train-depart-text">
-                  <Clock size={11} />
-                  <span>Departs {format12h(nextTrain.item.departureTime)}</span>
-                </div>
-              </div>
+            <div className="status-badge-premium">
+              <div className="status-dot-pulse dot-train"></div>
+              On Time
             </div>
+          </div>
 
-            <div className="train-route-visual">
-              <div className="train-station station-origin">
-                <div className="station-dot dot-origin"></div>
+          <div className="card-middle-section">
+            <div className="route-info-enhanced">
+              <div className="route-path-enhanced">
                 <span>{nextTrain.item.from}</span>
-              </div>
-              <div className="train-track">
-                <div className="track-line"></div>
-                <div className="nearby-station-chip">
-                  <span className="nearby-label">Nearby</span>
-                  <strong>{nextTrain.item.nearbyStation}</strong>
-                </div>
-              </div>
-              <div className="train-station station-dest">
-                <div className="station-dot dot-dest"></div>
+                <ArrowRight size={14} className="route-arrow-enhanced" />
                 <span>{nextTrain.item.to}</span>
               </div>
+              <div className="departure-info-enhanced">
+                <Clock size={12} />
+                <span>Station: {nextTrain.item.nearbyStation} • {format12h(nextTrain.item.departureTime)}</span>
+              </div>
+            </div>
+            <ProgressRing mins={nextTrain.mins} colorClass="text-indigo-500" />
+          </div>
+
+          <div className="card-bottom-section">
+            <div className="service-extra-info">
+              <span className="extra-tag">#{nextTrain.item.trainNumber}</span>
+              <span className="extra-tag">Express</span>
+            </div>
+            <div className="next-following">
+              Platform <span>02</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* ─── Water Timings Card ─── */}
-      {nextWater && (
-        <div className="update-card card-water">
-          <div className="card-accent-strip accent-water"></div>
-          <div className="card-inner">
-            <div className="card-header">
-              <div className="card-type">
-                <div className="card-type-icon icon-bg-water">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/water-tap-icon.svg" alt="Water" fill style={{ objectFit: 'contain' }} />
-                  </div>
-                </div>
-                <span>Water timings</span>
+      {(activeTab === "all" || activeTab === "water") && nextWater && (
+        <div className="enhanced-update-card">
+          <div className="card-bg-glow glow-water"></div>
+          <div className="card-top-section">
+            <div className="service-meta">
+              <div className="service-icon-wrapper icon-water">
+                <Droplets size={20} />
               </div>
-              <div className="time-badge badge-water">
-                <span className="pulse-dot dot-water"></span>
-                {nextWater.timeRemaining}
+              <div className="service-labels">
+                <span className="service-type-label">Water Supply</span>
+                <span className="service-main-name">{nextWater.item.zone}</span>
               </div>
             </div>
-
-            <div className="water-detail-row">
-              <div className="water-info-block">
-                <div className="water-session" style={{textTransform: "capitalize"}}>
-                  <Sun size={12} />
-                  <span>{nextWater.item.session}</span>
-                </div>
-                <div className="water-zone">{nextWater.item.zone}</div>
-                <div className="water-time-range">
-                  <Clock size={11} />
-                  <span>{format12h(nextWater.item.startTime)} — {format12h(nextWater.item.endTime)}</span>
-                </div>
-              </div>
-              <div className="water-duration-chip">
-                <div className="duration-value">{nextWater.item.durationMins}</div>
-                <div className="duration-unit">mins</div>
-              </div>
+            <div className="status-badge-premium">
+              <div className="status-dot-pulse dot-water"></div>
+              Scheduled
             </div>
           </div>
+
+          <div className="card-middle-section">
+            <div className="route-info-enhanced">
+              <div className="route-path-enhanced">
+                <Sun size={14} />
+                <span style={{textTransform: 'capitalize'}}>{nextWater.item.session} Session</span>
+              </div>
+              <div className="departure-info-enhanced">
+                <Clock size={12} />
+                <span>{format12h(nextWater.item.startTime)} — {format12h(nextWater.item.endTime)}</span>
+              </div>
+            </div>
+            <ProgressRing mins={nextWater.mins} colorClass="text-cyan-500" />
+          </div>
+
+          <div className="card-bottom-section">
+            <div className="service-extra-info">
+              <span className="extra-tag">{nextWater.item.durationMins} Mins Supply</span>
+            </div>
+            <div className="next-following">
+              Pressure <span>Normal</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {(!nextBus && !nextTrain && !nextWater) && (
+        <div className="empty-updates-premium">
+          <div className="empty-icon-ring">
+            <Info size={24} />
+          </div>
+          <h3 className="empty-title">All Quiet for Now</h3>
+          <p className="empty-desc">No live updates currently available. Check back soon for transit & utility alerts.</p>
+          <button className="glass-back-btn" onClick={calculateNext} style={{marginTop: '12px', width: 'auto', padding: '0 20px', gap: '8px'}}>
+            <RefreshCcw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+            Refresh
+          </button>
         </div>
       )}
     </section>

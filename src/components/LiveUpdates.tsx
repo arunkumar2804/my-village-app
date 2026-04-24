@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { ArrowRight, Clock, Sun, Bus, Users, TrainFront, Droplets } from "lucide-react";
+import "./live-updates.css";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 
@@ -127,9 +128,9 @@ export default function LiveUpdates() {
   }
 
   return (
-    <section>
+    <>
       <h2 className="section-title">Live updates</h2>
-
+      <div className="live-updates-container">
       {/* ─── Next Bus Card ─── */}
       {nextBus && (
         <div className="update-card-premium card-bus-premium">
@@ -276,6 +277,7 @@ export default function LiveUpdates() {
           </div>
         </div>
       )}
-    </section>
+    </div>
+    </>
   );
 }

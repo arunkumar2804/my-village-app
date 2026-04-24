@@ -1,212 +1,173 @@
 .live-updates-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 4px;
+  gap: 16px;
 }
 
 .live-updates-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding: 0 4px;
+  margin-bottom: 4px;
 }
 
 .live-updates-header h2 {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--foreground);
 }
 
-/* Segmented Control Style Tabs */
-.segmented-tabs {
+.live-filter-tabs {
   display: flex;
+  gap: 4px;
   background: rgba(0, 0, 0, 0.05);
-  padding: 3px;
+  padding: 4px;
   border-radius: 12px;
-  position: relative;
 }
 
 @media (prefers-color-scheme: dark) {
-  .segmented-tabs { background: rgba(255, 255, 255, 0.08); }
+  .live-filter-tabs { background: rgba(255, 255, 255, 0.05); }
 }
 
-.tab-btn {
-  padding: 6px 14px;
+.filter-tab {
+  padding: 6px 12px;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
   border: none;
   background: transparent;
-  cursor: pointer;
-  border-radius: 9px;
-  transition: all 0.2s ease;
-  z-index: 1;
 }
 
-.tab-btn.active {
+.filter-tab.active {
   background: white;
   color: var(--foreground);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
-  .tab-btn.active { background: #334155; color: white; }
+  .filter-tab.active { background: #334155; color: white; }
 }
 
-/* Sleek Widget Cards */
-.live-widget-card {
-  position: relative;
+/* Simplified Clean Cards */
+.clean-update-card {
   background: var(--card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
-  border-radius: 22px;
-  padding: 14px 18px;
+  border-radius: 20px;
+  padding: 16px;
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease;
 }
 
-.live-widget-card:active {
-  transform: scale(0.97);
-  background: rgba(var(--foreground-rgb), 0.02);
+.clean-update-card:active {
+  transform: scale(0.98);
 }
 
-/* Accent Aura Glow */
-.aura-glow {
-  position: absolute;
-  left: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  filter: blur(30px);
-  opacity: 0.15;
-  z-index: 0;
-}
-
-.aura-bus { background: var(--bus-primary); }
-.aura-train { background: var(--train-primary); }
-.aura-water { background: var(--water-primary); }
-
-.widget-icon-container {
+.service-icon-box {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 1;
-  background: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .widget-icon-container { background: rgba(255, 255, 255, 0.05); }
-}
+.icon-bus { background: var(--bus-light); color: var(--bus-primary); }
+.icon-train { background: var(--train-light); color: var(--train-primary); }
+.icon-water { background: var(--water-light); color: var(--water-primary); }
 
-.icon-inner {
-  color: var(--accent-color);
-}
-
-.card-bus { --accent-color: var(--bus-primary); }
-.card-train { --accent-color: var(--train-primary); }
-.card-water { --accent-color: var(--water-primary); }
-
-.widget-info {
+.card-main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
-  position: relative;
-  z-index: 1;
 }
 
-.widget-title-row {
+.service-title-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.widget-name {
+.service-name {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--foreground);
-  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.status-badge-mini {
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: rgba(var(--accent-rgb), 0.1);
-  color: var(--accent-color);
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.widget-route {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
+.status-indicator {
   display: flex;
   align-items: center;
   gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.widget-time-section {
+.dot { width: 6px; height: 6px; border-radius: 50%; }
+.dot-bus { background: var(--bus-primary); }
+.dot-train { background: var(--train-primary); }
+.dot-water { background: var(--water-primary); }
+
+.route-details {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.time-info-section {
   text-align: right;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
   gap: 2px;
-  position: relative;
-  z-index: 1;
-}
-
-.main-time {
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.time-label-pill {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--accent-color);
-  background: rgba(var(--accent-rgb), 0.08);
-  padding: 2px 8px;
-  border-radius: 100px;
-  text-transform: lowercase;
-}
-
-/* Empty State */
-.widget-empty {
-  padding: 30px;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 22px;
-  border: 1px dashed var(--glass-border);
+  padding-left: 12px;
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
-  .widget-empty { background: rgba(255, 255, 255, 0.02); }
+  .time-info-section { border-left-color: rgba(255, 255, 255, 0.05); }
 }
 
-.widget-empty p {
+.departure-time {
   font-size: 14px;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.relative-time {
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
+}
+
+/* Empty State */
+.empty-state-simple {
+  padding: 32px 16px;
+  text-align: center;
+  background: var(--card-bg);
+  border-radius: 20px;
+  border: 1px dashed var(--glass-border);
+  color: var(--text-muted);
+}
+
+.empty-state-simple p {
+  font-size: 14px;
+  font-weight: 500;
   margin: 0;
 }

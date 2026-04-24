@@ -13,7 +13,7 @@ function getNextOccurence(timeStr: string): Date {
   const [hours, minutes] = timeStr.split(":").map(Number);
   const now = new Date();
   const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
-  
+
   // If time has already passed today, it means next occurrence is tomorrow
   if (target.getTime() <= now.getTime()) {
     target.setDate(target.getDate() + 1);
@@ -25,10 +25,10 @@ function getNextOccurence(timeStr: string): Date {
 function formatTimeRemaining(targetDate: Date): string {
   const diffMs = targetDate.getTime() - Date.now();
   const diffMins = Math.max(0, Math.floor(diffMs / 60000));
-  
+
   if (diffMins === 0) return "Due";
   if (diffMins < 60) return `${diffMins} mins`;
-  
+
   const hrs = Math.floor(diffMins / 60);
   const mins = diffMins % 60;
   return `${hrs} hr ${mins > 0 ? mins + " mins" : ""}`;
@@ -270,7 +270,7 @@ export default function LiveUpdates() {
             <div className="bus-progress-visual">
               <div className="bus-progress-labels">
                 <span className="progress-label-start">{nextBus.item.from}</span>
-                <span className="progress-label-center">Center stop</span>
+                <span className="progress-label-center">Panaimarathupalayam</span>
                 <span className="progress-label-end">{nextBus.item.to}</span>
               </div>
               <div className="bus-progress-track">
@@ -379,7 +379,7 @@ export default function LiveUpdates() {
 
             <div className="water-detail-row">
               <div className="water-info-block">
-                <div className="water-session" style={{textTransform: "capitalize"}}>
+                <div className="water-session" style={{ textTransform: "capitalize" }}>
                   <Sun size={12} />
                   <span>{nextWater.item.session}</span>
                 </div>
@@ -389,11 +389,11 @@ export default function LiveUpdates() {
                   <span>{format12h(nextWater.item.startTime)} — {format12h(nextWater.item.endTime)}</span>
                 </div>
               </div>
-                <div className="water-duration-chip">
-                  <div className="duration-value">{nextWater.item.durationMins}</div>
-                  <div className="duration-unit">mins</div>
-                </div>
+              <div className="water-duration-chip">
+                <div className="duration-value">{nextWater.item.durationMins}</div>
+                <div className="duration-unit">mins</div>
               </div>
+            </div>
 
             <div className="card-footer-row">
               <div className="meta-chip chip-subtle">Zone: {nextWater.item.zone}</div>

@@ -1,674 +1,212 @@
-.lu-section {
+.live-updates-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 0;
-  margin-bottom: 8px;
+  gap: 12px;
+  padding: 4px;
 }
 
-.lu-header {
+.live-updates-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 12px;
   padding: 0 4px;
 }
 
-.lu-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.lu-live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border-radius: 100px;
-  font-size: 10px;
+.live-updates-header h2 {
+  font-size: 20px;
   font-weight: 800;
-  color: white;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  box-shadow: 0 2px 16px rgba(16, 185, 129, 0.35);
-}
-
-.lu-live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: white;
-  animation: luPulse 2s ease-in-out infinite;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-}
-
-@keyframes luPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.7); }
-}
-
-.lu-title {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  color: var(--foreground);
-  margin: 0;
-}
-
-.lu-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* BUS CARD */
-.lu-bus-card {
-  position: relative;
-  background: var(--card-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 18px;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.lu-bus-card:active { transform: scale(0.98); }
-
-.lu-bus-card.urgent {
-  border-color: rgba(239, 68, 68, 0.25);
-  animation: luUrgentPulse 2s ease-in-out infinite;
-}
-
-@keyframes luUrgentPulse {
-  0%, 100% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
-  50% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05), 0 0 24px 2px rgba(239, 68, 68, 0.12); }
-}
-
-.lu-bus-card-bg {
-  position: absolute;
-  top: -60px;
-  right: -40px;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: #10b981;
-  filter: blur(60px);
-  opacity: 0.1;
-  z-index: 0;
-}
-
-.lu-bus-top {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.lu-bus-badge-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.lu-bus-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.lu-bus-tag.govt {
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
-}
-
-.lu-bus-tag.private {
-  background: rgba(245, 158, 11, 0.1);
-  color: #d97706;
-}
-
-.lu-urgent-tag {
-  padding: 4px 10px;
-  border-radius: 100px;
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.lu-bus-route {
-  font-size: 24px;
-  font-weight: 900;
-  color: var(--foreground);
   letter-spacing: -0.02em;
+  color: var(--foreground);
 }
 
-/* ROUTE DISPLAY */
-.lu-bus-route-display {
+/* Segmented Control Style Tabs */
+.segmented-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 3px;
+  border-radius: 12px;
   position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding: 0 4px;
-}
-
-.lu-route-stop {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.lu-stop-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #10b981;
-  border: 2px solid white;
-  box-shadow: 0 0 0 2px #10b981;
-}
-
-.lu-stop-dot.end-dot {
-  background: transparent;
-  border-color: var(--text-muted);
-  box-shadow: none;
-}
-
-.lu-route-stop span {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  max-width: 60px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.lu-route-journey {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.lu-journey-track {
-  position: relative;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: 100px;
-  overflow: visible;
 }
 
 @media (prefers-color-scheme: dark) {
-  .lu-journey-track { background: rgba(255, 255, 255, 0.08); }
+  .segmented-tabs { background: rgba(255, 255, 255, 0.08); }
 }
 
-.lu-journey-progress {
+.tab-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 9px;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.tab-btn.active {
+  background: white;
+  color: var(--foreground);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .tab-btn.active { background: #334155; color: white; }
+}
+
+/* Sleek Widget Cards */
+.live-widget-card {
   position: relative;
-  height: 100%;
-  border-radius: 100px;
-  background: linear-gradient(90deg, #10b981, #34d399);
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 22px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
-.lu-bus-icon-anim {
+.live-widget-card:active {
+  transform: scale(0.97);
+  background: rgba(var(--foreground-rgb), 0.02);
+}
+
+/* Accent Aura Glow */
+.aura-glow {
   position: absolute;
-  right: -12px;
+  left: -20px;
   top: 50%;
   transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  background: #10b981;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-  animation: busBounce 1s ease-in-out infinite;
-}
-
-@keyframes busBounce {
-  0%, 100% { transform: translateY(-50%) translateX(0); }
-  50% { transform: translateY(-52%) translateX(1px); }
-}
-
-.lu-bus-card.urgent .lu-bus-icon-anim {
-  background: #ef4444;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
-  animation: busBounceUrgent 0.5s ease-in-out infinite;
-}
-
-@keyframes busBounceUrgent {
-  0%, 100% { transform: translateY(-50%) translateX(0); }
-  50% { transform: translateY(-54%) translateX(2px); }
-}
-
-.lu-journey-stops {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 2px;
-  color: var(--text-muted);
-  opacity: 0.4;
-}
-
-/* TIMING SECTION */
-.lu-bus-timing {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 14px;
-  backdrop-filter: blur(10px);
-}
-
-@media (prefers-color-scheme: dark) {
-  .lu-bus-timing { background: rgba(255, 255, 255, 0.04); }
-}
-
-.lu-bus-card.urgent .lu-bus-timing {
-  background: rgba(239, 68, 68, 0.06);
-}
-
-.lu-bus-remain-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border-radius: 100px;
-  color: white;
-  font-size: 14px;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.lu-bus-card.urgent .lu-bus-remain-chip {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.lu-bus-depart-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  margin-left: auto;
-}
-
-.lu-depart-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.lu-depart-time {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-
-/* TRAIN CARD */
-.lu-train-card {
-  position: relative;
-  background: var(--card-bg);
-  backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 18px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.lu-train-card:active { transform: scale(0.98); }
-
-.lu-train-card-bg {
-  position: absolute;
-  top: -60px;
-  right: -40px;
-  width: 180px;
-  height: 180px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  background: #6366f1;
-  filter: blur(60px);
-  opacity: 0.1;
+  filter: blur(30px);
+  opacity: 0.15;
   z-index: 0;
 }
 
-.lu-train-header {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
+.aura-bus { background: var(--bus-primary); }
+.aura-train { background: var(--train-primary); }
+.aura-water { background: var(--water-primary); }
 
-.lu-train-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #6366f1, #818cf8);
+.widget-icon-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
-  flex-shrink: 0;
-}
-
-.lu-train-info {
-  flex: 1;
-}
-
-.lu-train-badges {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.lu-train-num-badge {
-  background: #1e293b;
-  color: white;
-  padding: 3px 10px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.lu-train-name-text {
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--foreground);
-  letter-spacing: -0.01em;
-}
-
-/* TRAIN ROUTE LINE */
-.lu-train-route-line {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 14px;
-  padding: 0 4px;
-}
-
-.lu-station-chip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.04);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  flex-shrink: 0;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
-  .lu-station-chip { background: rgba(255, 255, 255, 0.06); }
+  .widget-icon-container { background: rgba(255, 255, 255, 0.05); }
 }
 
-.lu-station-chip.start-chip {
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
+.icon-inner {
+  color: var(--accent-color);
 }
 
-.lu-dotted-track {
+.card-bus { --accent-color: var(--bus-primary); }
+.card-train { --accent-color: var(--train-primary); }
+.card-water { --accent-color: var(--water-primary); }
+
+.widget-info {
   flex: 1;
   display: flex;
-  align-items: center;
-  position: relative;
-  min-width: 40px;
-}
-
-.lu-track-dots {
-  flex: 1;
-  height: 2px;
-  background: repeating-linear-gradient(
-    to right,
-    #cbd5e1 0px,
-    #cbd5e1 4px,
-    transparent 4px,
-    transparent 8px
-  );
-}
-
-@media (prefers-color-scheme: dark) {
-  .lu-track-dots {
-    background: repeating-linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.2) 0px,
-      rgba(255, 255, 255, 0.2) 4px,
-      transparent 4px,
-      transparent 8px
-    );
-  }
-}
-
-.lu-nearby-stop-chip {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  color: white;
-  padding: 5px 12px;
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 800;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-}
-
-.lu-train-timing {
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
   position: relative;
   z-index: 1;
+}
+
+.widget-title-row {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 14px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .lu-train-timing { background: rgba(255, 255, 255, 0.04); }
-}
-
-.lu-train-remain-chip {
-  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
-  background: linear-gradient(135deg, #6366f1, #818cf8);
-  border-radius: 100px;
-  color: white;
-  font-size: 14px;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-.lu-train-depart-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  margin-left: auto;
-}
-
-/* WATER CARD */
-.lu-water-card {
-  position: relative;
-  background: var(--card-bg);
-  backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 16px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.lu-water-card:active { transform: scale(0.98); }
-
-.lu-water-card-bg {
-  position: absolute;
-  top: -60px;
-  right: -40px;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: #06b6d4;
-  filter: blur(60px);
-  opacity: 0.1;
-  z-index: 0;
-}
-
-.lu-water-header {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.lu-water-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #06b6d4, #22d3ee);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.35);
-  flex-shrink: 0;
-}
-
-.lu-water-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.lu-water-zone {
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--foreground);
-  letter-spacing: -0.01em;
-}
-
-.lu-water-session {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.lu-water-timing {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 14px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .lu-water-timing { background: rgba(255, 255, 255, 0.04); }
-}
-
-.lu-water-remain-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: linear-gradient(135deg, #06b6d4, #0891b2);
-  border-radius: 100px;
-  color: white;
-  font-size: 14px;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
-}
-
-.lu-water-start-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  margin-left: auto;
-}
-
-/* EMPTY STATE */
-.lu-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 20px;
-  background: var(--card-bg);
-  border-radius: 24px;
-  border: 1px dashed var(--glass-border);
-  gap: 8px;
-}
-
-.lu-empty-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--train-primary);
-  margin-bottom: 4px;
-}
-
-.lu-empty p {
+.widget-name {
   font-size: 15px;
   font-weight: 800;
   color: var(--foreground);
-  margin: 0;
+  letter-spacing: -0.01em;
 }
 
-.lu-empty span {
+.status-badge-mini {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent-color);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.widget-route {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-@media (max-width: 380px) {
-  .lu-bus-route { font-size: 20px; }
-  .lu-bus-remain-chip { font-size: 12px; padding: 6px 12px; }
-  .lu-depart-time { font-size: 14px; }
+.widget-time-section {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.main-time {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.time-label-pill {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-color);
+  background: rgba(var(--accent-rgb), 0.08);
+  padding: 2px 8px;
+  border-radius: 100px;
+  text-transform: lowercase;
+}
+
+/* Empty State */
+.widget-empty {
+  padding: 30px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 22px;
+  border: 1px dashed var(--glass-border);
+}
+
+@media (prefers-color-scheme: dark) {
+  .widget-empty { background: rgba(255, 255, 255, 0.02); }
+}
+
+.widget-empty p {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0;
 }

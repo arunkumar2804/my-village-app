@@ -42,10 +42,29 @@ function format12h(timeStr: string): string {
   return `${h12}:${mStr} ${ampm}`;
 }
 
+function getCrowdStatus(targetDate?: Date): { label: "Mostly crowded" | "Less crowded"; toneClass: string } {
+  if (!targetDate) {
+    return { label: "Less crowded", toneClass: "crowd-low" };
+  }
+
+  const diffMins = Math.max(0, Math.floor((targetDate.getTime() - Date.now()) / 60000));
+  if (diffMins <= 25) {
+    return { label: "Mostly crowded", toneClass: "crowd-high" };
+  }
+  return { label: "Less crowded", toneClass: "crowd-low" };
+}
+
+function getOperatorLabel(bus: BusTiming): string {
+  const service = bus.serviceName?.trim();
+  if (service) return service;
+  return bus.operatorType === "government" ? "Government Transport" : "Private Operator";
+}
+
 export default function LiveUpdates() {
   const [nextBus, setNextBus] = useState<{ item: BusTiming; timeRemaining: string; date?: Date } | null>(null);
   const [nextTrain, setNextTrain] = useState<{ item: TrainTiming; timeRemaining: string; date?: Date } | null>(null);
   const [nextWater, setNextWater] = useState<{ item: WaterUpdate; timeRemaining: string; date?: Date } | null>(null);
+  const busCrowdStatus = getCrowdStatus(nextBus?.date);
 
   const calculateNext = async () => {
     // Bus
@@ -110,25 +129,32 @@ export default function LiveUpdates() {
   };
 
   useEffect(() => {
+    const runCalculateNext = () => {
+      void calculateNext();
+    };
+
     // Initial calculate on mount (client-side)
-    calculateNext();
-    
+    const initialTimeoutId = setTimeout(runCalculateNext, 0);
+
     // Update every minute
-    const intervalId = setInterval(calculateNext, 60000);
-    return () => clearInterval(intervalId);
+    const intervalId = setInterval(runCalculateNext, 60000);
+    return () => {
+      clearTimeout(initialTimeoutId);
+      clearInterval(intervalId);
+    };
   }, []);
 
   if (!nextBus && !nextTrain && !nextWater) {
     return (
-      <section>
+      <section className="live-updates-container">
         <h2 className="section-title">Live updates</h2>
-        <div style={{ color: "var(--text-muted)", fontSize: 14 }}>No live updates currently available.</div>
+        <div className="live-updates-empty">No live updates currently available.</div>
       </section>
     );
   }
 
   return (
-    <section>
+    <section className="live-updates-container">
       <h2 className="section-title">Live updates</h2>
 
       {/* ─── Next Bus Card ─── */}
@@ -164,6 +190,16 @@ export default function LiveUpdates() {
                   <span>Departs at {format12h(nextBus.item.departureTime)}</span>
                 </div>
               </div>
+            </div>
+
+            <div className="bus-footer-row">
+              <div className="bus-footer-left">
+                <div className="meta-chip chip-operator">Operator: {getOperatorLabel(nextBus.item)}</div>
+                <div className={`meta-chip ${nextBus.item.fareType === "free" ? "chip-fare-free" : "chip-fare-paid"}`}>
+                  {nextBus.item.fareType === "free" ? "Free" : "Paid"}
+                </div>
+              </div>
+              <div className={`meta-chip chip-crowd ${busCrowdStatus.toneClass}`}>{busCrowdStatus.label}</div>
             </div>
           </div>
         </div>
@@ -217,6 +253,11 @@ export default function LiveUpdates() {
                 <span>{nextTrain.item.to}</span>
               </div>
             </div>
+
+            <div className="card-footer-row">
+              <div className="meta-chip chip-subtle">Route: {nextTrain.item.from} to {nextTrain.item.to}</div>
+              <div className="meta-chip chip-subtle">Nearby: {nextTrain.item.nearbyStation}</div>
+            </div>
           </div>
         </div>
       )}
@@ -253,9 +294,16 @@ export default function LiveUpdates() {
                   <span>{format12h(nextWater.item.startTime)} — {format12h(nextWater.item.endTime)}</span>
                 </div>
               </div>
-              <div className="water-duration-chip">
-                <div className="duration-value">{nextWater.item.durationMins}</div>
-                <div className="duration-unit">mins</div>
+                <div className="water-duration-chip">
+                  <div className="duration-value">{nextWater.item.durationMins}</div>
+                  <div className="duration-unit">mins</div>
+                </div>
+              </div>
+
+            <div className="card-footer-row">
+              <div className="meta-chip chip-subtle">Zone: {nextWater.item.zone}</div>
+              <div className="meta-chip chip-subtle" style={{ textTransform: "capitalize" }}>
+                {nextWater.item.session} supply
               </div>
             </div>
           </div>

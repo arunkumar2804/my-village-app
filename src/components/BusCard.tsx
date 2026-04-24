@@ -1,6 +1,6 @@
 "use client";
 
-import { Bus, Users, Clock } from "lucide-react";
+import { Bus, Users } from "lucide-react";
 import { useMemo } from "react";
 
 interface BusCardProps {
@@ -46,7 +46,7 @@ function calculateTimeRemaining(departureTime: Date | string): {
   } else {
     const h = Math.floor(totalMins / 60);
     const m = totalMins % 60;
-    formattedText = m > 0 ? `${h} hrs ${m} mins` : `${h} hrs`;
+    formattedText = m > 0 ? `${h} hr ${m} mins` : `${h} hr`;
   }
 
   return {
@@ -135,8 +135,7 @@ export default function BusCard({
         <div className="header-right">
           <div className="arrives-pill">
             <span className="pulse-dot"></span>
-            <span className="mins-val">{timeInfo.minutes < 1 ? '0' : timeInfo.minutes}</span>
-            <span className="mins-label">mins away</span>
+            <span className="mins-val">{timeInfo.formattedText}</span>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowRight, Clock, Sun } from "lucide-react";
 import "./live-updates.css";
@@ -64,37 +64,32 @@ function formatBusBadgeTime(departureDate: Date): string {
   return "On schedule";
 }
 
-function findLiveBus(activeBuses: BusTiming[]): { item: BusTiming; timeRemaining: string; date: Date } | null {
-  if (activeBuses.length === 0) return null;
+type LiveBusData = { item: BusTiming; timeRemaining: string; date: Date };
+
+function getNextDeparture(timeStr: string, now: Date): Date {
+  const departureToday = getTimeOnDate(timeStr, now);
+  if (departureToday.getTime() > now.getTime()) return departureToday;
+  return addMinutes(departureToday, 24 * 60);
+}
+
+function getPreviousDeparture(nextDeparture: Date): Date {
+  return addMinutes(nextDeparture, -24 * 60);
+}
+
+function getBusCardSelections(activeBuses: BusTiming[]): { nextBus: LiveBusData | null; previousBus: LiveBusData | null } {
+  if (activeBuses.length === 0) return { nextBus: null, previousBus: null };
 
   const now = new Date();
   const nowMs = now.getTime();
 
   const candidates = activeBuses.map((bus) => {
-    const departureToday = getTimeOnDate(bus.departureTime, now);
-    const journeyStart = addMinutes(departureToday, -30);
-    const journeyEnd = addMinutes(departureToday, 25);
-    const isInJourneyWindow = nowMs >= journeyStart.getTime() && nowMs <= journeyEnd.getTime();
-    const nextDeparture = departureToday.getTime() > nowMs ? departureToday : addMinutes(departureToday, 24 * 60);
+    const nextDeparture = getNextDeparture(bus.departureTime, now);
+    const previousDeparture = getPreviousDeparture(nextDeparture);
+    const previousJourneyEnd = addMinutes(previousDeparture, 25);
+    const isPreviousBusOnRoute = nowMs >= previousDeparture.getTime() && nowMs <= previousJourneyEnd.getTime();
 
-    return { bus, departureToday, nextDeparture, isInJourneyWindow };
+    return { bus, nextDeparture, previousDeparture, isPreviousBusOnRoute };
   });
-
-  const busesInJourneyWindow = candidates.filter((candidate) => candidate.isInJourneyWindow);
-
-  if (busesInJourneyWindow.length > 0) {
-    const nearestLiveBus = busesInJourneyWindow.reduce((prev, current) => {
-      const prevDiff = Math.abs(prev.departureToday.getTime() - nowMs);
-      const currentDiff = Math.abs(current.departureToday.getTime() - nowMs);
-      return currentDiff < prevDiff ? current : prev;
-    });
-
-    return {
-      item: nearestLiveBus.bus,
-      timeRemaining: formatBusBadgeTime(nearestLiveBus.departureToday),
-      date: nearestLiveBus.departureToday,
-    };
-  }
 
   const nearestUpcomingBus = candidates.reduce((prev, current) => {
     const prevDiff = prev.nextDeparture.getTime() - nowMs;
@@ -102,11 +97,31 @@ function findLiveBus(activeBuses: BusTiming[]): { item: BusTiming; timeRemaining
     return currentDiff < prevDiff ? current : prev;
   });
 
-  return {
+  const busesOnRoute = candidates.filter((candidate) => candidate.isPreviousBusOnRoute);
+  const latestOnRouteBus =
+    busesOnRoute.length > 0
+      ? busesOnRoute.reduce((prev, current) => {
+          const prevDiff = nowMs - prev.previousDeparture.getTime();
+          const currentDiff = nowMs - current.previousDeparture.getTime();
+          return currentDiff < prevDiff ? current : prev;
+        })
+      : null;
+
+  const nextBus: LiveBusData = {
     item: nearestUpcomingBus.bus,
     timeRemaining: formatBusBadgeTime(nearestUpcomingBus.nextDeparture),
     date: nearestUpcomingBus.nextDeparture,
   };
+
+  const previousBus: LiveBusData | null = latestOnRouteBus
+    ? {
+        item: latestOnRouteBus.bus,
+        timeRemaining: formatBusBadgeTime(latestOnRouteBus.previousDeparture),
+        date: latestOnRouteBus.previousDeparture,
+      }
+    : null;
+
+  return { nextBus, previousBus };
 }
 
 function getBusJourneyProgress(departureDate?: Date): number | null {
@@ -152,15 +167,25 @@ function getOperatorLabel(bus: BusTiming): string {
 
 export default function LiveUpdates() {
   const [nextBus, setNextBus] = useState<{ item: BusTiming; timeRemaining: string; date?: Date } | null>(null);
+  const [previousBus, setPreviousBus] = useState<{ item: BusTiming; timeRemaining: string; date?: Date } | null>(null);
+  const [showPreviousBus, setShowPreviousBus] = useState(false);
   const [nextTrain, setNextTrain] = useState<{ item: TrainTiming; timeRemaining: string; date?: Date } | null>(null);
   const [nextWater, setNextWater] = useState<{ item: WaterUpdate; timeRemaining: string; date?: Date } | null>(null);
+  const previousBusKeyRef = useRef("none");
   const busCrowdStatus = getCrowdStatus();
   const busJourneyProgress = getBusJourneyProgress(nextBus?.date);
 
   const calculateNext = async () => {
     // Bus
     const activeBuses = await getActiveBusSchedules();
-    setNextBus(findLiveBus(activeBuses));
+    const { nextBus: selectedNextBus, previousBus: selectedPreviousBus } = getBusCardSelections(activeBuses);
+    const newPreviousBusKey = selectedPreviousBus ? `${selectedPreviousBus.item.id}-${selectedPreviousBus.date?.getTime() ?? "na"}` : "none";
+    if (newPreviousBusKey !== previousBusKeyRef.current) {
+      previousBusKeyRef.current = newPreviousBusKey;
+      setShowPreviousBus(false);
+    }
+    setNextBus(selectedNextBus);
+    setPreviousBus(selectedPreviousBus);
 
     // Train
     const activeTrains = (await getTrainTimings()).filter((t) => t.isActive);
@@ -219,7 +244,7 @@ export default function LiveUpdates() {
     };
   }, []);
 
-  if (!nextBus && !nextTrain && !nextWater) {
+  if (!nextBus && !previousBus && !nextTrain && !nextWater) {
     return (
       <section className="live-updates-container">
         <h2 className="section-title">Live updates</h2>
@@ -270,7 +295,7 @@ export default function LiveUpdates() {
             <div className="bus-progress-visual">
               <div className="bus-progress-labels">
                 <span className="progress-label-start">{nextBus.item.from}</span>
-                <span className="progress-label-center">Panaimarathupalayam</span>
+                <span className="progress-label-center">Center Stop</span>
                 <span className="progress-label-end">{nextBus.item.to}</span>
               </div>
               <div className="bus-progress-track">
@@ -297,6 +322,33 @@ export default function LiveUpdates() {
               <div className={`meta-chip chip-crowd ${busCrowdStatus.toneClass}`}>{busCrowdStatus.label}</div>
             </div>
           </div>
+        </div>
+      )}
+      {previousBus && (
+        <div className="previous-bus-block">
+          <button
+            type="button"
+            className="previous-bus-toggle"
+            onClick={() => setShowPreviousBus((prev) => !prev)}
+          >
+            {showPreviousBus ? "Hide previous bus" : "View previous bus"}
+          </button>
+
+          {showPreviousBus && (
+            <div className="previous-bus-card">
+              <div className="previous-bus-top-row">
+                <span className="previous-bus-label">Previous bus on route</span>
+                <span className="previous-bus-time">{previousBus.timeRemaining}</span>
+              </div>
+              <div className="previous-bus-route-row">
+                <span className="previous-bus-route-number">{previousBus.item.routeNumber}</span>
+                <span className="previous-bus-route-name">{previousBus.item.from}</span>
+                <ArrowRight size={12} className="previous-bus-arrow" />
+                <span className="previous-bus-route-name">{previousBus.item.to}</span>
+              </div>
+              <div className="previous-bus-meta">Departed at {format12h(previousBus.item.departureTime)}</div>
+            </div>
+          )}
         </div>
       )}
 

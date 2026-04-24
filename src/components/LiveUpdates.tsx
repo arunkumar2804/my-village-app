@@ -1,37 +1,51 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import Image from "next/image";
-import { ArrowRight, Clock, Sun, Bus, Train, Droplets, Info, RefreshCcw } from "lucide-react";
+import { Bus, Train, Droplets, MapPin, Clock, Sun, Navigation, Shield, Building2 } from "lucide-react";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 import "./live-updates.css";
 
-// Helper to convert "HH:mm" to a target Date object, either today or tomorrow
-function getNextOccurence(timeStr: string): Date {
+interface BusInfo {
+  item: BusTiming;
+  relTime: string;
+  minutesLeft: number;
+  date: Date;
+  progress: number;
+}
+
+interface TrainInfo {
+  item: TrainTiming;
+  relTime: string;
+  minutesLeft: number;
+  date: Date;
+}
+
+interface WaterInfo {
+  item: WaterUpdate;
+  relTime: string;
+  minutesLeft: number;
+  date: Date;
+}
+
+function getNextOccurrence(timeStr: string): Date {
   const [hours, minutes] = timeStr.split(":").map(Number);
   const now = new Date();
   const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
-  
-  if (target.getTime() <= now.getTime()) {
-    target.setDate(target.getDate() + 1);
-  }
+  if (target.getTime() <= now.getTime()) target.setDate(target.getDate() + 1);
   return target;
 }
 
-// Converts diff in ms to a friendly string and raw minutes
-function getTimeData(targetDate: Date) {
+function getTimeData(targetDate: Date): { text: string; minutes: number } {
   const diffMs = targetDate.getTime() - Date.now();
   const diffMins = Math.max(0, Math.floor(diffMs / 60000));
   
-  let label = "Due";
-  if (diffMins > 0 && diffMins < 60) label = `${diffMins}m`;
-  else if (diffMins >= 60) {
-    const hrs = Math.floor(diffMins / 60);
-    label = `${hrs}h`;
-  }
-
-  return { label, mins: diffMins };
+  if (diffMins === 0) return { text: "Arriving", minutes: 0 };
+  if (diffMins === 1) return { text: "1 min", minutes: 1 };
+  if (diffMins < 60) return { text: `${diffMins} mins`, minutes: diffMins };
+  const hrs = Math.floor(diffMins / 60);
+  const mins = diffMins % 60;
+  return { text: `${hrs}h ${mins}m`, minutes: diffMins };
 }
 
 function format12h(timeStr: string): string {
@@ -42,279 +56,222 @@ function format12h(timeStr: string): string {
   return `${h12}:${mStr} ${ampm}`;
 }
 
+function getProgress(minutesLeft: number): number {
+  if (minutesLeft <= 5) return 95;
+  if (minutesLeft <= 10) return 85;
+  if (minutesLeft <= 15) return 70;
+  if (minutesLeft <= 30) return 50;
+  if (minutesLeft <= 45) return 35;
+  if (minutesLeft <= 60) return 20;
+  return 10;
+}
+
 export default function LiveUpdates() {
-  const [activeTab, setActiveTab] = useState<"all" | "transport" | "water">("all");
-  const [nextBus, setNextBus] = useState<{ item: BusTiming; time: string; mins: number; date: Date } | null>(null);
-  const [nextTrain, setNextTrain] = useState<{ item: TrainTiming; time: string; mins: number; date: Date } | null>(null);
-  const [nextWater, setNextWater] = useState<{ item: WaterUpdate; time: string; mins: number; date: Date } | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [buses, setBuses] = useState<BusInfo[]>([]);
+  const [trains, setTrains] = useState<TrainInfo[]>([]);
+  const [water, setWater] = useState<WaterInfo[]>([]);
+  const [, setTick] = useState(0);
 
   const calculateNext = async () => {
-    setIsRefreshing(true);
+    const busList: BusInfo[] = [];
+    const trainList: TrainInfo[] = [];
+    const waterList: WaterInfo[] = [];
     
-    // Bus
     const activeBuses = (await getBusTimings()).filter((b) => b.isActive);
-    if (activeBuses.length > 0) {
-      let closest = activeBuses[0];
-      let minDiff = Infinity;
-      let closestDate = new Date();
-      activeBuses.forEach((b) => {
-        const d = getNextOccurence(b.departureTime);
-        const diff = d.getTime() - Date.now();
-        if (diff < minDiff) { minDiff = diff; closest = b; closestDate = d; }
-      });
-      const { label, mins } = getTimeData(closestDate);
-      setNextBus({ item: closest, time: label, mins, date: closestDate });
-    }
-
-    // Train
+    activeBuses.forEach((b) => {
+      const d = getNextOccurrence(b.departureTime);
+      const { text, minutes } = getTimeData(d);
+      busList.push({ item: b, relTime: text, minutesLeft: minutes, date: d, progress: getProgress(minutes) });
+    });
+    busList.sort((a, b) => a.minutesLeft - b.minutesLeft);
+    
     const activeTrains = (await getTrainTimings()).filter((t) => t.isActive);
-    if (activeTrains.length > 0) {
-      let closest = activeTrains[0];
-      let minDiff = Infinity;
-      let closestDate = new Date();
-      activeTrains.forEach((t) => {
-        const d = getNextOccurence(t.departureTime);
-        const diff = d.getTime() - Date.now();
-        if (diff < minDiff) { minDiff = diff; closest = t; closestDate = d; }
-      });
-      const { label, mins } = getTimeData(closestDate);
-      setNextTrain({ item: closest, time: label, mins, date: closestDate });
-    }
-
-    // Water
+    activeTrains.forEach((t) => {
+      const d = getNextOccurrence(t.departureTime);
+      const { text, minutes } = getTimeData(d);
+      trainList.push({ item: t, relTime: text, minutesLeft: minutes, date: d });
+    });
+    trainList.sort((a, b) => a.minutesLeft - b.minutesLeft);
+    
     const activeWater = (await getWaterUpdates()).filter((w) => w.isActive);
-    if (activeWater.length > 0) {
-      let closest = activeWater[0];
-      let minDiff = Infinity;
-      let closestDate = new Date();
-      activeWater.forEach((w) => {
-        const d = getNextOccurence(w.startTime);
-        const diff = d.getTime() - Date.now();
-        if (diff < minDiff) { minDiff = diff; closest = w; closestDate = d; }
-      });
-      const { label, mins } = getTimeData(closestDate);
-      setNextWater({ item: closest, time: label, mins, date: closestDate });
-    }
-
-    setTimeout(() => setIsRefreshing(false), 500);
+    activeWater.forEach((w) => {
+      const d = getNextOccurrence(w.startTime);
+      const { text, minutes } = getTimeData(d);
+      waterList.push({ item: w, relTime: text, minutesLeft: minutes, date: d });
+    });
+    waterList.sort((a, b) => a.minutesLeft - b.minutesLeft);
+    
+    setBuses(busList);
+    setTrains(trainList);
+    setWater(waterList);
   };
 
   useEffect(() => {
     calculateNext();
-    const intervalId = setInterval(calculateNext, 60000);
-    return () => clearInterval(intervalId);
+    const interval = setInterval(() => {
+      calculateNext();
+      setTick(t => t + 1);
+    }, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  const ProgressRing = ({ mins, colorClass }: { mins: number, colorClass: string }) => {
-    const radius = 28;
-    const circumference = 2 * Math.PI * radius;
-    // Calculate percentage based on 120 mins max for visual effect
-    const percentage = Math.max(0, Math.min(100, (mins / 120) * 100));
-    const offset = circumference - (percentage / 100) * circumference;
-
+  if (buses.length === 0 && trains.length === 0 && water.length === 0) {
     return (
-      <div className="time-remaining-visual">
-        <svg className="progress-ring-svg" width="64" height="64">
-          <circle
-            className="progress-ring-bg"
-            stroke="rgba(0,0,0,0.05)"
-            strokeWidth="4"
-            fill="transparent"
-            r={radius}
-            cx="32"
-            cy="32"
-          />
-          <circle
-            className={`progress-ring-circle ${colorClass}`}
-            stroke="currentColor"
-            strokeWidth="4"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            strokeLinecap="round"
-            fill="transparent"
-            r={radius}
-            cx="32"
-            cy="32"
-          />
-        </svg>
-        <div className="time-val-overlay">
-          <span className="num">{mins > 60 ? Math.floor(mins/60) : mins}</span>
-          <span className="unit">{mins > 60 ? 'hr' : 'min'}</span>
+      <section className="lu-section">
+        <div className="lu-header">
+          <div className="lu-title-wrap">
+            <span className="lu-live-pill">
+              <span className="lu-live-dot"></span>
+              Live
+            </span>
+            <h2 className="lu-title">Updates</h2>
+          </div>
         </div>
-      </div>
+        <div className="lu-empty">
+          <div className="lu-empty-icon"><Bus size={28} /></div>
+          <p>No upcoming schedules</p>
+          <span>Check back soon</span>
+        </div>
+      </section>
     );
-  };
+  }
 
   return (
-    <section className="live-updates-container">
-      <div className="live-updates-header">
-        <h2>Live Updates</h2>
-        <div className="live-filter-tabs">
-          <button 
-            className={`filter-tab ${activeTab === "all" ? "active" : ""}`}
-            onClick={() => setActiveTab("all")}
-          >All</button>
-          <button 
-            className={`filter-tab ${activeTab === "transport" ? "active" : ""}`}
-            onClick={() => setActiveTab("transport")}
-          >Transport</button>
-          <button 
-            className={`filter-tab ${activeTab === "water" ? "active" : ""}`}
-            onClick={() => setActiveTab("water")}
-          >Water</button>
+    <section className="lu-section">
+      <div className="lu-header">
+        <div className="lu-title-wrap">
+          <span className="lu-live-pill">
+            <span className="lu-live-dot"></span>
+            Live
+          </span>
+          <h2 className="lu-title">Updates</h2>
         </div>
+        <span className="lu-count">{buses.length + trains.length + water.length} upcoming</span>
       </div>
 
-      {(activeTab === "all" || activeTab === "transport") && nextBus && (
-        <div className="enhanced-update-card">
-          <div className="card-bg-glow glow-bus"></div>
-          <div className="card-top-section">
-            <div className="service-meta">
-              <div className="service-icon-wrapper icon-bus">
-                <Bus size={20} />
+      <div className="lu-cards">
+        {buses.map((bus, i) => {
+          const isGovt = bus.item.operatorType === "government";
+          const isUrgent = bus.minutesLeft <= 5;
+          const isSoon = bus.minutesLeft <= 15;
+          
+          return (
+            <div key={bus.item.id || i} className={`lu-bus-card ${isUrgent ? "urgent" : ""} ${isSoon ? "soon" : ""}`}>
+              <div className="lu-bus-card-bg"></div>
+              
+              <div className="lu-bus-top">
+                <div className="lu-bus-badge-row">
+                  <span className={`lu-bus-tag ${isGovt ? "govt" : "private"}`}>
+                    {isGovt ? <Shield size={10} /> : <Building2 size={10} />}
+                    {isGovt ? "Government" : "Private"}
+                  </span>
+                  {isUrgent && <span className="lu-urgent-tag">⚡ Arriving</span>}
+                </div>
+                <span className="lu-bus-route">{bus.item.routeNumber}</span>
               </div>
-              <div className="service-labels">
-                <span className="service-type-label">Next Bus</span>
-                <span className="service-main-name">{nextBus.item.routeNumber} Service</span>
-              </div>
-            </div>
-            <div className="status-badge-premium">
-              <div className="status-dot-pulse dot-bus"></div>
-              Live Tracking
-            </div>
-          </div>
 
-          <div className="card-middle-section">
-            <div className="route-info-enhanced">
-              <div className="route-path-enhanced">
-                <span>{nextBus.item.from}</span>
-                <ArrowRight size={14} className="route-arrow-enhanced" />
-                <span>{nextBus.item.to}</span>
+              <div className="lu-bus-route-display">
+                <div className="lu-route-stop start">
+                  <div className="lu-stop-dot"></div>
+                  <span>{bus.item.from}</span>
+                </div>
+                
+                <div className="lu-route-journey">
+                  <div className="lu-journey-track">
+                    <div className="lu-journey-progress" style={{ width: `${bus.progress}%` }}>
+                      <div className="lu-bus-icon-anim">
+                        <Bus size={16} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="lu-journey-stops">
+                    <MapPin size={10} />
+                    <MapPin size={10} />
+                    <MapPin size={10} />
+                    <MapPin size={10} />
+                  </div>
+                </div>
+                
+                <div className="lu-route-stop end">
+                  <div className="lu-stop-dot end-dot"></div>
+                  <span>{bus.item.to}</span>
+                </div>
               </div>
-              <div className="departure-info-enhanced">
-                <Clock size={12} />
-                <span>Departs at {format12h(nextBus.item.departureTime)}</span>
-              </div>
-            </div>
-            <ProgressRing mins={nextBus.mins} colorClass="text-emerald-500" />
-          </div>
 
-          <div className="card-bottom-section">
-            <div className="service-extra-info">
-              <span className="extra-tag">{nextBus.item.operator || "Public"}</span>
-              <span className="extra-tag">AC Bus</span>
+              <div className="lu-bus-timing">
+                <div className="lu-timing-main">
+                  <Clock size={20} className="lu-timing-icon" />
+                  <div className="lu-timing-text">
+                    <span className="lu-timing-remain">{bus.relTime}</span>
+                    <span className="lu-timing-label">Remaining</span>
+                  </div>
+                </div>
+                <div className="lu-timing-divider"></div>
+                <div className="lu-timing-depart">
+                  <span className="lu-depart-label">Departs at</span>
+                  <span className="lu-depart-time">{format12h(bus.item.departureTime)}</span>
+                </div>
+              </div>
             </div>
-            <div className="next-following">
-              Next in <span>45m</span>
-            </div>
-          </div>
-        </div>
-      )}
+          );
+        })}
 
-      {(activeTab === "all" || activeTab === "transport") && nextTrain && (
-        <div className="enhanced-update-card">
-          <div className="card-bg-glow glow-train"></div>
-          <div className="card-top-section">
-            <div className="service-meta">
-              <div className="service-icon-wrapper icon-train">
-                <Train size={20} />
+        {trains.map((train, i) => (
+          <div key={train.item.id || i} className="lu-train-card">
+            <div className="lu-train-card-bg"></div>
+            <div className="lu-train-header">
+              <div className="lu-train-icon-wrap">
+                <Train size={22} />
               </div>
-              <div className="service-labels">
-                <span className="service-type-label">Next Train</span>
-                <span className="service-main-name">{nextTrain.item.trainName}</span>
+              <div className="lu-train-info">
+                <span className="lu-train-name">{train.item.trainName}</span>
+                <div className="lu-train-route">
+                  <MapPin size={11} />
+                  <span>{train.item.nearbyStation}</span>
+                </div>
               </div>
             </div>
-            <div className="status-badge-premium">
-              <div className="status-dot-pulse dot-train"></div>
-              On Time
+            <div className="lu-train-timing">
+              <div className="lu-tm-remain">
+                <span className="lu-tm-value">{train.relTime}</span>
+                <span className="lu-tm-label">remaining</span>
+              </div>
+              <div className="lu-tm-depart">
+                <span className="lu-td-value">{format12h(train.item.departureTime)}</span>
+                <span className="lu-td-label">departure</span>
+              </div>
             </div>
           </div>
+        ))}
 
-          <div className="card-middle-section">
-            <div className="route-info-enhanced">
-              <div className="route-path-enhanced">
-                <span>{nextTrain.item.from}</span>
-                <ArrowRight size={14} className="route-arrow-enhanced" />
-                <span>{nextTrain.item.to}</span>
+        {water.map((w, i) => (
+          <div key={w.item.id || i} className="lu-water-card">
+            <div className="lu-water-card-bg"></div>
+            <div className="lu-water-header">
+              <div className="lu-water-icon-wrap">
+                <Droplets size={22} />
               </div>
-              <div className="departure-info-enhanced">
-                <Clock size={12} />
-                <span>Station: {nextTrain.item.nearbyStation} • {format12h(nextTrain.item.departureTime)}</span>
-              </div>
-            </div>
-            <ProgressRing mins={nextTrain.mins} colorClass="text-indigo-500" />
-          </div>
-
-          <div className="card-bottom-section">
-            <div className="service-extra-info">
-              <span className="extra-tag">#{nextTrain.item.trainNumber}</span>
-              <span className="extra-tag">Express</span>
-            </div>
-            <div className="next-following">
-              Platform <span>02</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {(activeTab === "all" || activeTab === "water") && nextWater && (
-        <div className="enhanced-update-card">
-          <div className="card-bg-glow glow-water"></div>
-          <div className="card-top-section">
-            <div className="service-meta">
-              <div className="service-icon-wrapper icon-water">
-                <Droplets size={20} />
-              </div>
-              <div className="service-labels">
-                <span className="service-type-label">Water Supply</span>
-                <span className="service-main-name">{nextWater.item.zone}</span>
+              <div className="lu-water-info">
+                <span className="lu-water-zone">{w.item.zone} Zone</span>
+                <div className="lu-water-session">
+                  <Sun size={11} />
+                  <span className="capitalize">{w.item.session} session</span>
+                </div>
               </div>
             </div>
-            <div className="status-badge-premium">
-              <div className="status-dot-pulse dot-water"></div>
-              Scheduled
-            </div>
-          </div>
-
-          <div className="card-middle-section">
-            <div className="route-info-enhanced">
-              <div className="route-path-enhanced">
-                <Sun size={14} />
-                <span style={{textTransform: 'capitalize'}}>{nextWater.item.session} Session</span>
+            <div className="lu-water-timing">
+              <div className="lu-wt-remain">
+                <span className="lu-wt-value">{w.relTime}</span>
+                <span className="lu-wt-label">remaining</span>
               </div>
-              <div className="departure-info-enhanced">
-                <Clock size={12} />
-                <span>{format12h(nextWater.item.startTime)} — {format12h(nextWater.item.endTime)}</span>
+              <div className="lu-wt-starts">
+                <span className="lu-ws-value">{format12h(w.item.startTime)}</span>
+                <span className="lu-ws-label">starts</span>
               </div>
             </div>
-            <ProgressRing mins={nextWater.mins} colorClass="text-cyan-500" />
           </div>
-
-          <div className="card-bottom-section">
-            <div className="service-extra-info">
-              <span className="extra-tag">{nextWater.item.durationMins} Mins Supply</span>
-            </div>
-            <div className="next-following">
-              Pressure <span>Normal</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {(!nextBus && !nextTrain && !nextWater) && (
-        <div className="empty-updates-premium">
-          <div className="empty-icon-ring">
-            <Info size={24} />
-          </div>
-          <h3 className="empty-title">All Quiet for Now</h3>
-          <p className="empty-desc">No live updates currently available. Check back soon for transit & utility alerts.</p>
-          <button className="glass-back-btn" onClick={calculateNext} style={{marginTop: '12px', width: 'auto', padding: '0 20px', gap: '8px'}}>
-            <RefreshCcw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-            Refresh
-          </button>
-        </div>
-      )}
+        ))}
+      </div>
     </section>
   );
 }

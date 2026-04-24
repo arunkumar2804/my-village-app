@@ -124,48 +124,65 @@ export default function BusCard({
     [departureTime]
   );
 
-  return (
-    <div className={`bus-card ${timeInfo.minutes <= 5 ? 'urgent' : ''}`}>
-      <div className="bus-card-top-header">
-        <span className="bus-card-label">Next Bus</span>
-        <span className="bus-card-operator">{ownershipType.toUpperCase() === 'GOVERNMENT' ? 'TNSTC' : serviceName}</span>
-      </div>
+  // Arrival chip logic
+  const arrivalStatus = timeInfo.minutes < 1 ? "arriving" : timeInfo.minutes <= 5 ? "soon" : "later";
+  const arrivalText = timeInfo.minutes < 1 ? "Arriving" : `${timeInfo.minutes} mins`;
 
-      <div className="bus-card-main-info">
-        <div className="bus-card-number-box">
-          <span>{routeNumber}</span>
+  return (
+    <div className={`bus-card-v2 ${timeInfo.minutes <= 1 ? 'urgent' : ''}`}>
+      {/* Top Section */}
+      <div className="bus-card-main-row">
+        {/* Left Block: Route Number */}
+        <div className="bus-left-block">
+          <div className="route-num-box">
+            {routeNumber}
+          </div>
         </div>
-        <div className="bus-card-route-info">
-          <div className="bus-card-route-names">
-            <span className="route-from">{fromLocation}</span>
-            <div className="route-arrow">
-              <div className="arrow-line"></div>
-              <div className="arrow-head"></div>
+
+        {/* Center Block: Route Info */}
+        <div className="bus-center-block">
+          <div className="route-visual-row">
+            <span className="location-name">{fromLocation}</span>
+            <div className="route-path-visual">
+              <div className="path-dot"></div>
+              <div className="path-line-dashed">
+                <Bus size={12} className="bus-icon-small" />
+              </div>
+              <div className="path-dot"></div>
             </div>
-            <span className="route-to">{toLocation}</span>
+            <span className="location-name">{toLocation}</span>
+          </div>
+          <div className="departure-time-row">
+            Departs at {formatDepartureTime(departureTime)}
+          </div>
+        </div>
+
+        {/* Right Block: Arrival Chip (and spacing buffer) */}
+        <div className="bus-right-block">
+          <div className={`arrival-status-pill ${arrivalStatus}`}>
+            {arrivalText}
           </div>
         </div>
       </div>
 
-      <div className="bus-card-tags">
-        {fareType === "Free" && (
-          <span className="bus-tag free">
-            Free Bus
-          </span>
-        )}
-        <span className={`bus-tag crowd ${crowdInfo.status}`}>
-          <Users size={12} />
-          {crowdInfo.label}
-        </span>
-      </div>
+      {/* Divider */}
+      <div className="bus-card-divider"></div>
 
-      <div className="bus-card-footer">
-        <div className="footer-depart">
-          <span className="depart-label">Departs at</span>
-          <span className="depart-time">{formatDepartureTime(departureTime)}</span>
+      {/* Footer Row */}
+      <div className="bus-card-footer-row">
+        <div className="footer-left-tags">
+          <span className="tag-chip tnstc">
+            {ownershipType.toUpperCase() === 'GOVERNMENT' ? 'TNSTC' : serviceName}
+          </span>
+          {fareType === "Free" && (
+            <span className="tag-chip free-bus">Free Bus</span>
+          )}
         </div>
-        <div className="footer-remain">
-          <span className="remain-time">{timeInfo.formattedText}</span>
+        <div className="footer-right-status">
+          <span className={`crowd-status-pill ${crowdInfo.status}`}>
+            <Users size={12} />
+            {crowdInfo.label}
+          </span>
         </div>
       </div>
     </div>

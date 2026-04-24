@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { ArrowRight, Clock, Sun } from "lucide-react";
 import "./live-updates.css";
-import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
+import { getTrainTimings, getWaterUpdates } from "@/lib/store";
+import { getActiveBusSchedules } from "@/lib/bus-schedules";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 
 // Helper to convert "HH:mm" to a target Date object, either today or tomorrow
@@ -42,14 +43,103 @@ function format12h(timeStr: string): string {
   return `${h12}:${mStr} ${ampm}`;
 }
 
-function getCrowdStatus(targetDate?: Date): { label: "Mostly crowded" | "Less crowded"; toneClass: string } {
-  if (!targetDate) {
-    return { label: "Less crowded", toneClass: "crowd-low" };
+function getTimeOnDate(timeStr: string, baseDate: Date): Date {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), hours, minutes, 0);
+}
+
+function addMinutes(date: Date, mins: number): Date {
+  return new Date(date.getTime() + mins * 60000);
+}
+
+function formatBusBadgeTime(departureDate: Date): string {
+  const nowMs = Date.now();
+  const departureMs = departureDate.getTime();
+
+  if (nowMs < departureMs) return formatTimeRemaining(departureDate);
+
+  const minsSinceDeparture = Math.floor((nowMs - departureMs) / 60000);
+  if (minsSinceDeparture <= 0) return "Departing now";
+  if (minsSinceDeparture <= 25) return `On route ${minsSinceDeparture} mins`;
+  return "On schedule";
+}
+
+function findLiveBus(activeBuses: BusTiming[]): { item: BusTiming; timeRemaining: string; date: Date } | null {
+  if (activeBuses.length === 0) return null;
+
+  const now = new Date();
+  const nowMs = now.getTime();
+
+  const candidates = activeBuses.map((bus) => {
+    const departureToday = getTimeOnDate(bus.departureTime, now);
+    const journeyStart = addMinutes(departureToday, -30);
+    const journeyEnd = addMinutes(departureToday, 25);
+    const isInJourneyWindow = nowMs >= journeyStart.getTime() && nowMs <= journeyEnd.getTime();
+    const nextDeparture = departureToday.getTime() > nowMs ? departureToday : addMinutes(departureToday, 24 * 60);
+
+    return { bus, departureToday, nextDeparture, isInJourneyWindow };
+  });
+
+  const busesInJourneyWindow = candidates.filter((candidate) => candidate.isInJourneyWindow);
+
+  if (busesInJourneyWindow.length > 0) {
+    const nearestLiveBus = busesInJourneyWindow.reduce((prev, current) => {
+      const prevDiff = Math.abs(prev.departureToday.getTime() - nowMs);
+      const currentDiff = Math.abs(current.departureToday.getTime() - nowMs);
+      return currentDiff < prevDiff ? current : prev;
+    });
+
+    return {
+      item: nearestLiveBus.bus,
+      timeRemaining: formatBusBadgeTime(nearestLiveBus.departureToday),
+      date: nearestLiveBus.departureToday,
+    };
   }
 
-  const diffMins = Math.max(0, Math.floor((targetDate.getTime() - Date.now()) / 60000));
-  if (diffMins <= 25) {
-    return { label: "Mostly crowded", toneClass: "crowd-high" };
+  const nearestUpcomingBus = candidates.reduce((prev, current) => {
+    const prevDiff = prev.nextDeparture.getTime() - nowMs;
+    const currentDiff = current.nextDeparture.getTime() - nowMs;
+    return currentDiff < prevDiff ? current : prev;
+  });
+
+  return {
+    item: nearestUpcomingBus.bus,
+    timeRemaining: formatBusBadgeTime(nearestUpcomingBus.nextDeparture),
+    date: nearestUpcomingBus.nextDeparture,
+  };
+}
+
+function getBusJourneyProgress(departureDate?: Date): number | null {
+  if (!departureDate) return null;
+
+  const nowMs = Date.now();
+  const departureMs = departureDate.getTime();
+  const journeyStartMs = departureMs - 30 * 60000;
+  const journeyCenterMs = departureMs;
+  const journeyEndMs = departureMs + 25 * 60000;
+
+  if (nowMs < journeyStartMs || nowMs > journeyEndMs) return null;
+
+  if (nowMs <= journeyCenterMs) {
+    const firstHalfProgress = (nowMs - journeyStartMs) / (journeyCenterMs - journeyStartMs);
+    return firstHalfProgress * 50;
+  }
+
+  const secondHalfProgress = (nowMs - journeyCenterMs) / (journeyEndMs - journeyCenterMs);
+  return 50 + secondHalfProgress * 50;
+}
+
+function isPeakTimeNow(): boolean {
+  const now = new Date();
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
+  const morningPeak = minutesNow >= 8 * 60 && minutesNow < 9 * 60;
+  const eveningPeak = minutesNow >= 16 * 60 && minutesNow <= 18 * 60 + 30;
+  return morningPeak || eveningPeak;
+}
+
+function getCrowdStatus(): { label: "Mostly crowded" | "Less crowded"; toneClass: string } {
+  if (isPeakTimeNow()) {
+    return { label: "Mostly crowded", toneClass: "crowd-peak" };
   }
   return { label: "Less crowded", toneClass: "crowd-low" };
 }
@@ -64,28 +154,13 @@ export default function LiveUpdates() {
   const [nextBus, setNextBus] = useState<{ item: BusTiming; timeRemaining: string; date?: Date } | null>(null);
   const [nextTrain, setNextTrain] = useState<{ item: TrainTiming; timeRemaining: string; date?: Date } | null>(null);
   const [nextWater, setNextWater] = useState<{ item: WaterUpdate; timeRemaining: string; date?: Date } | null>(null);
-  const busCrowdStatus = getCrowdStatus(nextBus?.date);
+  const busCrowdStatus = getCrowdStatus();
+  const busJourneyProgress = getBusJourneyProgress(nextBus?.date);
 
   const calculateNext = async () => {
     // Bus
-    const activeBuses = (await getBusTimings()).filter((b) => b.isActive);
-    if (activeBuses.length > 0) {
-      let closestBus = activeBuses[0];
-      let minDiff = Infinity;
-      let closestDate = new Date();
-      activeBuses.forEach((b) => {
-        const d = getNextOccurence(b.departureTime);
-        const diff = d.getTime() - Date.now();
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestBus = b;
-          closestDate = d;
-        }
-      });
-      setNextBus({ item: closestBus, timeRemaining: formatTimeRemaining(closestDate), date: closestDate });
-    } else {
-      setNextBus(null);
-    }
+    const activeBuses = await getActiveBusSchedules();
+    setNextBus(findLiveBus(activeBuses));
 
     // Train
     const activeTrains = (await getTrainTimings()).filter((t) => t.isActive);
@@ -189,6 +264,26 @@ export default function LiveUpdates() {
                   <Clock size={11} />
                   <span>Departs at {format12h(nextBus.item.departureTime)}</span>
                 </div>
+              </div>
+            </div>
+
+            <div className="bus-progress-visual">
+              <div className="bus-progress-labels">
+                <span className="progress-label-start">{nextBus.item.from}</span>
+                <span className="progress-label-center">Center stop</span>
+                <span className="progress-label-end">{nextBus.item.to}</span>
+              </div>
+              <div className="bus-progress-track">
+                <span className="progress-dot progress-dot-start"></span>
+                <span className="progress-dot progress-dot-center"></span>
+                <span className="progress-destination-line"></span>
+                {busJourneyProgress !== null && (
+                  <span className="moving-bus-marker" style={{ left: `${busJourneyProgress}%` }}>
+                    <span className="moving-bus-icon">
+                      <Image src="/icons/bus-icon.svg" alt="Moving bus" fill style={{ objectFit: "contain" }} />
+                    </span>
+                  </span>
+                )}
               </div>
             </div>
 

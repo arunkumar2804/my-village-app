@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Search, Shield, Building2, Info } from "lucide-react";
-import { getBusTimings } from "@/lib/store";
+import { getActiveBusSchedules } from "@/lib/bus-schedules";
 import BusCard from "@/components/BusCard";
 import type { BusTiming } from "@/lib/types";
 import "./buses.css";
@@ -16,8 +16,8 @@ export default function BusSchedules() {
 
   useEffect(() => {
     const fetchBuses = async () => {
-      const data = await getBusTimings();
-      setBuses(data.filter((b) => b.isActive));
+      const data = await getActiveBusSchedules();
+      setBuses(data);
       setLoading(false);
     };
     fetchBuses();

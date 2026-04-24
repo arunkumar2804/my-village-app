@@ -245,6 +245,116 @@
   color: var(--text-muted);
 }
 
+.bus-progress-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.bus-progress-labels {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.progress-label-start,
+.progress-label-end {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-label-start {
+  text-align: left;
+}
+
+.progress-label-center {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+.progress-label-end {
+  text-align: right;
+}
+
+.bus-progress-track {
+  position: relative;
+  height: 26px;
+}
+
+.bus-progress-track::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 50%;
+  border-top: 2px dashed rgba(16, 185, 129, 0.55);
+  transform: translateY(-50%);
+}
+
+.progress-dot {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.9);
+}
+
+.progress-dot-start {
+  left: 0;
+}
+
+.progress-dot-center {
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.24);
+}
+
+.progress-destination-line {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 2px;
+  height: 16px;
+  border-radius: 3px;
+  background: rgba(6, 78, 59, 0.88);
+  transform: translateY(-50%);
+}
+
+.moving-bus-marker {
+  position: absolute;
+  top: 50%;
+  width: 25px;
+  height: 25px;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.34);
+  background: linear-gradient(145deg, rgba(236, 253, 245, 0.98), rgba(209, 250, 229, 0.86));
+  box-shadow:
+    0 6px 12px -8px rgba(5, 150, 105, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+.moving-bus-icon {
+  position: relative;
+  width: 12px;
+  height: 12px;
+}
+
 .bus-footer-row {
   display: flex;
   align-items: center;
@@ -298,10 +408,10 @@
   flex-shrink: 0;
 }
 
-.crowd-high {
-  color: #991b1b;
-  background: rgba(239, 68, 68, 0.16);
-  border-color: rgba(239, 68, 68, 0.24);
+.crowd-peak {
+  color: #9a3412;
+  background: rgba(251, 146, 60, 0.2);
+  border-color: rgba(245, 158, 11, 0.34);
 }
 
 .crowd-low {
@@ -615,10 +725,10 @@
     border-color: rgba(249, 115, 22, 0.3);
   }
 
-  .crowd-high {
-    color: #fca5a5;
-    background: rgba(239, 68, 68, 0.22);
-    border-color: rgba(239, 68, 68, 0.3);
+  .crowd-peak {
+    color: #fdba74;
+    background: rgba(249, 115, 22, 0.28);
+    border-color: rgba(251, 191, 36, 0.38);
   }
 
   .crowd-low {
@@ -644,6 +754,31 @@
   .chip-subtle {
     background: rgba(148, 163, 184, 0.16);
     border-color: rgba(148, 163, 184, 0.24);
+  }
+
+  .bus-progress-track::before {
+    border-top-color: rgba(52, 211, 153, 0.65);
+  }
+
+  .progress-dot {
+    border-color: rgba(15, 23, 42, 0.85);
+    box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.55);
+  }
+
+  .progress-dot-center {
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.35);
+  }
+
+  .progress-destination-line {
+    background: rgba(110, 231, 183, 0.88);
+  }
+
+  .moving-bus-marker {
+    border-color: rgba(52, 211, 153, 0.45);
+    background: linear-gradient(145deg, rgba(6, 78, 59, 0.92), rgba(5, 150, 105, 0.72));
+    box-shadow:
+      0 8px 14px -10px rgba(5, 150, 105, 0.75),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   .water-duration-chip {

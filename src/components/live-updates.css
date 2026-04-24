@@ -1,35 +1,40 @@
 .live-updates-section {
-  background: #111111;
-  padding: 24px 0;
-  margin: 0 -20px; /* Offset parent padding if necessary, or just rely on page structure */
+  background: #111111 !important;
+  padding: 32px 16px;
+  margin: 16px -20px 0;
+  min-height: 200px;
+  display: block;
 }
 
 .live-updates-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 0 16px;
+  gap: 20px;
+  max-width: 100%;
 }
 
 .section-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #FFFFFF;
-  margin-bottom: 20px;
-  padding: 0 16px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #FFFFFF !important;
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+  text-transform: none;
 }
 
 /* Premium Card Container */
 .update-card-premium {
-  background: #FFFFFF;
-  border-radius: 20px;
-  padding: 20px;
+  background: #FFFFFF !important;
+  border-radius: 24px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  gap: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   position: relative;
   width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
 }
 
 /* Top Row Styles */
@@ -37,95 +42,106 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .next-label-group {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
-.blue-bus-icon {
-  color: #4A90D9;
-}
+.blue-bus-icon { color: #4A90D9 !important; }
+.indigo-train-icon { color: #6366F1 !important; }
+.cyan-water-icon { color: #06B6D4 !important; }
 
 .next-bus-text {
-  color: #888888;
+  color: #888888 !important;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .time-remaining-badge {
-  background: #22C55E;
-  color: #FFFFFF;
-  font-size: 15px;
-  font-weight: 700;
-  padding: 8px 18px;
-  border-radius: 50px;
+  background: #22C55E !important;
+  color: #FFFFFF !important;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 10px 20px;
+  border-radius: 100px;
   line-height: 1;
 }
+
+.water-time-badge { background: #06B6D4 !important; }
 
 /* Middle Row Styles */
 .card-middle-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
+  width: 100%;
 }
 
 .route-tile {
-  width: 70px;
-  height: 70px;
-  background: #F2F2F2;
-  border-radius: 10px;
+  width: 72px;
+  height: 72px;
+  background: #F8F9FA !important;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  font-weight: 800;
-  color: #111111;
+  font-size: 30px;
+  font-weight: 900;
+  color: #111111 !important;
   flex-shrink: 0;
+  border: 1px solid #E9ECEF;
 }
+
+.train-tile { background: #EEF2FF !important; color: #4338CA !important; border-color: #E0E7FF; }
+.water-tile { background: #ECFEFF !important; color: #0E7490 !important; border-color: #CFFAFE; }
 
 .route-info-stack {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .route-path-line {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #111111;
+  gap: 10px;
+  color: #111111 !important;
 }
 
 .path-stop {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .dotted-connector {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .dot-line {
   flex: 1;
-  border-top: 2px dotted #BBBBBB;
+  border-top: 2px dashed #CED4DA !important;
 }
 
 .midpoint-bus-icon {
-  color: #111111;
+  color: #495057 !important;
   opacity: 0.8;
 }
 
 .departure-time-sub {
-  color: #888888;
-  font-size: 13px;
-  font-weight: 400;
+  color: #6C757D !important;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 /* Bottom Row Styles */
@@ -133,263 +149,50 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-top: 4px;
+  width: 100%;
 }
 
 .tag-chips-group {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .tag-chip {
-  background: #F5F5F5;
-  border: 1px solid #DDDDDD;
-  color: #333333;
+  background: #F8F9FA !important;
+  border: 1px solid #DEE2E6 !important;
+  color: #495057 !important;
   font-size: 12px;
-  font-weight: 400;
-  padding: 5px 12px;
-  border-radius: 20px;
-}
-
-.crowd-status-badge {
-  background: #EF4444;
-  color: #FFFFFF;
-  font-size: 13px;
   font-weight: 600;
-  padding: 7px 14px;
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 100px;
 }
 
-/* Maintain styles for other cards (Train, Water) if needed, 
-   but for now focusing on the Bus card redesign requested */
-.update-card {
-  background: var(--card-bg);
-  border-radius: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
-  overflow: hidden;
-  position: relative;
-  padding: 18px 20px 20px;
-}
-
-.card-accent-strip {
-  height: 4px;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.accent-train { background: linear-gradient(90deg, var(--train-primary), #818cf8); }
-.accent-water { background: linear-gradient(90deg, var(--water-primary), #67e8f9); }
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.card-type {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.crowd-status-badge, .status-badge-train, .status-badge-water {
   font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.card-type-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-bg-train { background: var(--train-light); }
-.icon-bg-water { background: var(--water-light); }
-
-.time-badge {
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 100px;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 12px;
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 700;
+  color: #FFFFFF !important;
 }
 
-.badge-train { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
-.badge-water { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
+.crowd-status-badge { background: #EF4444 !important; }
+.status-badge-train { background: #10B981 !important; }
+.status-badge-water { background: #6366F1 !important; }
 
-.pulse-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  animation: pulse-dot-anim 1.6s ease-in-out infinite;
-}
-
-.dot-train { background: #6366f1; }
-.dot-water { background: #06b6d4; }
-
-@keyframes pulse-dot-anim {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.6; }
-}
-
-.train-info-row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.train-name {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--foreground);
-}
-
-.train-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.train-number-badge {
-  background: #334155;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.train-depart-text {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.train-route-visual {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.train-station {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.station-dot {
+.live-dot-green, .live-dot-cyan {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  border: 2px solid white;
+  background: #FFFFFF;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
-.dot-origin { background: #6366f1; box-shadow: 0 0 0 1px #6366f1; }
-.dot-dest { background: var(--text-muted); }
-
-.train-track {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+/* Hide any legacy elements that might be lingering */
+.update-card, .card-accent-strip, .card-inner, .card-header, .card-type {
+  display: none !important;
 }
 
-.track-line {
-  width: 100%;
-  height: 2px;
-  background: #e2e8f0;
-}
-
-.nearby-station-chip {
-  background: #f8fafc;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 9px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.nearby-label {
-  font-size: 8px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.water-detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.water-info-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.water-session {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.water-zone {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--foreground);
-}
-
-.water-time-range {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.water-duration-chip {
-  width: 54px;
-  height: 54px;
-  border-radius: 14px;
-  background: rgba(6, 182, 212, 0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(6, 182, 212, 0.1);
-}
-
-.duration-value {
-  font-size: 18px;
-  font-weight: 900;
-  color: #06b6d4;
-  line-height: 1;
-}
-
-.duration-unit {
-  font-size: 9px;
-  font-weight: 700;
-  color: #06b6d4;
-  text-transform: uppercase;
-}

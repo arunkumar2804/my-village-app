@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, Clock, Sun, Bus, Users } from "lucide-react";
+import { ArrowRight, Clock, Sun, Bus, Users, TrainFront, Droplets } from "lucide-react";
 import { getBusTimings, getTrainTimings, getWaterUpdates } from "@/lib/store";
 import type { BusTiming, TrainTiming, WaterUpdate } from "@/lib/types";
 
@@ -181,51 +181,48 @@ export default function LiveUpdates() {
 
       {/* ─── Next Train Card ─── */}
       {nextTrain && (
-        <div className="update-card card-train">
-          <div className="card-accent-strip accent-train"></div>
-          <div className="card-inner">
-            <div className="card-header">
-              <div className="card-type">
-                <div className="card-type-icon icon-bg-train">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/train-icon.svg" alt="Train" fill style={{ objectFit: 'contain' }} />
-                  </div>
+        <div className="update-card-premium card-train-premium">
+          {/* Top Row: Label + Time Badge */}
+          <div className="card-top-row">
+            <div className="next-label-group">
+              <TrainFront size={16} className="indigo-train-icon" />
+              <span className="next-bus-text">Next Train</span>
+            </div>
+            <div className="time-remaining-badge">
+              {nextTrain.timeRemaining}
+            </div>
+          </div>
+
+          {/* Middle Row: Tile + Route Info */}
+          <div className="card-middle-row">
+            <div className="route-tile train-tile">
+              {nextTrain.item.trainNumber.slice(-3)}
+            </div>
+            <div className="route-info-stack">
+              <div className="route-path-line">
+                <span className="path-stop">{nextTrain.item.from}</span>
+                <div className="dotted-connector">
+                  <div className="dot-line" />
+                  <TrainFront size={14} className="midpoint-bus-icon" />
+                  <div className="dot-line" />
                 </div>
-                <span>Next Train</span>
+                <span className="path-stop">{nextTrain.item.to}</span>
               </div>
-              <div className="time-badge badge-train">
-                <span className="pulse-dot dot-train"></span>
-                {nextTrain.timeRemaining}
+              <div className="departure-time-sub">
+                Departs at {format12h(nextTrain.item.departureTime)}
               </div>
             </div>
+          </div>
 
-            <div className="train-info-row">
-              <div className="train-name">{nextTrain.item.trainName}</div>
-              <div className="train-meta-row">
-                <div className="train-number-badge">{nextTrain.item.trainNumber}</div>
-                <div className="train-depart-text">
-                  <Clock size={11} />
-                  <span>Departs {format12h(nextTrain.item.departureTime)}</span>
-                </div>
-              </div>
+          {/* Bottom Row: Chips + Crowd Badge */}
+          <div className="card-bottom-row">
+            <div className="tag-chips-group">
+              <span className="tag-chip">Unreserved</span>
+              <span className="tag-chip">Daily</span>
             </div>
-
-            <div className="train-route-visual">
-              <div className="train-station station-origin">
-                <div className="station-dot dot-origin"></div>
-                <span>{nextTrain.item.from}</span>
-              </div>
-              <div className="train-track">
-                <div className="track-line"></div>
-                <div className="nearby-station-chip">
-                  <span className="nearby-label">Nearby</span>
-                  <strong>{nextTrain.item.nearbyStation}</strong>
-                </div>
-              </div>
-              <div className="train-station station-dest">
-                <div className="station-dot dot-dest"></div>
-                <span>{nextTrain.item.to}</span>
-              </div>
+            <div className="status-badge-train">
+              <div className="live-dot-green" />
+              <span>On Time</span>
             </div>
           </div>
         </div>
@@ -233,40 +230,48 @@ export default function LiveUpdates() {
 
       {/* ─── Water Timings Card ─── */}
       {nextWater && (
-        <div className="update-card card-water">
-          <div className="card-accent-strip accent-water"></div>
-          <div className="card-inner">
-            <div className="card-header">
-              <div className="card-type">
-                <div className="card-type-icon icon-bg-water">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/water-tap-icon.svg" alt="Water" fill style={{ objectFit: 'contain' }} />
-                  </div>
+        <div className="update-card-premium card-water-premium">
+          {/* Top Row: Label + Time Badge */}
+          <div className="card-top-row">
+            <div className="next-label-group">
+              <Droplets size={16} className="cyan-water-icon" />
+              <span className="next-bus-text">Water timings</span>
+            </div>
+            <div className="time-remaining-badge water-time-badge">
+              {nextWater.timeRemaining}
+            </div>
+          </div>
+
+          {/* Middle Row: Tile + Route Info */}
+          <div className="card-middle-row">
+            <div className="route-tile water-tile">
+              {nextWater.item.zone.slice(0, 2)}
+            </div>
+            <div className="route-info-stack">
+              <div className="route-path-line">
+                <span className="path-stop">Supply</span>
+                <div className="dotted-connector">
+                  <div className="dot-line" />
+                  <Droplets size={14} className="midpoint-bus-icon" />
+                  <div className="dot-line" />
                 </div>
-                <span>Water timings</span>
+                <span className="path-stop">{nextWater.item.zone}</span>
               </div>
-              <div className="time-badge badge-water">
-                <span className="pulse-dot dot-water"></span>
-                {nextWater.timeRemaining}
+              <div className="departure-time-sub">
+                {format12h(nextWater.item.startTime)} — {format12h(nextWater.item.endTime)} ({nextWater.item.durationMins} mins)
               </div>
             </div>
+          </div>
 
-            <div className="water-detail-row">
-              <div className="water-info-block">
-                <div className="water-session" style={{textTransform: "capitalize"}}>
-                  <Sun size={12} />
-                  <span>{nextWater.item.session}</span>
-                </div>
-                <div className="water-zone">{nextWater.item.zone}</div>
-                <div className="water-time-range">
-                  <Clock size={11} />
-                  <span>{format12h(nextWater.item.startTime)} — {format12h(nextWater.item.endTime)}</span>
-                </div>
-              </div>
-              <div className="water-duration-chip">
-                <div className="duration-value">{nextWater.item.durationMins}</div>
-                <div className="duration-unit">mins</div>
-              </div>
+          {/* Bottom Row: Chips + Status */}
+          <div className="card-bottom-row">
+            <div className="tag-chips-group">
+              <span className="tag-chip" style={{textTransform: 'capitalize'}}>{nextWater.item.session}</span>
+              <span className="tag-chip">Filtered</span>
+            </div>
+            <div className="status-badge-water">
+              <div className="live-dot-cyan" />
+              <span>Active</span>
             </div>
           </div>
         </div>

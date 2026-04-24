@@ -749,7 +749,7 @@ body {
 /* Header Strip */
 .bus-header-strip {
   background: #0F172A; /* dark navy */
-  padding: 14px 20px;
+  padding: 14px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -810,7 +810,7 @@ body {
 
 /* Body */
 .bus-body {
-  padding: 20px 20px 0;
+  padding: 20px 18px 0;
 }
 
 .route-row {
@@ -902,12 +902,12 @@ body {
 .bus-card-divider-final {
   height: 0.5px;
   background: #E2E8F0;
-  margin: 16px 20px 0;
+  margin: 16px 18px 0;
 }
 
 /* Footer */
 .bus-footer-final {
-  padding: 12px 20px 16px;
+  padding: 12px 18px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;

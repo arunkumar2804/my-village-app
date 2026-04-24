@@ -124,65 +124,66 @@ export default function BusCard({
     [departureTime]
   );
 
-  // Arrival chip logic
-  const arrivalStatus = timeInfo.minutes < 1 ? "arriving" : timeInfo.minutes <= 5 ? "soon" : "later";
-  const arrivalText = timeInfo.minutes < 1 ? "Arriving" : `${timeInfo.minutes} mins`;
-
   return (
-    <div className={`bus-card-v2 ${timeInfo.minutes <= 1 ? 'urgent' : ''}`}>
-      {/* Top Section */}
-      <div className="bus-card-main-row">
-        {/* Left Block: Route Number */}
-        <div className="bus-left-block">
-          <div className="route-num-box">
+    <div className="bus-card-final">
+      {/* Header Strip */}
+      <div className="bus-header-strip">
+        <div className="header-left">
+          <Bus size={18} className="header-bus-icon" />
+          <span className="next-bus-label">NEXT BUS</span>
+        </div>
+        <div className="header-right">
+          <div className="arrives-pill">
+            <span className="pulse-dot"></span>
+            <span className="mins-val">{timeInfo.minutes < 1 ? '0' : timeInfo.minutes}</span>
+            <span className="mins-label">mins away</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Card Body */}
+      <div className="bus-body">
+        <div className="route-row">
+          <div className="route-badge">
             {routeNumber}
           </div>
-        </div>
-
-        {/* Center Block: Route Info */}
-        <div className="bus-center-block">
-          <div className="route-visual-row">
-            <span className="location-name">{fromLocation}</span>
-            <div className="route-path-visual">
-              <div className="path-dot"></div>
-              <div className="path-line-dashed">
-                <Bus size={12} className="bus-icon-small" />
+          <div className="route-info-stack">
+            <div className="stops-row">
+              <span className="stop-name">{fromLocation}</span>
+              <div className="path-visualizer">
+                <div className="dot-start"></div>
+                <div className="dashed-line-seg"></div>
+                <Bus size={16} className="path-bus-icon" />
+                <div className="dashed-line-seg"></div>
+                <div className="dot-end"></div>
               </div>
-              <div className="path-dot"></div>
+              <span className="stop-name">{toLocation}</span>
             </div>
-            <span className="location-name">{toLocation}</span>
-          </div>
-          <div className="departure-time-row">
-            Departs at {formatDepartureTime(departureTime)}
-          </div>
-        </div>
-
-        {/* Right Block: Arrival Chip (and spacing buffer) */}
-        <div className="bus-right-block">
-          <div className={`arrival-status-pill ${arrivalStatus}`}>
-            {arrivalText}
+            <div className="depart-time-text">
+              {formatDepartureTime(departureTime)}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Divider */}
-      <div className="bus-card-divider"></div>
+      <div className="bus-card-divider-final"></div>
 
-      {/* Footer Row */}
-      <div className="bus-card-footer-row">
-        <div className="footer-left-tags">
-          <span className="tag-chip tnstc">
+      {/* Footer */}
+      <div className="bus-footer-final">
+        <div className="footer-tags-left">
+          <span className="footer-tag-pill">
             {ownershipType.toUpperCase() === 'GOVERNMENT' ? 'TNSTC' : serviceName}
           </span>
           {fareType === "Free" && (
-            <span className="tag-chip free-bus">Free Bus</span>
+            <span className="footer-tag-pill">Free Bus</span>
           )}
         </div>
-        <div className="footer-right-status">
-          <span className={`crowd-status-pill ${crowdInfo.status}`}>
-            <Users size={12} />
-            {crowdInfo.label}
-          </span>
+        <div className="footer-crowd-right">
+          <div className={`crowd-badge-final ${crowdInfo.status}`}>
+            <Users size={14} />
+            <span>{crowdInfo.label}</span>
+          </div>
         </div>
       </div>
     </div>

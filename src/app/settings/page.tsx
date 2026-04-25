@@ -5,20 +5,43 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import BottomNav from "@/components/BottomNav";
+import { User, Mail, Shield, Bell, Moon, Info, LogOut, ChevronRight } from "lucide-react";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<{
+    name: string;
+    email: string;
+    avatar: string;
+    id: string;
+  } | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user?.email) {
-        setUserEmail(session.user.email);
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUserInfo({
+          name: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
+          email: session.user.email || "",
+          avatar: session.user.user_metadata?.avatar_url || "",
+          id: session.user.id
+        });
       }
-    });
+    };
+
+    fetchUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserEmail(session?.user?.email || null);
+      if (session?.user) {
+        setUserInfo({
+          name: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
+          email: session.user.email || "",
+          avatar: session.user.user_metadata?.avatar_url || "",
+          id: session.user.id
+        });
+      } else {
+        setUserInfo(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -38,16 +61,38 @@ export default function SettingsPage() {
       <div className="settings-page">
         <h1 className="settings-heading">Settings</h1>
 
-        {userEmail === "arunkumail29@gmail.com" && (
+        {/* ─── Profile Header ─── */}
+        <div className="settings-profile-card">
+          <div className="profile-avatar-wrap">
+            {userInfo?.avatar ? (
+              <img src={userInfo.avatar} alt="Profile" />
+            ) : (
+              <div className="profile-placeholder">
+                <User size={32} />
+              </div>
+            )}
+          </div>
+          <div className="profile-info">
+            <h2>{userInfo?.name || "Loading..."}</h2>
+            <div className="profile-email">
+              <Mail size={14} />
+              <span>{userInfo?.email || "..."}</span>
+            </div>
+          </div>
+        </div>
+
+        {userInfo?.email === "arunkumail29@gmail.com" && (
           <div className="settings-group">
             <div className="settings-group-label">Management</div>
             <Link href="/admin" className="settings-row">
-              <div className="settings-row-icon admin-icon">🛠</div>
+              <div className="settings-row-icon admin-icon">
+                <Shield size={20} color="white" />
+              </div>
               <div className="settings-row-body">
                 <div className="settings-row-title">Admin Console</div>
                 <div className="settings-row-desc">Manage bus, train, water & more</div>
               </div>
-              <span className="settings-row-arrow">›</span>
+              <ChevronRight className="settings-row-arrow" size={20} />
             </Link>
           </div>
         )}
@@ -55,44 +100,57 @@ export default function SettingsPage() {
         <div className="settings-group">
           <div className="settings-group-label">App</div>
           <div className="settings-row">
-            <div className="settings-row-icon">🔔</div>
+            <div className="settings-row-icon">
+              <Bell size={20} />
+            </div>
             <div className="settings-row-body">
               <div className="settings-row-title">Notifications</div>
               <div className="settings-row-desc">Coming soon</div>
             </div>
+            <ChevronRight className="settings-row-arrow" size={20} />
           </div>
           <div className="settings-row">
-            <div className="settings-row-icon">🌙</div>
+            <div className="settings-row-icon">
+              <Moon size={20} />
+            </div>
             <div className="settings-row-body">
               <div className="settings-row-title">Appearance</div>
               <div className="settings-row-desc">Coming soon</div>
             </div>
+            <ChevronRight className="settings-row-arrow" size={20} />
           </div>
           <div className="settings-row">
-            <div className="settings-row-icon">ℹ️</div>
+            <div className="settings-row-icon">
+              <Info size={20} />
+            </div>
             <div className="settings-row-body">
               <div className="settings-row-title">About</div>
-              <div className="settings-row-desc">My Village App v1.0</div>
+              <div className="settings-row-desc">My Village App v1.2</div>
             </div>
+            <ChevronRight className="settings-row-arrow" size={20} />
           </div>
         </div>
 
         <div className="settings-group">
           <div className="settings-group-label">Account</div>
-          <div className="settings-row" onClick={handleLogout} style={{ cursor: "pointer" }}>
-            <div className="settings-row-icon">🚪</div>
+          <div className="settings-row logout" onClick={handleLogout} style={{ cursor: "pointer" }}>
+            <div className="settings-row-icon logout-icon">
+              <LogOut size={20} color="#ef4444" />
+            </div>
             <div className="settings-row-body">
-              <div className="settings-row-title" style={{ color: "var(--danger, #ef4444)" }}>Log Out</div>
+              <div className="settings-row-title" style={{ color: "#ef4444" }}>Log Out</div>
               <div className="settings-row-desc">Sign out of your account</div>
             </div>
           </div>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "32px", marginBottom: "80px", fontSize: "12px", color: "var(--text-muted, rgba(0,0,0,0.5))" }}>
-          Made with ❤️ by Arun Kumar
+        <div className="settings-credits">
+          <p>Made with ❤️ by Arun Kumar</p>
+          <span>Panaimarathupalayam Community</span>
         </div>
       </div>
       <BottomNav />
     </main>
   );
 }
+

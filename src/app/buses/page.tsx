@@ -8,6 +8,8 @@ import BusCard from "@/components/BusCard";
 import type { BusTiming } from "@/lib/types";
 import "./buses.css";
 
+import BottomNav from "@/components/BottomNav";
+
 export default function BusSchedules() {
   const [buses, setBuses] = useState<BusTiming[]>([]);
   const [loading, setLoading] = useState(true);
@@ -142,6 +144,9 @@ export default function BusSchedules() {
         <Info size={16} />
         <span>Timings are subject to traffic conditions</span>
       </div>
+
+      <BottomNav />
     </div>
   );
 }
+

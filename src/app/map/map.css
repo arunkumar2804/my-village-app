@@ -508,7 +508,7 @@
 
 .map-category-container {
   position: fixed;
-  bottom: calc(80px + env(safe-area-inset-bottom));
+  bottom: calc(105px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
   background: rgba(255, 255, 255, 0.95);
@@ -672,7 +672,7 @@
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  z-index: 1000;
+  z-index: 2000;
   display: flex;
   align-items: flex-end;
   animation: fadeIn 0.2s ease-out;

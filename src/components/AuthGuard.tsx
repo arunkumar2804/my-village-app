@@ -61,6 +61,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         options: {
           // This makes it instantly redirect back to our app securely
           redirectTo: typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
+          queryParams: {
+            prompt: "select_account",
+          },
         },
       });
     } catch (e) {

@@ -29,6 +29,8 @@ const CATEGORIES = [
   { id: "shop", label: "Shops", icon: <Store size={18} />, emoji: "🛍️", color: "#ec4899", gradient: "linear-gradient(135deg, #ec4899 0%, #db2777 100%)" },
 ];
 
+import BottomNav from "@/components/BottomNav";
+
 export default function MapPage() {
   const router = useRouter();
   const [locations, setLocations] = useState<VillageLocation[]>([]);
@@ -335,6 +337,8 @@ export default function MapPage() {
           </div>
         </div>
       )}
+      
+      <BottomNav />
     </div>
   );
 }

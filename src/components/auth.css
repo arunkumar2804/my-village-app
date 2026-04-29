@@ -83,14 +83,14 @@
 .auth-card h1 {
   font-size: 24px;
   font-weight: 800;
-  color: var(--text-dark);
+  color: #0f172a;
   margin-bottom: 12px;
   letter-spacing: -0.5px;
 }
 
 .auth-card p {
   font-size: 15px;
-  color: var(--text-light);
+  color: #475569;
   line-height: 1.5;
   margin-bottom: 32px;
 }
@@ -107,7 +107,7 @@
   border-radius: 14px;
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-dark);
+  color: #0f172a;
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 2px 4px rgba(0,0,0,0.02);
@@ -162,9 +162,13 @@
   padding: 16px 16px 16px 44px;
   border-radius: 14px;
   font-size: 16px;
-  color: var(--text-dark);
+  color: #0f172a;
   outline: none;
   transition: all 0.2s;
+}
+
+.onboarding-form input::placeholder {
+  color: #94a3b8;
 }
 
 .onboarding-form input:focus {
@@ -208,4 +212,30 @@
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .auth-card {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.06);
+  }
+
+  .auth-card h1 {
+    color: #0f172a;
+  }
+
+  .auth-card p {
+    color: #475569;
+  }
+
+  .btn-google {
+    color: #0f172a;
+    border-color: #cbd5e1;
+  }
+
+  .onboarding-form input {
+    color: #0f172a;
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
 }

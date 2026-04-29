@@ -5,6 +5,7 @@ begin;
 
 -- 1) Profiles role columns
 alter table public.profiles
+  add column if not exists phone_number text,
   add column if not exists role text,
   add column if not exists is_admin boolean default false;
 

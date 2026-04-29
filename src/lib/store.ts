@@ -345,13 +345,6 @@ export async function upsertProfile(profile: Profile): Promise<{ profile: Profil
       avatar_url: profile.avatar_url || "",
       phone_number: profile.phone_number,
     },
-    {
-      id: profile.id,
-      email: profile.email,
-      full_name: profile.full_name,
-      avatar_url: profile.avatar_url || "",
-      phoneNumber: profile.phone_number,
-    },
   ];
 
   let lastErrorMessage = "Unknown profile save error.";

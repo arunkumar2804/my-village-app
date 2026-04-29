@@ -75,18 +75,31 @@ export default function Home() {
     return <Cloud size={16} />;
   };
 
-  const quickServices = [
+  const quickServices: Array<{
+    icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+    label: string;
+    link?: string;
+    color: string;
+    bg: string;
+  }> = [
     { icon: Bus, label: "Bus", link: "/buses", color: "#10b981", bg: "#ecfdf5" },
     { icon: Train, label: "Train", link: "/trains", color: "#6366f1", bg: "#eef2ff" },
     { icon: Droplets, label: "Water", link: "/water", color: "#06b6d4", bg: "#ecfeff" },
     { icon: Ticket, label: "Ration", link: "/ration", color: "#ec4899", bg: "#fdf2f8" },
   ];
 
-  const moreServices = [
-    { icon: Landmark, label: "Panchayat", color: "#8b5cf6", bg: "#f5f3ff" },
-    { icon: CalendarDays, label: "Events", color: "#f59e0b", bg: "#fffbeb" },
-    { icon: Waves, label: "Canal", color: "#0ea5e9", bg: "#f0f9ff" },
-    { icon: Megaphone, label: "News", color: "#ef4444", bg: "#fef2f2" },
+  const moreServices: Array<{
+    icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+    label: string;
+    link?: string;
+    color: string;
+    bg: string;
+    iconBg: string;
+  }> = [
+    { icon: Landmark, label: "Panchayat", color: "#8b5cf6", bg: "#f5f3ff", iconBg: "#ede9fe" },
+    { icon: CalendarDays, label: "Events", color: "#f59e0b", bg: "#fffbeb", iconBg: "#fef3c7" },
+    { icon: Waves, label: "Canal", color: "#0ea5e9", bg: "#f0f9ff", iconBg: "#dbeafe" },
+    { icon: Megaphone, label: "News", color: "#ef4444", bg: "#fef2f2", iconBg: "#fee2e2" },
   ];
 
   return (
@@ -166,7 +179,7 @@ export default function Home() {
             const Icon = service.icon;
             const inner = (
               <div className="ms-chip" style={{ background: service.bg }}>
-                <div className="ms-chip-icon">
+                <div className="ms-chip-icon" style={{ background: service.iconBg, borderColor: `${service.color}25` }}>
                   <Icon size={18} style={{ color: service.color }} />
                 </div>
                 <span className="ms-chip-label" style={{ color: service.color }}>{service.label}</span>

@@ -56,8 +56,8 @@
   100% { transform: translate(50px, 50px) scale(1.2); }
 }
 
-/* Premium Header */
-.premium-header {
+/* Ration Header */
+.ration-header {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -91,22 +91,20 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-.header-text {
+.ration-header-text {
   display: flex;
   flex-direction: column;
 }
 
-.premium-title {
+.ration-title {
   font-size: 1.25rem;
   font-weight: 800;
   margin: 0;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--foreground) 0%, rgba(var(--foreground-rgb), 0.7) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--foreground);
 }
 
-.premium-subtitle {
+.ration-subtitle {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -115,7 +113,7 @@
   letter-spacing: 0.05em;
 }
 
-.premium-content {
+.ration-content {
   position: relative;
   z-index: 1;
   padding: 20px;
@@ -180,12 +178,22 @@
   gap: 6px;
 }
 
+.hero-status-pill.closed {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
 .status-dot {
   width: 8px;
   height: 8px;
   background: var(--premium-green);
   border-radius: 50%;
   box-shadow: 0 0 10px var(--premium-green);
+}
+
+.status-dot.closed {
+  background: var(--premium-rose);
+  box-shadow: 0 0 10px var(--premium-rose);
 }
 
 .hero-shop-name {
@@ -331,14 +339,14 @@
   padding: 0 4px;
 }
 
-.header-left {
+.ration-section-left {
   display: flex;
   align-items: center;
   gap: 10px;
   color: var(--foreground);
 }
 
-.header-left h3 {
+.ration-section-left h3 {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 800;

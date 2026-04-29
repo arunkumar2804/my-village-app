@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import "./admin.css";
 import type {
@@ -9,11 +9,16 @@ import type {
   WaterUpdate,
   CanalUpdate,
   Announcement,
+  NotificationEntry,
   VillageEvent,
+  VillageLocation,
   Profile,
   DataCategory,
 } from "@/lib/types";
 import * as store from "@/lib/store";
+import { supabase } from "@/lib/supabase";
+
+const MASTER_ADMIN_EMAIL = "arunkumail29@gmail.com";
 
 // ─── Tab definitions ───
 const TABS: { key: DataCategory; label: string; emoji: string }[] = [
@@ -22,6 +27,7 @@ const TABS: { key: DataCategory; label: string; emoji: string }[] = [
   { key: "water", label: "Water", emoji: "💧" },
   { key: "canal", label: "Canal", emoji: "🌊" },
   { key: "announcement", label: "Announce", emoji: "📢" },
+  { key: "notification", label: "Notify", emoji: "🔔" },
   { key: "event", label: "Events", emoji: "📅" },
   { key: "location", label: "Maps", emoji: "📍" },
   { key: "users", label: "Users", emoji: "👥" },
@@ -32,6 +38,17 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false);
   const [toast, setToast] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const sectionSuffix: Record<DataCategory, string> = {
+    bus: "Timings",
+    train: "Timings",
+    water: "Timings",
+    canal: "Updates",
+    announcement: "Feed",
+    notification: "Feed",
+    event: "Calendar",
+    location: "Directory",
+    users: "Directory",
+  };
 
   const refresh = () => setRefreshKey((k) => k + 1);
 
@@ -69,7 +86,10 @@ export default function AdminPage() {
       {/* ─── Content ─── */}
       <div className="admin-content">
         <div className="admin-section-header">
-          <h2>{TABS.find((t) => t.key === activeTab)?.emoji} {TABS.find((t) => t.key === activeTab)?.label} {activeTab === "users" ? "Directory" : "Timings"}</h2>
+          <h2>
+            {TABS.find((t) => t.key === activeTab)?.emoji} {TABS.find((t) => t.key === activeTab)?.label}{" "}
+            {sectionSuffix[activeTab]}
+          </h2>
           {activeTab !== "users" && (
             <button className="btn-add" onClick={() => setShowForm(true)}>
               + Add
@@ -103,12 +123,13 @@ function TabCount({ category, refreshKey }: { category: DataCategory; refreshKey
   useEffect(() => {
     let active = true;
     const fetchCount = async () => {
-      const counts: Record<DataCategory, () => Promise<any[]>> = {
+      const counts: Record<DataCategory, () => Promise<unknown[]>> = {
         bus: store.getBusTimings,
         train: store.getTrainTimings,
         water: store.getWaterUpdates,
         canal: store.getCanalUpdates,
         announcement: store.getAnnouncements,
+        notification: store.getNotifications,
         event: store.getEvents,
         location: store.getVillageLocations,
         users: store.getAllProfiles,
@@ -149,6 +170,7 @@ function DataList({
         water: store.getWaterUpdates,
         canal: store.getCanalUpdates,
         announcement: store.getAnnouncements,
+        notification: store.getNotifications,
         event: store.getEvents,
         location: store.getVillageLocations,
         users: store.getAllProfiles,
@@ -168,12 +190,43 @@ function DataList({
       water: store.deleteWaterUpdate,
       canal: store.deleteCanalUpdate,
       announcement: store.deleteAnnouncement,
+      notification: store.deleteNotification,
       event: store.deleteEvent,
       location: store.deleteVillageLocation,
+      users: store.deleteProfile,
     };
     await deleters[category](id);
     onRefresh();
     onToast("Deleted!");
+  };
+
+  const handleToggleAdmin = async (profile: Profile) => {
+    const isMasterAdmin = profile.email === MASTER_ADMIN_EMAIL;
+    if (isMasterAdmin) {
+      onToast("Master admin role cannot be changed.");
+      return;
+    }
+
+    const nextRole: "user" | "admin" = profile.role === "admin" || profile.is_admin ? "user" : "admin";
+    const updated = await store.updateProfileRole(profile.id, nextRole);
+    if (!updated) {
+      onToast("Failed to update user role.");
+      return;
+    }
+    onRefresh();
+    onToast(nextRole === "admin" ? "User made admin." : "Admin access removed.");
+  };
+
+  const handleRemoveUser = async (profile: Profile) => {
+    const isMasterAdmin = profile.email === MASTER_ADMIN_EMAIL;
+    if (isMasterAdmin) {
+      onToast("Master admin cannot be removed.");
+      return;
+    }
+    if (!confirm(`Remove ${profile.full_name || profile.email} from app users?`)) return;
+    await store.deleteProfile(profile.id);
+    onRefresh();
+    onToast("User removed.");
   };
 
   if (items.length === 0) {
@@ -183,38 +236,63 @@ function DataList({
       water: "No water updates added yet",
       canal: "No canal updates added yet",
       announcement: "No announcements yet",
+      notification: "No notifications yet",
       event: "No events added yet",
+      location: "No map locations added yet",
+      users: "No users available",
     };
     return (
       <div className="admin-empty">
         <div className="empty-emoji">{TABS.find((t) => t.key === category)?.emoji}</div>
         <h3>{emptyMessages[category]}</h3>
-        <p>Click &quot;+ Add&quot; to create one</p>
+        <p>{category === "users" ? "Users appear here after sign-in." : "Click \"+ Add\" to create one"}</p>
       </div>
     );
   }
 
   return (
     <div className="data-list">
-      {items.map((item: any) => (
-        <div key={item.id} className="data-card">
+      {items.map((item) => {
+        const row = item as { id: string };
+        return (
+        <div key={row.id} className="data-card">
           <div className="data-card-body">
             {category === "bus" && <BusCardAdmin item={item as BusTiming} />}
             {category === "train" && <TrainCard item={item as TrainTiming} />}
             {category === "water" && <WaterCard item={item as WaterUpdate} />}
             {category === "canal" && <CanalCard item={item as CanalUpdate} />}
             {category === "announcement" && <AnnouncementCard item={item as Announcement} />}
+            {category === "notification" && <NotificationCard item={item as NotificationEntry} />}
             {category === "event" && <EventCard item={item as VillageEvent} />}
-            {category === "location" && <LocationCard item={item as any} />}
+            {category === "location" && <LocationCard item={item as VillageLocation} />}
             {category === "users" && <UserCard item={item as Profile} />}
           </div>
           <div className="data-card-actions">
-            {category !== "users" && (
-              <button className="btn-icon delete" title="Delete" onClick={() => handleDelete(item.id)}>🗑</button>
+            {category !== "users" ? (
+              <button className="btn-icon delete" title="Delete" onClick={() => handleDelete(row.id)}>
+                🗑
+              </button>
+            ) : (
+              <>
+                <button
+                  className="btn-icon"
+                  title={(item as Profile).role === "admin" || (item as Profile).is_admin ? "Remove admin" : "Make admin"}
+                  onClick={() => handleToggleAdmin(item as Profile)}
+                >
+                  {(item as Profile).role === "admin" || (item as Profile).is_admin ? "👤" : "⭐"}
+                </button>
+                <button
+                  className="btn-icon delete"
+                  title="Remove user"
+                  onClick={() => handleRemoveUser(item as Profile)}
+                >
+                  🗑
+                </button>
+              </>
             )}
           </div>
         </div>
-      ))}
+      )})}
     </div>
   );
 }
@@ -224,6 +302,7 @@ function DataList({
 // ═══════════════════════════════════════════
 
 function UserCard({ item }: { item: Profile }) {
+  const role = item.role === "admin" || item.is_admin ? "admin" : "user";
   return (
     <>
       {item.avatar_url && (
@@ -233,6 +312,9 @@ function UserCard({ item }: { item: Profile }) {
       <div className="data-card-subtitle">{item.email}</div>
       <div className="data-card-meta">
         <span className="data-chip active" style={{ fontSize: 12 }}>📞 {item.phone_number}</span>
+        <span className={`data-chip ${role === "admin" ? "important" : ""}`}>
+          {role === "admin" ? "Admin" : "User"}
+        </span>
       </div>
     </>
   );
@@ -322,6 +404,24 @@ function AnnouncementCard({ item }: { item: Announcement }) {
   );
 }
 
+function NotificationCard({ item }: { item: NotificationEntry }) {
+  return (
+    <>
+      <div className="data-card-title">{item.title}</div>
+      <div className="data-card-subtitle">{item.description}</div>
+      <div className="data-card-meta">
+        <span className="data-chip">{item.targetType === "all" ? "All users" : "Selected users"}</span>
+        {item.targetType === "selected" && (
+          <span className="data-chip">{item.targetUserIds?.length || 0} recipients</span>
+        )}
+        <span className={`data-chip ${item.isActive ? "active" : "inactive"}`}>
+          {item.isActive ? "Active" : "Inactive"}
+        </span>
+      </div>
+    </>
+  );
+}
+
 function EventCard({ item }: { item: VillageEvent }) {
   return (
     <>
@@ -336,7 +436,7 @@ function EventCard({ item }: { item: VillageEvent }) {
   );
 }
 
-function LocationCard({ item }: { item: any }) {
+function LocationCard({ item }: { item: VillageLocation }) {
   return (
     <>
       <div className="data-card-title">{item.name}</div>
@@ -370,6 +470,7 @@ function FormModal({
         {category === "water" && <WaterForm onSaved={onSaved} onClose={onClose} />}
         {category === "canal" && <CanalForm onSaved={onSaved} onClose={onClose} />}
         {category === "announcement" && <AnnouncementForm onSaved={onSaved} onClose={onClose} />}
+        {category === "notification" && <NotificationForm onSaved={onSaved} onClose={onClose} />}
         {category === "event" && <EventForm onSaved={onSaved} onClose={onClose} />}
         {category === "location" && <LocationForm onSaved={onSaved} onClose={onClose} />}
       </div>
@@ -631,6 +732,129 @@ function AnnouncementForm({ onSaved, onClose }: { onSaved: () => void; onClose: 
       <div className="form-actions">
         <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-submit">Save Announcement</button>
+      </div>
+    </form>
+  );
+}
+
+function NotificationForm({ onSaved, onClose }: { onSaved: () => void; onClose: () => void }) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [targetType, setTargetType] = useState<"all" | "selected">("all");
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [currentUserId, setCurrentUserId] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const [users, sessionResult] = await Promise.all([store.getAllProfiles(), supabase.auth.getSession()]);
+      if (!active) return;
+      setProfiles(users);
+      const userId = sessionResult.data.session?.user?.id;
+      if (userId) setCurrentUserId(userId);
+    };
+    void load();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const toggleUserSelection = (id: string) => {
+    setSelectedUserIds((prev) => (prev.includes(id) ? prev.filter((entry) => entry !== id) : [...prev, id]));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (targetType === "selected" && selectedUserIds.length === 0) {
+      alert("Choose at least one user for selected notifications.");
+      return;
+    }
+
+    const result = await store.addNotification({
+      title,
+      description,
+      targetType,
+      targetUserIds: targetType === "all" ? [] : selectedUserIds,
+      isActive: true,
+      createdBy: currentUserId,
+    });
+
+    if (!result) {
+      alert("Failed to save notification. Please create the notifications table in Supabase.");
+      return;
+    }
+
+    onSaved();
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label>Notification Title</label>
+        <input
+          className="form-input"
+          placeholder="e.g. Water supply delayed"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+      </div>
+      <div className="form-group">
+        <label>Description</label>
+        <textarea
+          className="form-textarea"
+          placeholder="Message for users..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+        />
+      </div>
+      <div className="form-group">
+        <label>Recipients</label>
+        <select
+          className="form-select"
+          value={targetType}
+          onChange={(e) => setTargetType(e.target.value as "all" | "selected")}
+        >
+          <option value="all">All users</option>
+          <option value="selected">Selected users</option>
+        </select>
+      </div>
+
+      {targetType === "selected" && (
+        <div className="form-group">
+          <label>Select Users</label>
+          <div style={{ maxHeight: 180, overflowY: "auto", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: 10 }}>
+            {profiles.length === 0 ? (
+              <div style={{ fontSize: 12, color: "#94a3b8" }}>No users available.</div>
+            ) : (
+              profiles.map((profile) => (
+                <label
+                  key={profile.id}
+                  style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, fontSize: 13, color: "#f1f5f9" }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedUserIds.includes(profile.id)}
+                    onChange={() => toggleUserSelection(profile.id)}
+                  />
+                  <span>{profile.full_name || profile.email}</span>
+                </label>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="form-actions">
+        <button type="button" className="btn-cancel" onClick={onClose}>
+          Cancel
+        </button>
+        <button type="submit" className="btn-submit">
+          Send Notification
+        </button>
       </div>
     </form>
   );

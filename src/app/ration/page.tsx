@@ -1,12 +1,15 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, User, MapPin, Clock, Phone, Hash, CreditCard, Users, Box, Store, Info, TrendingDown, TrendingUp, AlertCircle } from "lucide-react";
+import { ArrowLeft, User, MapPin, Clock, Phone, Hash, CreditCard, Users, Box, Store, Info, TrendingUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import "./ration.css";
 
 export default function RationPage() {
   const router = useRouter();
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const isOpenNow = (currentMinutes >= 9 * 60 && currentMinutes < 13 * 60) || (currentMinutes >= 14 * 60 && currentMinutes < 18 * 60);
 
   const stockData = [
     { name: "Rice - General", unit: "Kg", allotted: 1026.00, available: 894.00, icon: "🍚" },
@@ -27,17 +30,17 @@ export default function RationPage() {
       <div className="bg-glow bg-glow-1"></div>
       <div className="bg-glow bg-glow-2"></div>
 
-      <header className="premium-header">
+      <header className="ration-header">
         <button onClick={() => router.back()} className="glass-back-btn">
           <ArrowLeft size={22} />
         </button>
-        <div className="header-text">
-          <h1 className="premium-title">Ration Center</h1>
-          <p className="premium-subtitle">Digital Inventory & Info</p>
+        <div className="ration-header-text">
+          <h1 className="ration-title">Ration Center</h1>
+          <p className="ration-subtitle">Ration Store Details</p>
         </div>
       </header>
 
-      <main className="premium-content scroll-area">
+      <main className="ration-content scroll-area">
         {/* Shop Hero Section */}
         <section className="shop-hero-card">
           <div className="hero-gradient-overlay"></div>
@@ -46,9 +49,9 @@ export default function RationPage() {
               <div className="hero-avatar">
                 <Store size={32} />
               </div>
-              <div className="hero-status-pill">
-                <div className="status-dot"></div>
-                Open Now
+              <div className={`hero-status-pill ${isOpenNow ? "open" : "closed"}`}>
+                <div className={`status-dot ${isOpenNow ? "open" : "closed"}`}></div>
+                {isOpenNow ? "Open Now" : "Closed"}
               </div>
             </div>
             
@@ -112,7 +115,7 @@ export default function RationPage() {
         {/* Stock Inventory Section */}
         <section className="inventory-section">
           <div className="section-header-premium">
-            <div className="header-left">
+            <div className="ration-section-left">
               <Box size={20} />
               <h3>Stock Inventory</h3>
             </div>

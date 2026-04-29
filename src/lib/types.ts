@@ -56,6 +56,17 @@ export interface Announcement {
   createdAt: string;
 }
 
+export interface NotificationEntry {
+  id: string;
+  title: string;
+  description: string;
+  targetType: "all" | "selected";
+  targetUserIds: string[];
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
 export interface VillageEvent {
   id: string;
   title: string;
@@ -82,6 +93,7 @@ export type DataCategory =
   | "water"
   | "canal"
   | "announcement"
+  | "notification"
   | "event"
   | "users"
   | "location";
@@ -92,5 +104,7 @@ export interface Profile {
   full_name: string;
   avatar_url: string;
   phone_number: string | null;
+  role?: "user" | "admin";
+  is_admin?: boolean;
   created_at?: string;
 }

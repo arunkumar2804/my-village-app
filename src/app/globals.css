@@ -1044,6 +1044,43 @@ body {
   stroke: #1D9E75;
 }
 
+@media (prefers-color-scheme: dark) {
+  .route-badge {
+    background: rgba(16, 185, 129, 0.16);
+    color: #6ee7b7;
+  }
+
+  .stop-name {
+    color: #e2e8f0;
+  }
+
+  .dot-end {
+    background: #e2e8f0;
+  }
+
+  .dashed-line-seg {
+    border-top-color: rgba(110, 231, 183, 0.45);
+  }
+
+  .path-bus-icon {
+    color: #6ee7b7;
+  }
+
+  .depart-time-text {
+    color: #cbd5e1;
+  }
+
+  .bus-card-divider-final {
+    background: rgba(148, 163, 184, 0.3);
+  }
+
+  .footer-tag-pill {
+    background: rgba(15, 23, 42, 0.82);
+    border-color: rgba(148, 163, 184, 0.28);
+    color: #e2e8f0;
+  }
+}
+
 .bus-card-crowd-tag {
   display: inline-flex;
   align-items: center;

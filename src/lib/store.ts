@@ -9,6 +9,7 @@ import type {
   WaterUpdate,
   CanalUpdate,
   Announcement,
+  NotificationEntry,
   VillageEvent,
   VillageLocation,
 } from "./types";
@@ -118,6 +119,25 @@ export async function deleteAnnouncement(id: string): Promise<void> {
   await supabase.from("announcements").delete().eq("id", id);
 }
 
+// ─── Notifications ───
+export async function getNotifications(): Promise<NotificationEntry[]> {
+  const { data, error } = await supabase.from("notifications").select("*").order("created_at", { ascending: false });
+  if (error) return [];
+  return data as NotificationEntry[];
+}
+
+export async function addNotification(
+  data: Omit<NotificationEntry, "id" | "createdAt">,
+): Promise<NotificationEntry | null> {
+  const { data: newRow, error } = await supabase.from("notifications").insert([data]).select().single();
+  if (error) return null;
+  return newRow as NotificationEntry;
+}
+
+export async function deleteNotification(id: string): Promise<void> {
+  await supabase.from("notifications").delete().eq("id", id);
+}
+
 // ─── Events ───
 export async function getEvents(): Promise<VillageEvent[]> {
   const { data, error } = await supabase.from("events").select("*").order("created_at", { ascending: false });
@@ -157,4 +177,38 @@ export async function getAllProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
   if (error) return [];
   return data as Profile[];
+}
+
+export async function updateProfileRole(id: string, role: "user" | "admin"): Promise<Profile | null> {
+  const fullUpdate = await supabase
+    .from("profiles")
+    .update({ role, is_admin: role === "admin" })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (!fullUpdate.error) {
+    return fullUpdate.data as Profile;
+  }
+
+  const roleOnly = await supabase.from("profiles").update({ role }).eq("id", id).select().single();
+  if (!roleOnly.error) {
+    return roleOnly.data as Profile;
+  }
+
+  const adminOnly = await supabase
+    .from("profiles")
+    .update({ is_admin: role === "admin" })
+    .eq("id", id)
+    .select()
+    .single();
+  if (!adminOnly.error) {
+    return adminOnly.data as Profile;
+  }
+
+  return null;
+}
+
+export async function deleteProfile(id: string): Promise<void> {
+  await supabase.from("profiles").delete().eq("id", id);
 }

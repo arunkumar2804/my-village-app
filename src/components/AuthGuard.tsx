@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { getProfile, upsertProfile } from "@/lib/store";
@@ -84,6 +83,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       full_name: sessionUser.user_metadata?.full_name || "Resident",
       avatar_url: sessionUser.user_metadata?.avatar_url || "",
       phone_number: phone,
+      role: "user",
+      is_admin: false,
     };
 
     const saved = await upsertProfile(newDoc);

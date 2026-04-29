@@ -133,6 +133,10 @@
   transition: all 0.2s;
 }
 
+.buses-search-wrap input::placeholder {
+  color: var(--text-muted);
+}
+
 @media (prefers-color-scheme: dark) {
   .buses-search-wrap input { background: rgba(255, 255, 255, 0.06); }
 }
@@ -159,21 +163,21 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: transparent;
+  background: var(--card-bg);
   border: 1px solid var(--glass-border);
   border-radius: 100px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--foreground);
   white-space: nowrap;
   transition: all 0.2s;
 }
 
 .buses-filter-btn.active {
-  background: var(--foreground);
-  color: var(--background);
-  border-color: var(--foreground);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
 }
 
 /* Main Content */

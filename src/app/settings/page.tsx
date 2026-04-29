@@ -4,11 +4,13 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { getProfile } from "@/lib/store";
 import BottomNav from "@/components/BottomNav";
 import { User, Mail, Shield, Bell, Moon, Info, LogOut, ChevronRight } from "lucide-react";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const [canSeeAdminConsole, setCanSeeAdminConsole] = useState(false);
   const [userInfo, setUserInfo] = useState<{
     name: string;
     email: string;
@@ -20,6 +22,10 @@ export default function SettingsPage() {
     const fetchUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
+        const profile = await getProfile(session.user.id);
+        const isMasterAdmin = session.user.email === "arunkumail29@gmail.com";
+        const isAdminUser = profile?.role === "admin" || profile?.is_admin;
+        setCanSeeAdminConsole(Boolean(isMasterAdmin || isAdminUser));
         setUserInfo({
           name: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
           email: session.user.email || "",
@@ -39,8 +45,14 @@ export default function SettingsPage() {
           avatar: session.user.user_metadata?.avatar_url || "",
           id: session.user.id
         });
+        getProfile(session.user.id).then((profile) => {
+          const isMasterAdmin = session.user.email === "arunkumail29@gmail.com";
+          const isAdminUser = profile?.role === "admin" || profile?.is_admin;
+          setCanSeeAdminConsole(Boolean(isMasterAdmin || isAdminUser));
+        });
       } else {
         setUserInfo(null);
+        setCanSeeAdminConsole(false);
       }
     });
 
@@ -81,7 +93,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {userInfo?.email === "arunkumail29@gmail.com" && (
+        {canSeeAdminConsole && (
           <div className="settings-group">
             <div className="settings-group-label">Management</div>
             <Link href="/admin" className="settings-row">
@@ -99,16 +111,16 @@ export default function SettingsPage() {
 
         <div className="settings-group">
           <div className="settings-group-label">App</div>
-          <div className="settings-row">
+          <Link href="/notifications" className="settings-row">
             <div className="settings-row-icon">
               <Bell size={20} />
             </div>
             <div className="settings-row-body">
               <div className="settings-row-title">Notifications</div>
-              <div className="settings-row-desc">Coming soon</div>
+              <div className="settings-row-desc">View admin notifications</div>
             </div>
             <ChevronRight className="settings-row-arrow" size={20} />
-          </div>
+          </Link>
           <div className="settings-row">
             <div className="settings-row-icon">
               <Moon size={20} />
@@ -153,4 +165,3 @@ export default function SettingsPage() {
     </main>
   );
 }
-

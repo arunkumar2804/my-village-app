@@ -87,11 +87,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       is_admin: false,
     };
 
-    const saved = await upsertProfile(newDoc);
-    if (saved) {
-      setProfile(saved);
+    const result = await upsertProfile(newDoc);
+    if (result.profile) {
+      setProfile(result.profile);
     } else {
-      alert("Failed to save profile. Did you run the SQL to create the profiles table?");
+      alert(
+        `Failed to save profile: ${result.error || "Unknown error"}. ` +
+          "Please run SUPABASE_ADMIN_NOTIFICATIONS.sql in Supabase SQL Editor and try again.",
+      );
     }
     setSaving(false);
   };

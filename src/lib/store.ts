@@ -294,10 +294,29 @@ export async function deleteEvent(id: string): Promise<void> {
 // ─── Profiles ───
 import type { Profile } from "./types";
 
+function normalizeProfileRow(row: Record<string, unknown>): Profile {
+  return {
+    id: String(row.id ?? ""),
+    email: String(row.email ?? ""),
+    full_name: String(row.full_name ?? row.fullName ?? ""),
+    avatar_url: String(row.avatar_url ?? row.avatarUrl ?? ""),
+    phone_number:
+      (row.phone_number as string | null | undefined) ??
+      (row.phoneNumber as string | null | undefined) ??
+      null,
+    role:
+      row.role === "admin" || row.role === "user"
+        ? (row.role as "admin" | "user")
+        : undefined,
+    is_admin: typeof row.is_admin === "boolean" ? row.is_admin : typeof row.isAdmin === "boolean" ? row.isAdmin : undefined,
+    created_at: typeof row.created_at === "string" ? row.created_at : undefined,
+  };
+}
+
 export async function getProfile(id: string): Promise<Profile | null> {
   const { data, error } = await supabase.from("profiles").select("*").eq("id", id).single();
   if (error) return null;
-  const profile = data as Profile;
+  const profile = normalizeProfileRow(data as Record<string, unknown>);
   const overrides = await getRoleOverrides();
   const overrideRole = overrides[id];
   if (!overrideRole) return profile;
@@ -308,19 +327,52 @@ export async function getProfile(id: string): Promise<Profile | null> {
   };
 }
 
-export async function upsertProfile(profile: Profile): Promise<Profile | null> {
-  const { data, error } = await supabase.from("profiles").upsert(profile).select().single();
-  if (error) {
-    console.error("Error creating profile", error);
-    return null;
+export async function upsertProfile(profile: Profile): Promise<{ profile: Profile | null; error: string | null }> {
+  const payloads: Array<Record<string, unknown>> = [
+    {
+      id: profile.id,
+      email: profile.email,
+      full_name: profile.full_name,
+      avatar_url: profile.avatar_url || "",
+      phone_number: profile.phone_number,
+      role: profile.role ?? "user",
+      is_admin: profile.is_admin ?? false,
+    },
+    {
+      id: profile.id,
+      email: profile.email,
+      full_name: profile.full_name,
+      avatar_url: profile.avatar_url || "",
+      phone_number: profile.phone_number,
+    },
+    {
+      id: profile.id,
+      email: profile.email,
+      full_name: profile.full_name,
+      avatar_url: profile.avatar_url || "",
+      phoneNumber: profile.phone_number,
+    },
+  ];
+
+  let lastErrorMessage = "Unknown profile save error.";
+  for (const payload of payloads) {
+    const { data, error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" }).select().single();
+    if (!error && data) {
+      return { profile: normalizeProfileRow(data as Record<string, unknown>), error: null };
+    }
+    if (error) {
+      lastErrorMessage = error.message;
+    }
   }
-  return data as Profile;
+
+  console.error("Error creating profile", lastErrorMessage);
+  return { profile: null, error: lastErrorMessage };
 }
 
 export async function getAllProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
   if (error) return [];
-  const profiles = data as Profile[];
+  const profiles = (data as Array<Record<string, unknown>>).map(normalizeProfileRow);
   const overrides = await getRoleOverrides();
   return profiles.map((profile) => {
     const overrideRole = overrides[profile.id];

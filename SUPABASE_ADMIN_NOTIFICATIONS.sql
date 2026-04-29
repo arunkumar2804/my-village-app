@@ -161,3 +161,6 @@ with check (
 );
 
 commit;
+
+-- Notify PostgREST to reload the schema cache so new columns are immediately available to the API
+NOTIFY pgrst, 'reload schema';

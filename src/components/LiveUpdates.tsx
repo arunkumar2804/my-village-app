@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { ArrowRight, Clock, Sun } from "lucide-react";
+import { ArrowRight, Bus, Clock, Droplets, Sun, Train } from "lucide-react";
 import "./live-updates.css";
 import { getTrainTimings, getWaterUpdates } from "@/lib/store";
 import { getActiveBusSchedules } from "@/lib/bus-schedules";
@@ -265,9 +264,7 @@ export default function LiveUpdates() {
             <div className="card-header">
               <div className="card-type">
                 <div className="card-type-icon icon-bg-bus">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/bus-icon.svg" alt="Bus" fill style={{ objectFit: 'contain' }} />
-                  </div>
+                  <Bus size={14} color="#059669" />
                 </div>
                 <span>Next Bus</span>
               </div>
@@ -304,9 +301,7 @@ export default function LiveUpdates() {
                 <span className="progress-destination-line"></span>
                 {busJourneyProgress !== null && (
                   <span className="moving-bus-marker" style={{ left: `${busJourneyProgress}%` }}>
-                    <span className="moving-bus-icon">
-                      <Image src="/icons/bus-icon.svg" alt="Moving bus" fill style={{ objectFit: "contain" }} />
-                    </span>
+                    <span className="moving-bus-icon"><Bus size={12} color="#065f46" /></span>
                   </span>
                 )}
               </div>
@@ -360,9 +355,7 @@ export default function LiveUpdates() {
             <div className="card-header">
               <div className="card-type">
                 <div className="card-type-icon icon-bg-train">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/train-icon.svg" alt="Train" fill style={{ objectFit: 'contain' }} />
-                  </div>
+                  <Train size={14} color="#4f46e5" />
                 </div>
                 <span>Next Train</span>
               </div>
@@ -417,9 +410,7 @@ export default function LiveUpdates() {
             <div className="card-header">
               <div className="card-type">
                 <div className="card-type-icon icon-bg-water">
-                  <div style={{ position: 'relative', width: 14, height: 14 }}>
-                    <Image src="/icons/water-tap-icon.svg" alt="Water" fill style={{ objectFit: 'contain' }} />
-                  </div>
+                  <Droplets size={14} color="#0e7490" />
                 </div>
                 <span>Water timings</span>
               </div>

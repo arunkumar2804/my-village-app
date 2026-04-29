@@ -3,6 +3,8 @@
   --background: #f1f5f9;
   --foreground: #111827;
   --text-muted: #6b7280;
+  --text-dark: #0f172a;
+  --text-light: #64748b;
   --card-bg: rgba(255, 255, 255, 0.65);
   --glass-border: rgba(255, 255, 255, 0.5);
   --glass-blur: blur(16px);
@@ -32,9 +34,11 @@
   :root {
     --background: #0f172a;
     --foreground: #f8fafc;
-    --card-bg: rgba(30, 41, 59, 0.55);
+    --card-bg: rgba(30, 41, 59, 0.68);
     --glass-border: rgba(255, 255, 255, 0.08);
     --text-muted: #94a3b8;
+    --text-dark: #f8fafc;
+    --text-light: #cbd5e1;
     --accent-green: #064e3b;
     --accent-green-text: #34d399;
 
@@ -63,11 +67,11 @@ html, body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
 body {
   background: linear-gradient(135deg, #e0f2fe 0%, #f1f5f9 40%, #dcfce7 100%);
-  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -76,7 +80,6 @@ body {
 @media (prefers-color-scheme: dark) {
   body {
     background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #064e3b 100%);
-    background-attachment: fixed;
   }
 }
 
@@ -91,6 +94,10 @@ body {
 
 .scroll-area {
   flex: 1;
+  min-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   padding: 24px 20px;
   padding-top: calc(24px + var(--ios-safe-top));
   padding-bottom: calc(100px + var(--ios-safe-bottom));
@@ -400,6 +407,8 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(15, 23, 42, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -493,6 +502,12 @@ body {
   color: var(--primary);
 }
 
+@media (prefers-color-scheme: dark) {
+  .nav-item {
+    color: #f8fafc;
+  }
+}
+
 /* Icon wrapper with active indicator */
 .nav-icon-wrapper {
   width: 42px;
@@ -511,16 +526,17 @@ body {
   transform: translateY(-4px);
 }
 
+.nav-icon-wrapper.nav-icon-active .nav-icon-inner {
+  color: #ffffff;
+}
+
 .nav-icon-inner {
+  color: currentColor;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .nav-item.active .nav-icon-inner {
   transform: scale(1.1);
-}
-
-.nav-icon-wrapper.nav-icon-active img {
-  filter: brightness(0) invert(1);
 }
 
 .nav-label {
@@ -534,13 +550,17 @@ body {
   transform: scale(1.05);
 }
 
-.nav-item img {
-  transition: all 0.3s ease;
-}
-
 .nav-item svg {
   width: 24px;
   height: 24px;
+  stroke-width: 2.2;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ms-chip-icon {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
 }
 
 

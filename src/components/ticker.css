@@ -38,7 +38,7 @@
 
 .ticker-empty {
   font-size: 13px;
-  color: var(--text-light);
+  color: var(--text-muted);
   font-weight: 500;
 }
 
@@ -69,13 +69,13 @@
 .ticker-title {
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--foreground);
   margin-right: 6px;
 }
 
 .ticker-desc {
   font-size: 10px;
-  color: var(--text-light);
+  color: var(--text-muted);
   font-weight: 400;
 }
 
@@ -105,13 +105,13 @@
 
 /* Disabled State */
 .ticker-wrapper.disabled {
-  background: #f8fafc;
-  border-color: #f1f5f9;
+  background: var(--card-bg);
+  border-color: var(--glass-border);
   box-shadow: none;
 }
 
 .ticker-wrapper.disabled .ticker-icon {
-  background: #e2e8f0;
-  color: #94a3b8;
+  background: rgba(100, 116, 139, 0.2);
+  color: var(--text-muted);
   box-shadow: none;
 }

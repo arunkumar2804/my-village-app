@@ -3,16 +3,16 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import { Home, Map, Info, Settings } from "lucide-react";
 
 const BottomNav = () => {
   const pathname = usePathname();
 
   const navItems = [
-    { iconSrc: "/icons/Home-icon.svg", label: "Home", href: "/" },
-    { iconSrc: "/icons/map-icon.svg", label: "Map", href: "/map" },
-    { iconSrc: "/icons/village-info-icon.svg", label: "Village info", href: "/info" },
-    { iconSrc: "/icons/settings-icon.svg", label: "Settings", href: "/settings" },
+    { icon: Home, label: "Home", href: "/" },
+    { icon: Map, label: "Map", href: "/map" },
+    { icon: Info, label: "Village info", href: "/info" },
+    { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
   return (
@@ -20,6 +20,7 @@ const BottomNav = () => {
       <nav className="bottom-nav">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
@@ -27,8 +28,8 @@ const BottomNav = () => {
               className={`nav-item ${isActive ? "active" : ""}`}
             >
               <div className={`nav-icon-wrapper ${isActive ? "nav-icon-active" : ""}`}>
-                <div className="nav-icon-inner" style={{ position: 'relative', width: 24, height: 24 }}>
-                   <Image src={item.iconSrc} alt={item.label} fill style={{ objectFit: 'contain' }} />
+                <div className="nav-icon-inner">
+                  <Icon size={22} />
                 </div>
               </div>
               <span className="nav-label">{item.label}</span>

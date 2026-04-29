@@ -102,6 +102,10 @@
   cursor: pointer;
 }
 
+.spin {
+  animation: spin 1s linear infinite;
+}
+
 /* ─── Search ─── */
 .premium-search {
   position: relative;

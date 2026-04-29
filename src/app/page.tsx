@@ -7,9 +7,15 @@ import {
   CloudRain,
   CloudLightning,
   ChevronRight,
+  Bus,
+  Train,
+  Droplets,
+  Landmark,
+  Ticket,
+  CalendarDays,
+  Waves,
   Megaphone,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import LiveUpdates from "@/components/LiveUpdates";
@@ -70,17 +76,17 @@ export default function Home() {
   };
 
   const quickServices = [
-    { iconSrc: "/icons/bus-icon.svg", label: "Bus", link: "/buses", color: "#10b981", bg: "#ecfdf5" },
-    { iconSrc: "/icons/train-icon.svg", label: "Train", link: "/trains", color: "#6366f1", bg: "#eef2ff" },
-    { iconSrc: "/icons/water-tap-icon.svg", label: "Water", color: "#06b6d4", bg: "#ecfeff" },
-    { iconSrc: "/icons/panchayat-icon.svg", label: "Panchayat", color: "#8b5cf6", bg: "#f5f3ff" },
+    { icon: Bus, label: "Bus", link: "/buses", color: "#10b981", bg: "#ecfdf5" },
+    { icon: Train, label: "Train", link: "/trains", color: "#6366f1", bg: "#eef2ff" },
+    { icon: Droplets, label: "Water", link: "/water", color: "#06b6d4", bg: "#ecfeff" },
+    { icon: Ticket, label: "Ration", link: "/ration", color: "#ec4899", bg: "#fdf2f8" },
   ];
 
   const moreServices = [
-    { iconSrc: "/icons/events-icon.svg", label: "Events", color: "#f59e0b", bg: "#fffbeb" },
-    { iconSrc: "/icons/canal-icon.svg", label: "Canal", color: "#0ea5e9", bg: "#f0f9ff" },
-    { iconSrc: "/icons/ration-icon.svg", label: "Ration", link: "/ration", color: "#ec4899", bg: "#fdf2f8" },
-    { iconSrc: "/icons/announcement-icon.svg", label: "News", color: "#ef4444", bg: "#fef2f2" },
+    { icon: Landmark, label: "Panchayat", color: "#8b5cf6", bg: "#f5f3ff" },
+    { icon: CalendarDays, label: "Events", color: "#f59e0b", bg: "#fffbeb" },
+    { icon: Waves, label: "Canal", color: "#0ea5e9", bg: "#f0f9ff" },
+    { icon: Megaphone, label: "News", color: "#ef4444", bg: "#fef2f2" },
   ];
 
   return (
@@ -132,12 +138,11 @@ export default function Home() {
         </div>
         <div className="quick-access-grid">
           {quickServices.map((service, index) => {
+            const Icon = service.icon;
             const inner = (
               <div className="qa-card" key={index}>
                 <div className="qa-icon-ring" style={{ background: service.bg, borderColor: service.color + '20' }}>
-                  <div style={{ position: 'relative', width: 26, height: 26 }}>
-                    <Image src={service.iconSrc} alt={service.label} fill style={{ objectFit: 'contain' }} />
-                  </div>
+                  <Icon size={24} style={{ color: service.color }} />
                 </div>
                 <span className="qa-label">{service.label}</span>
               </div>
@@ -158,12 +163,11 @@ export default function Home() {
         </div>
         <div className="more-services-scroll">
           {moreServices.map((service, index) => {
+            const Icon = service.icon;
             const inner = (
               <div className="ms-chip" style={{ background: service.bg }}>
-                <div className="ms-chip-icon" style={{ background: 'white' }}>
-                  <div style={{ position: 'relative', width: 20, height: 20 }}>
-                    <Image src={service.iconSrc} alt={service.label} fill style={{ objectFit: 'contain' }} />
-                  </div>
+                <div className="ms-chip-icon">
+                  <Icon size={18} style={{ color: service.color }} />
                 </div>
                 <span className="ms-chip-label" style={{ color: service.color }}>{service.label}</span>
                 <ChevronRight size={14} style={{ color: service.color, opacity: 0.5 }} />
